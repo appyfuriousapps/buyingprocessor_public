@@ -1,6 +1,6 @@
 package com.appyfurious.afbilling
 
-class ProductPreview(
+open class ProductPreview(
         val id: String,
         var title: String = "'",
         var description: String = "",
