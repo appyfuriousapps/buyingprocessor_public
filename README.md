@@ -15,6 +15,7 @@ try {
 открытие модалки покупки
 
 <code>
+
 try {
             billing?.products?.get(0)?.let {
                 billing?.showFormPurchaseProduct(it)
@@ -22,12 +23,13 @@ try {
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-</code>
+
+</code><br><br>
 
 проверка есть ли хоть одна подписка
 
 <code>
-private val restore = { _: View ->
+
         try {
             billing?.isSubs { isSubs ->
                 
@@ -35,6 +37,6 @@ private val restore = { _: View ->
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        Unit
     }
+    
 </code>
