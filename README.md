@@ -23,3 +23,18 @@ try {
             ex.printStackTrace()
         }
 </code>
+
+проверка есть ли хоть одна подписка
+
+<code>
+private val restore = { _: View ->
+        try {
+            billing?.isSubs { isSubs ->
+                
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        Unit
+    }
+</code>
