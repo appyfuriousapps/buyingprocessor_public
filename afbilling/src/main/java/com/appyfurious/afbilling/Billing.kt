@@ -18,11 +18,15 @@ import com.google.gson.GsonBuilder
 import java.util.*
 
 open class Billing(
-        private val contextUI: Context,
-        private val activity: Activity,
-        private val errorServiceConnection: (_: Exception) -> Unit,
-        private val listSubs: List<ProductPreview>? = null,
-        private val connectBody: ((products: List<InAppProduct>?) -> Unit)? = null) {
+        private val listener: BillingListener,
+        private val listSubs: List<ProductPreview>? = null) {
+
+    interface BillingListener {
+        fun context(): Context
+        fun connectBody(products: (List<InAppProduct>?))
+        fun purchases()
+        fun canceled()
+    }
 
     companion object {
         const val REQUEST_CODE_BUY = 1234
@@ -46,6 +50,7 @@ open class Billing(
     var inAppBillingService: IInAppBillingService? = null
         protected set
 
+    //public
     var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             try {
@@ -54,9 +59,9 @@ open class Billing(
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
                     syncProducts(products, listSubs)
                 }
-                connectBody?.invoke(products)
+                listener.connectBody(products)
             } catch (ex: Exception) {
-                errorServiceConnection(ex)
+                ex.printStackTrace()
             }
         }
 
@@ -70,12 +75,14 @@ open class Billing(
             try {
                 val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
                 serviceIntent.`package` = "com.android.vending"
-                contextUI.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+                listener.context().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
                 error(ex)
             }
         }.start()
     }
+
+    private fun activity() = (listener.context() as Activity)
 
     private fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
         productsPreview?.map { preview ->
@@ -91,8 +98,9 @@ open class Billing(
         val skuList = ArrayList(productIds)
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
+
         val skuDetails = inAppBillingService!!.getSkuDetails(
-                3, contextUI.packageName, type, query)
+                3, listener.context().packageName, type, query)
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
         return responseList?.map {
@@ -101,10 +109,11 @@ open class Billing(
     }
 
     fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String = "12345") {
-        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, contextUI.packageName,
+        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener?.context()?.packageName,
                 product.getSku(), product.getType(), developerPayload)
         val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
-        activity.startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY, Intent(), 0, 0, 0)
+        activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
+                Intent(), 0, 0, 0)
     }
 
     fun isSubs(body: (Boolean) -> Unit) {
@@ -123,7 +132,7 @@ open class Billing(
         val myProduct = ArrayList<InAppProduct>()
         do {
             val result = inAppBillingService!!.getPurchases(
-                    3, contextUI.packageName, type, continuationToken)
+                    3, listener.context().packageName, type, continuationToken)
             if (result.getInt("RESPONSE_CODE", -1) != 0) {
                 throw Exception("Invalid response code")
             }
@@ -137,11 +146,14 @@ open class Billing(
         body(myProduct)
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, success: () -> Unit) {
-        if (requestCode == Billing.REQUEST_CODE_BUY) {
-            val responseCode = data?.getIntExtra(Billing.RESPONSE_CODE, -1)
-            if (responseCode == Billing.BILLING_RESPONSE_RESULT_OK) {
-                success()
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_BUY) {
+            val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
+            if (responseCode == BILLING_RESPONSE_RESULT_OK) {
+                listener.purchases()
+            }
+            if (responseCode == PURCHASE_STATUS_CANCELLED) {
+                listener.canceled()
             }
         }
     }
@@ -149,12 +161,15 @@ open class Billing(
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
                          product: InAppProduct, serverValidateUrl: String, apiKey: String,
                          secretKey: String, listener: ValidationCallback.ValidationListener) {
-        if (requestCode == Billing.REQUEST_CODE_BUY) {
-            val responseCode = data?.getIntExtra(Billing.RESPONSE_CODE, -1)
-            if (responseCode == Billing.BILLING_RESPONSE_RESULT_OK) {
+        if (requestCode == REQUEST_CODE_BUY) {
+            val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
+            if (responseCode == BILLING_RESPONSE_RESULT_OK) {
                 getAdvertingId {
                     validateRequest(validationBody(product, it), serverValidateUrl, apiKey, secretKey, listener)
                 }
+            }
+            if (responseCode == PURCHASE_STATUS_CANCELLED) {
+                this.listener.canceled()
             }
         }
     }
@@ -169,12 +184,12 @@ open class Billing(
 
     private fun validationBody(product: InAppProduct, adInfoId: String) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken ?: "",
-                    product.productId, ValidationBody.PRODUCT_TYPE, activity.packageName,
-                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(contextUI),
+                    product.productId, ValidationBody.PRODUCT_TYPE, listener.context().packageName,
+                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.context()),
                     adInfoId)
 
     private fun getAdvertingId(success: (String) -> Unit) {
-        AdvertisingIdClient.getAdvertisingId(contextUI, object : AdvertisingIdClient.Listener {
+        AdvertisingIdClient.getAdvertisingId(listener.context(), object : AdvertisingIdClient.Listener {
             override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo) {
                 success(adInfo.id)
             }
