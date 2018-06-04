@@ -109,7 +109,7 @@ open class Billing(
     }
 
     fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String = "12345") {
-        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener?.context()?.packageName,
+        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.context().packageName,
                 product.getSku(), product.getType(), developerPayload)
         val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
         activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,

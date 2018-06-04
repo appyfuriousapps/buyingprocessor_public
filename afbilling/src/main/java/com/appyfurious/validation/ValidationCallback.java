@@ -40,7 +40,6 @@ public class ValidationCallback implements Callback<ResponseBody> {
     @Override
     public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
         if (response.isSuccessful()) {
-
             mEncryptor = new CryptoAES128(mSecretKey);
             String decryptString;
             try {
@@ -59,7 +58,7 @@ public class ValidationCallback implements Callback<ResponseBody> {
                 validationSuccess();
             }
         } else {
-            validationSuccess();
+            mValidationListener.onValidationFailure("Validation Error");
         }
     }
 
