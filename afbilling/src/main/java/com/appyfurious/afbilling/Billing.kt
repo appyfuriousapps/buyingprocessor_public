@@ -9,7 +9,13 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import com.android.vending.billing.IInAppBillingService
+import com.appsflyer.AppsFlyerLib
+import com.appyfurious.validation.ValidationCallback
+import com.appyfurious.validation.ValidationClient
+import com.appyfurious.validation.body.ValidationBody
+import com.appyfurious.validation.utils.AdvertisingIdClient
 import com.google.gson.GsonBuilder
+import java.util.*
 
 open class Billing(
         private val contextUI: Context,
@@ -50,7 +56,7 @@ open class Billing(
                 }
                 connectBody?.invoke(products)
             } catch (ex: Exception) {
-                error(ex)
+                errorServiceConnection(ex)
             }
         }
 
@@ -129,5 +135,53 @@ open class Billing(
             continuationToken = result.getString("INAPP_CONTINUATION_TOKEN")
         } while (continuationToken != null)
         body(myProduct)
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, success: () -> Unit) {
+        if (requestCode == Billing.REQUEST_CODE_BUY) {
+            val responseCode = data?.getIntExtra(Billing.RESPONSE_CODE, -1)
+            if (responseCode == Billing.BILLING_RESPONSE_RESULT_OK) {
+                success()
+            }
+        }
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
+                         product: InAppProduct, serverValidateUrl: String, apiKey: String,
+                         secretKey: String, listener: ValidationCallback.ValidationListener) {
+        if (requestCode == Billing.REQUEST_CODE_BUY) {
+            val responseCode = data?.getIntExtra(Billing.RESPONSE_CODE, -1)
+            if (responseCode == Billing.BILLING_RESPONSE_RESULT_OK) {
+                getAdvertingId {
+                    validateRequest(validationBody(product, it), serverValidateUrl, apiKey, secretKey, listener)
+                }
+            }
+        }
+    }
+
+    private fun validateRequest(body: ValidationBody, baseUrl: String, apiKey: String,
+                                secretKey: String, listener: ValidationCallback.ValidationListener) {
+        val service = ValidationClient.getValidationService(secretKey, baseUrl)
+        val call = service.validate(apiKey, body)
+        val validationCallback = ValidationCallback(secretKey, listener)
+        call.enqueue(validationCallback)
+    }
+
+    private fun validationBody(product: InAppProduct, adInfoId: String) =
+            ValidationBody(UUID.randomUUID().toString(), product.purchaseToken ?: "",
+                    product.productId, ValidationBody.PRODUCT_TYPE, activity.packageName,
+                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(contextUI),
+                    adInfoId)
+
+    private fun getAdvertingId(success: (String) -> Unit) {
+        AdvertisingIdClient.getAdvertisingId(contextUI, object : AdvertisingIdClient.Listener {
+            override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo) {
+                success(adInfo.id)
+            }
+
+            override fun onAdvertisingIdClientFail(exception: Exception) {
+                success("advertingId")
+            }
+        })
     }
 }

@@ -17,11 +17,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ValidationClient {
 
-    private static final String BASE_URL = "https://subtrack.appycnt.com/";
     private static Retrofit retrofit = null;
     private static ValidationService validationService = null;
 
-    private static void getValidationClient(String secretKey) {
+    private static void getValidationClient(String secretKey, String baseUrl) {
         if (retrofit == null) {
 
             EncryptionInterceptor encryptionInterceptor = new EncryptionInterceptor(secretKey);
@@ -31,7 +30,7 @@ public class ValidationClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl(baseUrl)
                     .client(okHttpClient)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -42,9 +41,9 @@ public class ValidationClient {
         }
     }
 
-    public static ValidationService getValidationService(String secretKey) {
+    public static ValidationService getValidationService(String secretKey, String baseUrl) {
         if (validationService == null) {
-            getValidationClient(secretKey);
+            getValidationClient(secretKey, baseUrl);
         }
 
         return validationService;

@@ -13,6 +13,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class ValidationBody {
 
+    public static final String PRODUCT_TYPE = "subscription";
+
     @SerializedName("hash") private String hash;
     @SerializedName("purchaseToken") private String purchaseToken;
     @SerializedName("productId") private String productId;
