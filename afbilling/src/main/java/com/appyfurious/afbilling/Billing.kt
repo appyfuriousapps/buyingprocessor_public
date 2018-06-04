@@ -46,7 +46,7 @@ open class Billing(
     var inAppBillingService: IInAppBillingService? = null
         protected set
 
-    private var serviceConnection: ServiceConnection = object : ServiceConnection {
+    var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             try {
                 inAppBillingService = IInAppBillingService.Stub.asInterface(service)
