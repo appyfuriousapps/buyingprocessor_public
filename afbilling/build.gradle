@@ -34,6 +34,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    compile 'com.appsflyer:af-android-sdk:4.8.11@aar'
+    compile 'com.android.installreferrer:installreferrer:1.0'
+    implementation 'com.facebook.android:facebook-android-sdk:4.33.0'
 }
 repositories {
     mavenCentral()
