@@ -90,4 +90,9 @@ public class ValidationBody {
         this.deviceData = deviceData;
     }
 
+    @Override
+    public String toString() {
+        return "hash:" + hash + " purchaseToken:" + purchaseToken + " productId:" + productId + " type:" + type + " _package:" +
+                _package + " developerPayload:" + developerPayload + " deviceData:" + deviceData;
+    }
 }

@@ -8,8 +8,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
+import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidationCallback
 import com.appyfurious.validation.ValidationClient
 import com.appyfurious.validation.body.ValidationBody
@@ -61,24 +63,29 @@ open class Billing(
                 }
                 listener.connectBody(products)
             } catch (ex: Exception) {
+                Logger.notify("serviceConnection")
                 ex.printStackTrace()
             }
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             inAppBillingService = null
+            Logger.notify("onServiceDisconnected inAppBillingService = null")
         }
     }
 
     init {
         Thread {
+            Logger.exception("init async start")
             try {
                 val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
                 serviceIntent.`package` = "com.android.vending"
                 listener.context().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
+                Logger.exception("init")
                 error(ex)
             }
+            Logger.exception("init async finish")
         }.start()
     }
 
@@ -127,6 +134,7 @@ open class Billing(
 
     @Deprecated("use isSubs method")
     fun readMyPurchases(type: String, body: (products: List<InAppProduct>) -> Unit) {
+        Logger.notify("start readMyPurchases")
         var continuationToken: String? = null
         val gson = GsonBuilder().create()
         val myProduct = ArrayList<InAppProduct>()
@@ -138,48 +146,62 @@ open class Billing(
             }
             val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
             val serverProducts = responseList.map {
+                Logger.notify("readMyPurchases $it")
                 gson.fromJson(it, InAppProduct::class.java)
             }
             myProduct.addAll(serverProducts)
             continuationToken = result.getString("INAPP_CONTINUATION_TOKEN")
         } while (continuationToken != null)
         body(myProduct)
+        Logger.notify("finish readMyPurchases")
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Logger.notify("start onActivityResult not validate")
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
+                Logger.notify("onActivityResult not validate BILLING_RESPONSE_RESULT_OK")
                 listener.purchases()
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
+                Logger.notify("onActivityResult not validate PURCHASE_STATUS_CANCELLED")
                 listener.canceled()
             }
         }
+        Logger.notify("finish onActivityResult not validate")
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
                          product: InAppProduct, serverValidateUrl: String, apiKey: String,
                          secretKey: String, listener: ValidationCallback.ValidationListener) {
+        Logger.notify("start onActivityResult validate")
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
+                Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
                 getAdvertingId {
                     validateRequest(validationBody(product, it), serverValidateUrl, apiKey, secretKey, listener)
                 }
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
+                Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")
                 this.listener.canceled()
             }
         }
+        Logger.notify("finish onActivityResult validate")
     }
 
     private fun validateRequest(body: ValidationBody, baseUrl: String, apiKey: String,
                                 secretKey: String, listener: ValidationCallback.ValidationListener) {
+        Logger.notify("validateRequest start")
+        Logger.notify("validateRequest ValidationBody: $body")
+        Logger.notify("baseUrl $baseUrl, apiKey $apiKey, secretKey $secretKey")
         val service = ValidationClient.getValidationService(secretKey, baseUrl)
         val call = service.validate(apiKey, body)
         val validationCallback = ValidationCallback(secretKey, listener)
         call.enqueue(validationCallback)
+        Logger.notify("validateRequest finish")
     }
 
     private fun validationBody(product: InAppProduct, adInfoId: String) =
@@ -191,10 +213,12 @@ open class Billing(
     private fun getAdvertingId(success: (String) -> Unit) {
         AdvertisingIdClient.getAdvertisingId(listener.context(), object : AdvertisingIdClient.Listener {
             override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo) {
+                Logger.notify("onAdvertisingIdClientFinish ${adInfo.id}")
                 success(adInfo.id)
             }
 
             override fun onAdvertisingIdClientFail(exception: Exception) {
+                Logger.notify("onAdvertisingIdClientFail advertingId")
                 success("advertingId")
             }
         })
