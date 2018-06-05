@@ -39,9 +39,13 @@ class ValidationCallback(private val mSecretKey: String,
             val decryptString: String?
             try {
                 decryptString = mEncryptor?.decrypt(response.body()?.string())
+                Logger.notify("decryptString $decryptString")
                 val jsonResponse = JSONObject(decryptString)
+                Logger.notify(jsonResponse.toString())
                 val jsonData = jsonResponse.getJSONObject("data")
+                Logger.notify(jsonData.toString())
                 val isValid = jsonData.getBoolean("isValid")
+                Logger.notify(isValid.toString())
                 if (isValid) {
                     Logger.notify("isValid validationSuccess")
                     validationSuccess()
@@ -51,9 +55,11 @@ class ValidationCallback(private val mSecretKey: String,
                 }
             } catch (e: IOException) {
                 Logger.notify("IOException validationSuccess")
+                Logger.exception(e)
                 validationSuccess()
             } catch (e: JSONException) {
                 Logger.notify("JSONException validationSuccess")
+                Logger.exception(e)
                 validationSuccess()
             }
         } else {

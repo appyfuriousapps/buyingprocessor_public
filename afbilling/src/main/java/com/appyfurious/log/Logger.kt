@@ -8,9 +8,11 @@ class Logger {
         const val EXCEPTION = "exception"
         const val TAG = "validation"
         private var isDebug = false
+        private var isPrintExceptionObject = false
 
-        fun init(isDebug: Boolean) {
+        fun init(isDebug: Boolean, isPrintExceptionObject: Boolean) {
             this.isDebug = isDebug
+            this.isPrintExceptionObject = isPrintExceptionObject
         }
 
         fun notify(message: String) {
@@ -22,6 +24,12 @@ class Logger {
         fun exception(message: String) {
             if (isDebug) {
                 Log.e(TAG, "$EXCEPTION: $message")
+            }
+        }
+
+        fun exception(ex: Exception) {
+            if (isDebug && isPrintExceptionObject) {
+                Log.e(TAG, ex.message, ex)
             }
         }
 
