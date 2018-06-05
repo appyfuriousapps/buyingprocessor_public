@@ -7,7 +7,11 @@ class Logger {
         const val NOTIFY = "notify"
         const val EXCEPTION = "exception"
         const val TAG = "validation"
-        var isDebug = false
+        private var isDebug = false
+
+        fun init(isDebug: Boolean) {
+            this.isDebug = isDebug
+        }
 
         fun notify(message: String) {
             if (isDebug) {
@@ -17,7 +21,7 @@ class Logger {
 
         fun exception(message: String) {
             if (isDebug) {
-                Log.d(TAG, "$EXCEPTION: $message")
+                Log.e(TAG, "$EXCEPTION: $message")
             }
         }
 

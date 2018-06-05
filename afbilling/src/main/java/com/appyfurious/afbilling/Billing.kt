@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
@@ -132,6 +131,16 @@ open class Billing(
         }
     }
 
+    fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
+        readMyPurchases(InAppProduct.SUBS) {
+            var product: InAppProduct? = null
+            val isSubs = it.isNotEmpty() && it.filter {
+                it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
+            }.map { product = it }.isNotEmpty()
+            body(isSubs, product)
+        }
+    }
+
     @Deprecated("use isSubs method")
     fun readMyPurchases(type: String, body: (products: List<InAppProduct>) -> Unit) {
         Logger.notify("start readMyPurchases")
@@ -172,16 +181,19 @@ open class Billing(
         Logger.notify("finish onActivityResult not validate")
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
-                         product: InAppProduct, serverValidateUrl: String, apiKey: String,
-                         secretKey: String, listener: ValidationCallback.ValidationListener) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, serverValidateUrl: String,
+                         apiKey: String, secretKey: String, listener: ValidationCallback.ValidationListener) {
         Logger.notify("start onActivityResult validate")
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
-                getAdvertingId {
-                    validateRequest(validationBody(product, it), serverValidateUrl, apiKey, secretKey, listener)
+                isSubs { isSubs, product ->
+                    getAdvertingId { advertingId ->
+                        if (isSubs && product != null)
+                            validateRequest(validationBody(product, advertingId),
+                                    serverValidateUrl, apiKey, secretKey, listener)
+                    }
                 }
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
@@ -205,7 +217,8 @@ open class Billing(
     }
 
     private fun validationBody(product: InAppProduct, adInfoId: String) =
-            ValidationBody(UUID.randomUUID().toString(), product.purchaseToken ?: "",
+            ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
+                    ?: "product.purchaseToken",
                     product.productId, ValidationBody.PRODUCT_TYPE, listener.context().packageName,
                     product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.context()),
                     adInfoId)
