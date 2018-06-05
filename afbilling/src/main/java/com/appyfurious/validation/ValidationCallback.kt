@@ -69,12 +69,12 @@ class ValidationCallback(private val mSecretKey: String,
 
     private fun validationSuccess() {
         mValidationListener.onValidationSuccess()
-        FacebookInteractor.logAddedToCartEvent(mValidationListener.validationContext)
+        FacebookInteractor.logAddedToCartEvent(mValidationListener.validationContext())
     }
 
     interface ValidationListener {
 
-        val validationContext: Context
+        fun validationContext(): Context
 
         fun onValidationSuccess()
 
