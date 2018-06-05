@@ -34,7 +34,7 @@ public class AdvertisingIdClient {
     /**
      * Method to invoke the process of getting advertisingid, using UIThread
      *
-     * @param context  a valid context
+     * @param context  a valid billingContext
      * @param listener valid Listener for callbacks
      */
     public static synchronized void getAdvertisingId(Context context, Listener listener) {
@@ -56,7 +56,7 @@ public class AdvertisingIdClient {
             mHandler = new Handler(Looper.getMainLooper());
             mListener = listener;
             if (context == null) {
-                invokeFail(new Exception(TAG + " - Error: context null"));
+                invokeFail(new Exception(TAG + " - Error: billingContext null"));
             } else {
                 new Thread(new Runnable() {
 

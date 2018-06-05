@@ -23,7 +23,7 @@ open class Billing(
         private val listSubs: List<ProductPreview>? = null) {
 
     interface BillingListener {
-        fun context(): Context?
+        fun billingContext(): Context?
         fun connectBody(products: (List<InAppProduct>?))
         fun purchases()
         fun canceled()
@@ -79,7 +79,7 @@ open class Billing(
             try {
                 val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
                 serviceIntent.`package` = "com.android.vending"
-                listener.context()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+                listener.billingContext()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
                 Logger.exception("init")
                 error(ex)
@@ -88,7 +88,7 @@ open class Billing(
         }.start()
     }
 
-    private fun activity() = (listener.context() as Activity)
+    private fun activity() = (listener.billingContext() as Activity)
 
     private fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
         productsPreview?.map { preview ->
@@ -106,7 +106,7 @@ open class Billing(
         query.putStringArrayList("ITEM_ID_LIST", skuList)
 
         val skuDetails = inAppBillingService!!.getSkuDetails(
-                3, listener.context()?.packageName, type, query)
+                3, listener.billingContext()?.packageName, type, query)
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
         return responseList?.map {
@@ -115,7 +115,7 @@ open class Billing(
     }
 
     fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String = "12345") {
-        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.context()?.packageName,
+        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.billingContext()?.packageName,
                 product.getSku(), product.getType(), developerPayload)
         val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
         activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
@@ -149,7 +149,7 @@ open class Billing(
         val myProduct = ArrayList<InAppProduct>()
         do {
             val result = inAppBillingService!!.getPurchases(
-                    3, listener.context()?.packageName, type, continuationToken)
+                    3, listener.billingContext()?.packageName, type, continuationToken)
             if (result.getInt("RESPONSE_CODE", -1) != 0) {
                 throw Exception("Invalid response code")
             }
@@ -190,8 +190,9 @@ open class Billing(
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
                 isSubs { isSubs, product ->
                     getAdvertingId { advertingId ->
-                        if (isSubs && product != null)
-                            validateRequest(validationBody(product, advertingId),
+                        if (product != null && isSubs)
+                            listener.showProgress()
+                            validateRequest(validationBody(product!!, advertingId),
                                     serverValidateUrl, apiKey, secretKey, listener)
                     }
                 }
@@ -219,12 +220,12 @@ open class Billing(
     private fun validationBody(product: InAppProduct, adInfoId: String) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken",
-                    product.productId, ValidationBody.PRODUCT_TYPE, listener.context()?.packageName,
-                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.context()),
+                    product.productId, ValidationBody.PRODUCT_TYPE, listener.billingContext()?.packageName,
+                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.billingContext()),
                     adInfoId)
 
     private fun getAdvertingId(success: (String) -> Unit) {
-        AdvertisingIdClient.getAdvertisingId(listener.context(), object : AdvertisingIdClient.Listener {
+        AdvertisingIdClient.getAdvertisingId(listener.billingContext(), object : AdvertisingIdClient.Listener {
             override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo) {
                 Logger.notify("onAdvertisingIdClientFinish ${adInfo.id}")
                 success(adInfo.id)
