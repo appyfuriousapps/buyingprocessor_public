@@ -24,9 +24,9 @@ open class Billing(
 
     interface BillingListener {
         fun billingContext(): Context?
-        fun connectBody(products: (List<InAppProduct>?))
-        fun purchases()
-        fun canceled()
+        fun billingConnectBody(products: (List<InAppProduct>?))
+        fun billingPurchases()
+        fun billingCanceled()
     }
 
     companion object {
@@ -60,7 +60,7 @@ open class Billing(
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
                     syncProducts(products, listSubs)
                 }
-                listener.connectBody(products)
+                listener.billingConnectBody(products)
             } catch (ex: Exception) {
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
@@ -171,11 +171,11 @@ open class Billing(
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
                 Logger.notify("onActivityResult not validate BILLING_RESPONSE_RESULT_OK")
-                listener.purchases()
+                listener.billingPurchases()
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult not validate PURCHASE_STATUS_CANCELLED")
-                listener.canceled()
+                listener.billingCanceled()
             }
         }
         Logger.notify("finish onActivityResult not validate")
@@ -191,7 +191,7 @@ open class Billing(
                 isSubs { isSubs, product ->
                     getAdvertingId { advertingId ->
                         if (product != null && isSubs)
-                            listener.showProgress()
+                            listener.onValidationShowProgress()
                             validateRequest(validationBody(product!!, advertingId),
                                     serverValidateUrl, apiKey, secretKey, listener)
                     }
@@ -199,7 +199,7 @@ open class Billing(
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")
-                this.listener.canceled()
+                this.listener.billingCanceled()
             }
         }
         Logger.notify("finish onActivityResult validate")

@@ -25,12 +25,12 @@ import android.os.Bundle;
  *    price, type, title and description.
  * 2. The purchase flow is synchronous and purchase information is available immediately
  *    after it completes.
- * 3. Purchase information of in-app purchases is maintained within the Google Play system
+ * 3. Purchase information of in-app billingPurchases is maintained within the Google Play system
  *    till the purchase is consumed.
- * 4. An API to consume a purchase of an inapp item. All purchases of one-time
+ * 4. An API to consume a purchase of an inapp item. All billingPurchases of one-time
  *    in-app items are consumable and thereafter can be purchased again.
- * 5. An API to get current purchases of the user immediately. This will not contain any
- *    consumed purchases.
+ * 5. An API to get current billingPurchases of the user immediately. This will not contain any
+ *    consumed billingPurchases.
  *
  * All calls will give a response code with the following possible values
  * RESULT_OK = 0 - success
@@ -119,7 +119,7 @@ interface IInAppBillingService {
      * V1 and V2 that have not been consumed.
      * @param apiVersion billing API version that the app is using
      * @param packageName package name of the calling app
-     * @param type of the in-app items being requested ("inapp" for one-time purchases
+     * @param type of the in-app items being requested ("inapp" for one-time billingPurchases
      *        and "subs" for subscriptions)
      * @param continuationToken to be set as null for the first call, if the number of owned
      *        skus are too many, a continuationToken is returned in the response bundle.
@@ -133,7 +133,7 @@ interface IInAppBillingService {
      *         "INAPP_DATA_SIGNATURE_LIST"- StringArrayList containing the signatures
      *                                      of the purchase information
      *         "INAPP_CONTINUATION_TOKEN" - String containing a continuation token for the
-     *                                      next set of in-app purchases. Only set if the
+     *                                      next set of in-app billingPurchases. Only set if the
      *                                      user has more owned skus than the current list.
      */
     Bundle getPurchases(int apiVersion, String packageName, String type, String continuationToken);
@@ -196,7 +196,7 @@ interface IInAppBillingService {
      * @param apiVersion billing API version that the app is using, must be 6 or later
      * @param packageName package name of the calling app
      * @param sku the SKU of the in-app item as published in the developer console
-     * @param type of the in-app item being purchased ("inapp" for one-time purchases
+     * @param type of the in-app item being purchased ("inapp" for one-time billingPurchases
      *        and "subs" for subscriptions)
      * @param developerPayload optional argument to be sent back with the purchase information
      * @extraParams a Bundle with the following optional keys:
@@ -222,7 +222,7 @@ interface IInAppBillingService {
      *            "accountId" - String - an optional obfuscated string that is uniquely
      *                          associated with the user's account in your app.
      *                          If you pass this value, Google Play can use it to detect irregular
-     *                          activity, such as many devices making purchases on the same
+     *                          activity, such as many devices making billingPurchases on the same
      *                          account in a short period of time.
      *                          Do not use the developer ID or the user's Google ID for this field.
      *                          In addition, this field should not contain the user's ID in
@@ -241,7 +241,7 @@ interface IInAppBillingService {
      * expired, canceled, or consumed.
      * @param apiVersion billing API version that the app is using, must be 6 or later
      * @param packageName package name of the calling app
-     * @param type of the in-app items being requested ("inapp" for one-time purchases
+     * @param type of the in-app items being requested ("inapp" for one-time billingPurchases
      *        and "subs" for subscriptions)
      * @param continuationToken to be set as null for the first call, if the number of owned
      *        skus is too large, a continuationToken is returned in the response bundle.
@@ -258,7 +258,7 @@ interface IInAppBillingService {
      *         "INAPP_DATA_SIGNATURE_LIST"- ArrayList<String> containing the signatures
      *                                      of the purchase information
      *         "INAPP_CONTINUATION_TOKEN" - String containing a continuation token for the
-     *                                      next set of in-app purchases. Only set if the
+     *                                      next set of in-app billingPurchases. Only set if the
      *                                      user has more owned skus than the current list.
      */
     Bundle getPurchaseHistory(int apiVersion, String packageName, String type,

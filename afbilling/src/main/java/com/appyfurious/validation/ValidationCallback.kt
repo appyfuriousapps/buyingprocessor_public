@@ -60,13 +60,13 @@ class ValidationCallback(private val mSecretKey: String,
             Logger.notify("response.isSuccessful == false onValidationFailure")
             mValidationListener.onValidationFailure("Validation Error")
         }
-        mValidationListener.hideProgress()
+        mValidationListener.onValidationHideProgress()
     }
 
     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
         Logger.notify("onFailure validationSuccess")
         validationSuccess()
-        mValidationListener.hideProgress()
+        mValidationListener.onValidationHideProgress()
     }
 
     private fun validationSuccess() {
@@ -78,8 +78,8 @@ class ValidationCallback(private val mSecretKey: String,
         fun validationContext(): Context?
         fun onValidationSuccess()
         fun onValidationFailure(errorMessage: String)
-        fun showProgress()
-        fun hideProgress()
+        fun onValidationShowProgress()
+        fun onValidationHideProgress()
     }
 
 }
