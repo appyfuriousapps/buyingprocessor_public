@@ -23,7 +23,7 @@ open class Billing(
         private val listSubs: List<ProductPreview>? = null) {
 
     interface BillingListener {
-        fun context(): Context
+        fun context(): Context?
         fun connectBody(products: (List<InAppProduct>?))
         fun purchases()
         fun canceled()
@@ -75,16 +75,16 @@ open class Billing(
 
     init {
         Thread {
-            Logger.exception("init async start")
+            Logger.notify("init async start")
             try {
                 val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
                 serviceIntent.`package` = "com.android.vending"
-                listener.context().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+                listener.context()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
                 Logger.exception("init")
                 error(ex)
             }
-            Logger.exception("init async finish")
+            Logger.notify("init async finish")
         }.start()
     }
 
@@ -106,7 +106,7 @@ open class Billing(
         query.putStringArrayList("ITEM_ID_LIST", skuList)
 
         val skuDetails = inAppBillingService!!.getSkuDetails(
-                3, listener.context().packageName, type, query)
+                3, listener.context()?.packageName, type, query)
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
         return responseList?.map {
@@ -115,7 +115,7 @@ open class Billing(
     }
 
     fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String = "12345") {
-        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.context().packageName,
+        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.context()?.packageName,
                 product.getSku(), product.getType(), developerPayload)
         val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
         activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
@@ -149,7 +149,7 @@ open class Billing(
         val myProduct = ArrayList<InAppProduct>()
         do {
             val result = inAppBillingService!!.getPurchases(
-                    3, listener.context().packageName, type, continuationToken)
+                    3, listener.context()?.packageName, type, continuationToken)
             if (result.getInt("RESPONSE_CODE", -1) != 0) {
                 throw Exception("Invalid response code")
             }
@@ -219,7 +219,7 @@ open class Billing(
     private fun validationBody(product: InAppProduct, adInfoId: String) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken",
-                    product.productId, ValidationBody.PRODUCT_TYPE, listener.context().packageName,
+                    product.productId, ValidationBody.PRODUCT_TYPE, listener.context()?.packageName,
                     product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.context()),
                     adInfoId)
 
