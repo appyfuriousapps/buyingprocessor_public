@@ -47,10 +47,10 @@ class CryptoAES128(secretKey: String) {
         ""
     }
 
-    fun decrypt(responseBody: String) = try {
+    fun decrypt(responseBody: String?) = try {
         val c = Cipher.getInstance("AES/ECB/NoPadding")
         c.init(Cipher.DECRYPT_MODE, mSecretKeySpec)
-        val bytes = Base64.decode(responseBody.toByteArray(charset("UTF-8")), Base64.DEFAULT)
+        val bytes = Base64.decode(responseBody?.toByteArray(charset("UTF-8")), Base64.DEFAULT)
         val b = c.doFinal(bytes)
         String(b)
     } catch (e: Exception) {
