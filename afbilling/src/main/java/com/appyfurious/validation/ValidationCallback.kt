@@ -36,10 +36,9 @@ class ValidationCallback(private val mSecretKey: String,
         if (response.isSuccessful) {
             Logger.notify("response.isSuccessful")
             mEncryptor = CryptoAES128(mSecretKey)
-            val decryptString: String?
             try {
-                decryptString = mEncryptor?.decrypt(response.body()?.string())
-                Logger.notify("decryptString $decryptString")
+                val decryptString = mEncryptor?.decrypt(response.body()?.string())
+                Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
                 val jsonResponse = JSONObject(decryptString)
                 Logger.notify(jsonResponse.toString())
                 val jsonData = jsonResponse.getJSONObject("data")
