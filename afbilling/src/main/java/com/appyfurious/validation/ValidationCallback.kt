@@ -61,6 +61,8 @@ class ValidationCallback(private val mSecretKey: String,
             }
         } else {
             Logger.notify("response.isSuccessful == false onValidationFailure")
+            val decryptString = mEncryptor?.decrypt(response.body()?.string())
+            Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
             mValidationListener.onValidationFailure("Validation Error")
         }
         mValidationListener.onValidationHideProgress()
