@@ -26,7 +26,9 @@ import retrofit2.Response
  */
 
 class ValidationCallback(private val mSecretKey: String,
-                         private val mValidationListener: ValidationListener) : Callback<ResponseBody> {
+                         private val mValidationListener: ValidationListener? = null,
+                         private val validationRestoreListener: ValidationRestoreListener? = null)
+    : Callback<ResponseBody> {
 
     private var mEncryptor: CryptoAES128? = null
 
@@ -48,7 +50,7 @@ class ValidationCallback(private val mSecretKey: String,
                     validationSuccess()
                 } else {
                     Logger.notify("isValid == false onValidationFailure")
-                    mValidationListener.onValidationFailure("Validation Error")
+                    validationFailure()
                 }
             } catch (e: IOException) {
                 Logger.notify("IOException validationSuccess")
@@ -63,20 +65,29 @@ class ValidationCallback(private val mSecretKey: String,
             Logger.notify("response.isSuccessful == false onValidationFailure")
             val decryptString = mEncryptor?.decrypt(response.body()?.string())
             Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
-            mValidationListener.onValidationFailure("Validation Error")
+            validationFailure()
         }
-        mValidationListener.onValidationHideProgress()
+        mValidationListener?.onValidationHideProgress()
     }
 
     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
         Logger.notify("onFailure validationSuccess")
         validationSuccess()
-        mValidationListener.onValidationHideProgress()
+        mValidationListener?.onValidationHideProgress()
     }
 
     private fun validationSuccess() {
-        mValidationListener.onValidationSuccess()
-        FacebookInteractor.logAddedToCartEvent(mValidationListener.validationContext())
+        mValidationListener?.onValidationSuccess()
+        if (validationRestoreListener != null) {
+            validationRestoreListener.validationRestoreSuccess()
+        } else {
+            FacebookInteractor.logAddedToCartEvent(mValidationListener?.validationContext())
+        }
+    }
+
+    private fun validationFailure(errorMessage: String = "Validation Error") {
+        mValidationListener?.onValidationFailure(errorMessage)
+        validationRestoreListener?.validationRestoreFailure(errorMessage)
     }
 
     interface ValidationListener {
@@ -87,4 +98,8 @@ class ValidationCallback(private val mSecretKey: String,
         fun onValidationHideProgress()
     }
 
+    interface ValidationRestoreListener {
+        fun validationRestoreSuccess()
+        fun validationRestoreFailure(errorMessage: String)
+    }
 }
