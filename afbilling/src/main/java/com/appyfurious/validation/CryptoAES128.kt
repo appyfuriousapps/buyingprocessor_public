@@ -36,6 +36,7 @@ class CryptoAES128(secretKey: String) {
 
     fun encrypt(requestBody: String) = try {
         Logger.notify("encrypt")
+        Logger.notify("body request: $requestBody")
         val c = Cipher.getInstance("AES")
         c.init(Cipher.ENCRYPT_MODE, mSecretKeySpec)
         val encodedBytes = c.doFinal(requestBody.toByteArray())
