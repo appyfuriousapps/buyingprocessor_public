@@ -93,6 +93,7 @@ public class ValidationBody {
     @Override
     public String toString() {
         return "hash:" + hash + " purchaseToken:" + purchaseToken + " productId:" + productId + " type:" + type + " _package:" +
-                _package + " developerPayload:" + developerPayload + " deviceData:" + deviceData;
+                _package + " developerPayload:" + developerPayload + " deviceData.getAppsflyerId:" + deviceData.getAppsflyerId()
+                + "deviceData.getIdfa():" + deviceData.getIdfa();
     }
 }
