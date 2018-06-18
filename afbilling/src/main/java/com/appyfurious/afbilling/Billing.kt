@@ -258,14 +258,15 @@ open class Billing(
 
     private fun getAdvertingId(success: (String) -> Unit) {
         AdvertisingIdClient.getAdvertisingId(listener.billingContext(), object : AdvertisingIdClient.Listener {
-            override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo) {
-                Logger.notify("onAdvertisingIdClientFinish ${adInfo.id}")
-                success(adInfo.id)
+            private val default = "advertingId"
+            override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo?) {
+                Logger.notify("onAdvertisingIdClientFinish ${adInfo?.id}")
+                success(adInfo?.id ?: default)
             }
 
             override fun onAdvertisingIdClientFail(exception: Exception) {
                 Logger.notify("onAdvertisingIdClientFail advertingId")
-                success("advertingId")
+                success(default)
             }
         })
     }
