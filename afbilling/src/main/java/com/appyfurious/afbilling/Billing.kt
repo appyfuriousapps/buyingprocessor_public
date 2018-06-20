@@ -140,8 +140,8 @@ open class Billing(
                 it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
             }.map { product = it }.isNotEmpty()
             getAdvertingId { advertingId ->
-                product?.let {
-                    validateRequest(validationBody(it, advertingId), restoreListener =
+                if (product != null) {
+                    validateRequest(validationBody(product!!, advertingId), restoreListener =
                     object : ValidationCallback.ValidationRestoreListener {
                         override fun validationRestoreSuccess() {
                             body(true, product)
@@ -151,6 +151,8 @@ open class Billing(
                             body(false, null)
                         }
                     })
+                } else {
+                    body(false, product)
                 }
             }
         }
