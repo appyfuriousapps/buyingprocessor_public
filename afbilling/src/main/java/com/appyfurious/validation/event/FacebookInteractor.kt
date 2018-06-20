@@ -5,27 +5,16 @@ import android.os.Bundle
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 
-/**
- * FacebookInteractor.java
- * getfitandroid
- *
- *
- * Created by o.davidovich on 24.05.2018.
- *
- *
- * Copyright © 2018 Appyfurious. All rights reserved.
- */
-
 object FacebookInteractor {
 
     const val PREMIUM_SCREEN_SHOWN = "Premium_Screen_Shown"
     const val PREMIUM_OPTION_SELECTED = "Premium_Option_Selected"
 
-    private const val SEGMENT_ID = "Segment ID"
-    private const val SCREEN_ID = "Screen ID"
-    private const val SOURCE = "Source"
-    private const val PRODUCT_ID = "Product ID"
-    private const val PREMIUM_OPTION_PURCHASED = "Premium_Option_Purchased"
+    const val SEGMENT_ID = "Segment ID"
+    const val SCREEN_ID = "Screen ID"
+    const val SOURCE = "Source"
+    const val PRODUCT_ID = "Product ID"
+    const val PREMIUM_OPTION_PURCHASED = "Premium_Option_Purchased"
 
     private fun logger(context: Context?, body: (AppEventsLogger) -> Unit) {
         context?.let {
