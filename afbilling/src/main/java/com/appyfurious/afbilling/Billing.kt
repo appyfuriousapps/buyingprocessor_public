@@ -134,24 +134,30 @@ open class Billing(
     }
 
     fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
+        Logger.notify("restore init")
         readMyPurchases(InAppProduct.SUBS) {
+            Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
             var product: InAppProduct? = null
             val isSubs = it.isNotEmpty() && it.filter {
                 it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
             }.map { product = it }.isNotEmpty()
             getAdvertingId { advertingId ->
-                if (product != null) {
+                Logger.notify("advertingId: $advertingId, isSubs: $isSubs, product != null -> ${product != null}")
+                if (product != null && isSubs) {
                     validateRequest(validationBody(product!!, advertingId), restoreListener =
                     object : ValidationCallback.ValidationRestoreListener {
                         override fun validationRestoreSuccess() {
+                            Logger.notify("validationRestoreSuccess")
                             body(true, product)
                         }
 
                         override fun validationRestoreFailure(errorMessage: String) {
+                            Logger.notify("validationRestoreFailure")
                             body(false, null)
                         }
                     })
                 } else {
+                    Logger.notify("ELSE validationRestoreFailure")
                     body(false, product)
                 }
             }

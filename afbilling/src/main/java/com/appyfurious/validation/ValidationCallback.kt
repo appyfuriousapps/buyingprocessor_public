@@ -13,6 +13,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.NullPointerException
 
 /**
  * ValidationCallback.java
@@ -34,34 +35,35 @@ class ValidationCallback(private val mSecretKey: String,
 
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
         if (response.isSuccessful || (response.code() in 500..599)) {
-            //Logger.notify("response.isSuccessful")
             mEncryptor = CryptoAES128(mSecretKey)
             try {
                 val decryptString = mEncryptor?.decrypt(response.body()?.string())
-                //Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
+                Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
                 val jsonResponse = JSONObject(decryptString)
-                //Logger.notify(jsonResponse.toString())
+                Logger.notify(jsonResponse.toString())
                 val jsonData = jsonResponse.getJSONObject("data")
-                //Logger.notify(jsonData.toString())
+                Logger.notify(jsonData.toString())
                 val isValid = jsonData.getBoolean("isValid")
-                //Logger.notify(isValid.toString())
+                Logger.notify(isValid.toString())
                 if (isValid) {
-                    //Logger.notify("isValid validationSuccess")
+                    Logger.notify("isValid validationSuccess")
                     validationSuccess()
                 } else {
-                    //Logger.notify("isValid == false onValidationFailure")
+                    Logger.notify("isValid == false onValidationFailure")
                     validationFailure()
                 }
             } catch (e: IOException) {
-                //Logger.notify("IOException validationSuccess")
-                //Logger.exception(e)
+                Logger.notify("IOException validationSuccess")
+                Logger.exception(e)
                 validationSuccess()
             } catch (e: JSONException) {
-                //Logger.notify("JSONException validationSuccess")
-                //Logger.exception(e)
+                Logger.notify("JSONException validationSuccess")
+                Logger.exception(e)
+                validationSuccess()
+            } catch (e: NullPointerException) {
                 validationSuccess()
             } catch (e: Exception) {
-                validationSuccess()
+
             }
         } else {
             //Logger.notify("response.isSuccessful == false onValidationFailure")
