@@ -60,6 +60,8 @@ class ValidationCallback(private val mSecretKey: String,
                 //Logger.notify("JSONException validationSuccess")
                 //Logger.exception(e)
                 validationSuccess()
+            } catch (e: Exception) {
+                validationSuccess()
             }
         } else {
             //Logger.notify("response.isSuccessful == false onValidationFailure")
