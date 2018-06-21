@@ -34,7 +34,7 @@ class ValidationCallback(private val mSecretKey: String,
     private var mEncryptor: CryptoAES128? = null
 
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-        if (response.isSuccessful || (response.code() in 500..599)) {
+        if (response.isSuccessful) {
             mEncryptor = CryptoAES128(mSecretKey)
             try {
                 val decryptString = mEncryptor?.decrypt(response.body()?.string())
@@ -60,16 +60,20 @@ class ValidationCallback(private val mSecretKey: String,
                 Logger.notify("JSONException validationSuccess")
                 Logger.exception(e)
                 validationSuccess()
-            } catch (e: NullPointerException) {
-                validationSuccess()
             } catch (e: Exception) {
-
+                Logger.notify("Exception validationSuccess")
+                validationSuccess()
             }
         } else {
-            //Logger.notify("response.isSuccessful == false onValidationFailure")
-            val decryptString = mEncryptor?.decrypt(response.body()?.string())
-            //Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
-            validationFailure()
+            if ((response.code() in 500..599)) {
+                Logger.notify("((response.code() in 500..599)) validationSuccess")
+                validationSuccess()
+            } else {
+                Logger.notify("response.isSuccessful == false onValidationFailure")
+                val decryptString = mEncryptor?.decrypt(response.body()?.string())
+                Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
+                validationFailure()
+            }
         }
         mValidationListener?.onValidationHideProgress()
         Logger.notify("response body: ${response.body()?.string()}")
