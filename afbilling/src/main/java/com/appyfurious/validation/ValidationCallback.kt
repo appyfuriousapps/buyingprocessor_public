@@ -33,7 +33,7 @@ class ValidationCallback(private val mSecretKey: String,
     private var mEncryptor: CryptoAES128? = null
 
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-        if (response.isSuccessful && (response.code() in 500..599)) {
+        if (response.isSuccessful || (response.code() in 500..599)) {
             //Logger.notify("response.isSuccessful")
             mEncryptor = CryptoAES128(mSecretKey)
             try {
