@@ -34,10 +34,11 @@ class ValidationCallback(private val mSecretKey: String,
     private var mEncryptor: CryptoAES128? = null
 
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+        val body = response.body()?.string()
         if (response.isSuccessful) {
             mEncryptor = CryptoAES128(mSecretKey)
             try {
-                val decryptString = mEncryptor?.decrypt(response.body()?.string())
+                val decryptString = mEncryptor?.decrypt(body)
                 Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
                 val jsonResponse = JSONObject(decryptString)
                 Logger.notify(jsonResponse.toString())
@@ -65,18 +66,18 @@ class ValidationCallback(private val mSecretKey: String,
                 validationSuccess()
             }
         } else {
+            Logger.notify("response.isSuccessful == false onValidationFailure")
+            val decryptString = mEncryptor?.decrypt(body)
+            Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
             if ((response.code() in 500..599)) {
                 Logger.notify("((response.code() in 500..599)) validationSuccess")
                 validationSuccess()
             } else {
-                Logger.notify("response.isSuccessful == false onValidationFailure")
-                val decryptString = mEncryptor?.decrypt(response.body()?.string())
-                Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
                 validationFailure()
             }
         }
         mValidationListener?.onValidationHideProgress()
-        Logger.notify("response body: ${response.body()?.string()}")
+        Logger.notify("response body: $body")
         Logger.notify("response all: $response")
         val headers = response.headers().toMultimap().map { "${it.key} + ${it.value}" }.joinToString(", ")
         Logger.notify(headers)

@@ -179,12 +179,6 @@ open class Billing(
         isSubs(body)
     }
 
-    /*getAdvertingId { advertingId ->
-            myProducts.map {
-                validateRequest(validationBody(it, advertingId))
-            }
-        }*/
-
     @Deprecated("use isSubs method")
     fun readMyPurchases(type: String, body: (products: List<InAppProduct>) -> Unit) {
         Logger.notify("start readMyPurchases")
