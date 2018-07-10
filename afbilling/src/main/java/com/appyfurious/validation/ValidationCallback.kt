@@ -67,8 +67,8 @@ class ValidationCallback(private val mSecretKey: String,
             }
         } else {
             Logger.notify("response.isSuccessful == false onValidationFailure")
-            val decryptString = mEncryptor?.decrypt(body)
-            Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
+            //val decryptString = mEncryptor?.decrypt(body)
+            //Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
             if ((response.code() in 500..599)) {
                 Logger.notify("((response.code() in 500..599)) validationSuccess")
                 validationSuccess()
@@ -79,8 +79,8 @@ class ValidationCallback(private val mSecretKey: String,
         mValidationListener?.onValidationHideProgress()
         Logger.notify("response body: $body")
         Logger.notify("response all: $response")
-        val headers = response.headers().toMultimap().map { "${it.key} + ${it.value}" }.joinToString(", ")
-        Logger.notify(headers)
+        //val headers = response.headers().toMultimap().map { "${it.key} + ${it.value}" }.joinToString(", ")
+        //Logger.notify(headers)
     }
 
     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {

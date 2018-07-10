@@ -116,7 +116,7 @@ open class Billing(
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
 
-        val skuDetails = inAppBillingService!!.getSkuDetails(
+        val skuDetails = inAppBillingService?.getSkuDetails(
                 3, listener.billingContext()?.packageName, type, query)
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
