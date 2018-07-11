@@ -16,6 +16,8 @@ object FacebookInteractor {
     const val PRODUCT_ID = "Product ID"
     const val PREMIUM_OPTION_PURCHASED = "Premium_Option_Purchased"
 
+    const val DEFAULT_VALUE = "default"
+
     private fun logger(context: Context?, body: (AppEventsLogger) -> Unit) {
         context?.let {
             body(AppEventsLogger.newLogger(it))
@@ -29,20 +31,20 @@ object FacebookInteractor {
         }
     }
 
-    fun logPremiumScreenShownEvent(context: Context?, screenName: String, callScreenName: String) {
+    fun logPremiumScreenShownEvent(context: Context?, segment: String, screenName: String, callScreenName: String) {
         logger(context) {
             it.logEvent(PREMIUM_SCREEN_SHOWN, Bundle().apply {
-                putString(SEGMENT_ID, "default")
+                putString(SEGMENT_ID, segment)
                 putString(SCREEN_ID, screenName)
                 putString(SOURCE, callScreenName)
             })
         }
     }
 
-    fun logPremiumOptionSelectedEvent(context: Context?, screenName: String, callScreenName: String, productId: String) {
+    fun logPremiumOptionSelectedEvent(context: Context?, segment: String, screenName: String, callScreenName: String, productId: String) {
         logger(context) {
             it.logEvent(PREMIUM_OPTION_SELECTED, Bundle().apply {
-                putString(SEGMENT_ID, "default")
+                putString(SEGMENT_ID, segment)
                 putString(SCREEN_ID, screenName)
                 putString(SOURCE, callScreenName)
                 putString(PRODUCT_ID, productId)
@@ -50,10 +52,10 @@ object FacebookInteractor {
         }
     }
 
-    fun logPremiumOptionPurchasedEvent(context: Context?, screenName: String, callScreenName: String, productId: String) {
+    fun logPremiumOptionPurchasedEvent(context: Context?, segment: String, screenName: String, callScreenName: String, productId: String) {
         logger(context) {
             it.logEvent(PREMIUM_OPTION_SELECTED, Bundle().apply {
-                putString(SEGMENT_ID, "default")
+                putString(SEGMENT_ID, segment)
                 putString(SCREEN_ID, screenName)
                 putString(SOURCE, callScreenName)
                 putString(PRODUCT_ID, productId)
