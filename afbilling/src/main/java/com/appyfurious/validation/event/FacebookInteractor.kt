@@ -7,6 +7,8 @@ import com.facebook.appevents.AppEventsLogger
 
 object FacebookInteractor {
 
+    class Param(val key: String, val value: String)
+
     const val PREMIUM_SCREEN_SHOWN = "Premium_Screen_Shown"
     const val PREMIUM_OPTION_SELECTED = "Premium_Option_Selected"
 
@@ -70,6 +72,14 @@ object FacebookInteractor {
                 putString(SCREEN_ID, screenName)
                 putString(SOURCE, callScreenName)
                 putString(PRODUCT_ID, productId)
+            })
+        }
+    }
+
+    fun logEventUniversal(context: Context?, eventName: String, vararg params: Param) {
+        logger(context) {
+            it.logEvent(eventName, Bundle().apply {
+                params.map { putString(it.key, it.value) }
             })
         }
     }
