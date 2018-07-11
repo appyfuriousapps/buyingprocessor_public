@@ -62,4 +62,15 @@ object FacebookInteractor {
             })
         }
     }
+
+    fun logEvent(context: Context?, eventName: String, segment: String, screenName: String, callScreenName: String, productId: String) {
+        logger(context) {
+            it.logEvent(eventName, Bundle().apply {
+                putString(SEGMENT_ID, segment)
+                putString(SCREEN_ID, screenName)
+                putString(SOURCE, callScreenName)
+                putString(PRODUCT_ID, productId)
+            })
+        }
+    }
 }
