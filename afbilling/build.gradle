@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.appsflyer:af-android-sdk:4.8.11@aar'
     implementation 'com.android.installreferrer:installreferrer:1.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.33.0'
+    implementation 'com.facebook.android:facebook-core:4.33.0'
 }
 repositories {
     mavenCentral()
