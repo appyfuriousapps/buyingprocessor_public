@@ -1,19 +1,15 @@
 package com.appyfurious.validation
 
 import android.content.Context
-
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.event.FacebookInteractor
+import okhttp3.ResponseBody
 import org.json.JSONException
 import org.json.JSONObject
-
-import java.io.IOException
-
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.NullPointerException
+import java.io.IOException
 
 /**
  * ValidationCallback.java
@@ -69,12 +65,12 @@ class ValidationCallback(private val mSecretKey: String,
             Logger.notify("response.isSuccessful == false onValidationFailure")
             //val decryptString = mEncryptor?.decrypt(body)
             //Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
-            if ((response.code() in 500..599)) {
-                Logger.notify("((response.code() in 500..599)) validationSuccess")
-                validationSuccess()
-            } else {
-                validationFailure()
-            }
+            //if ((response.code() in 500..599)) {
+            Logger.notify("((response.code() in 500..599)) validationSuccess")
+            validationSuccess()
+            // } else {
+            //   validationFailure()
+            //}
         }
         mValidationListener?.onValidationHideProgress()
         Logger.notify("response body: $body")
