@@ -29,9 +29,7 @@ open class Billing(
     interface BillingListener {
         fun billingContext(): Context?
         fun billingConnectBody(products: (List<InAppProduct>?))
-        @Deprecated("")
-        fun billingPurchases()
-
+        fun billingErrorConnect()
         fun billingCanceled()
     }
 
@@ -67,6 +65,7 @@ open class Billing(
                 }
                 listener.billingConnectBody(products)
             } catch (ex: Exception) {
+                listener.billingErrorConnect()
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
             }
@@ -86,6 +85,9 @@ open class Billing(
                 serviceIntent.`package` = "com.android.vending"
                 listener.billingContext()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
+                (listener.billingContext() as? Activity)?.runOnUiThread {
+                    listener.billingErrorConnect()
+                }
                 Logger.exception("init")
                 error(ex)
             }
