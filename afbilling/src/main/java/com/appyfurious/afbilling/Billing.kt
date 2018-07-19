@@ -19,19 +19,11 @@ import com.google.gson.GsonBuilder
 import java.util.*
 
 open class Billing(
-        var baseUrl: String, var apiKey: String, var secretKey: String,
+        private val baseUrl: String,
+        private val apiKey: String,
+        private val secretKey: String,
         private val listener: BillingListener,
-        private val listSubs: List<ProductPreview>? = null) {
-
-    constructor(listener: BillingListener, listSubs: List<ProductPreview>? = null) :
-            this("", "", "", listener, listSubs)
-
-    interface BillingListener {
-        fun billingContext(): Context?
-        fun billingConnectBody(products: (List<InAppProduct>?))
-        fun billingErrorConnect()
-        fun billingCanceled()
-    }
+        private val listSubs: List<ProductPreview>? = null) : BaseBilling {
 
     companion object {
         const val REQUEST_CODE_BUY = 1234
@@ -50,20 +42,22 @@ open class Billing(
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
-    var products: List<InAppProduct>? = null
-        protected set
-    var inAppBillingService: IInAppBillingService? = null
-        protected set
+    private var products: List<InAppProduct>? = null
+    private var inAppBillingService: IInAppBillingService? = null
 
-    var serviceConnection: ServiceConnection = object : ServiceConnection {
+    private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             try {
                 inAppBillingService = IInAppBillingService.Stub.asInterface(service)
                 if (listSubs != null) {
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
                     syncProducts(products, listSubs)
+                    if (products != null)
+                        listener.billingConnectBody(products)
+                    else listener.billingErrorAuth()
+                } else {
+                    listener.billingConnectBody(null)
                 }
-                listener.billingConnectBody(products)
             } catch (ex: Exception) {
                 listener.billingErrorConnect()
                 Logger.notify("serviceConnection")
@@ -95,12 +89,6 @@ open class Billing(
         }.start()
     }
 
-    fun setValidationParams(baseUrl: String, apiKey: String, secretKey: String) {
-        this.baseUrl = baseUrl
-        this.apiKey = apiKey
-        this.secretKey = secretKey
-    }
-
     private fun activity() = (listener.billingContext() as Activity)
 
     private fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
@@ -113,7 +101,7 @@ open class Billing(
         }
     }
 
-    fun getInAppPurchases(type: String, productIds: List<String>): List<InAppProduct>? {
+    private fun getInAppPurchases(type: String, productIds: List<String>): List<InAppProduct>? {
         val skuList = ArrayList(productIds)
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
@@ -127,7 +115,11 @@ open class Billing(
         }
     }
 
-    fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String = "12345") {
+    override fun getProducts() = products
+
+    override fun getInAppBillingService() = inAppBillingService
+
+    override fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String) {
         val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.billingContext()?.packageName,
                 product.getSku(), product.getType(), developerPayload)
         val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
@@ -135,7 +127,7 @@ open class Billing(
                 Intent(), 0, 0, 0)
     }
 
-    fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
+    override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
         readMyPurchases(InAppProduct.SUBS) {
             Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
@@ -166,23 +158,12 @@ open class Billing(
         }
     }
 
-    fun isSubs(body: (Boolean) -> Unit) {
+    override fun isSubs(body: (Boolean) -> Unit) {
         val newBody = { isSubs: Boolean, _: InAppProduct? -> body(isSubs) }
         isSubs(newBody)
     }
 
-    fun isSubs(baseUrl: String, apiKey: String, secretKey: String, body: (Boolean) -> Unit) {
-        setValidationParams(baseUrl, apiKey, secretKey)
-        isSubs(body)
-    }
-
-    fun isSubs(baseUrl: String, apiKey: String, secretKey: String, body: (Boolean, InAppProduct?) -> Unit) {
-        setValidationParams(baseUrl, apiKey, secretKey)
-        isSubs(body)
-    }
-
-    @Deprecated("use isSubs method")
-    fun readMyPurchases(type: String, body: (products: List<InAppProduct>) -> Unit) {
+    private fun readMyPurchases(type: String, body: (products: List<InAppProduct>) -> Unit) {
         Logger.notify("start readMyPurchases")
         var continuationToken: String? = null
         val gson = GsonBuilder().create()
@@ -205,14 +186,8 @@ open class Billing(
         Logger.notify("finish readMyPurchases")
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, serverValidateUrl: String,
-                         apiKey: String, secretKey: String, listener: ValidationCallback.ValidationListener) {
-        setValidationParams(serverValidateUrl, apiKey, secretKey)
-        onActivityResult(requestCode, resultCode, data, listener)
-    }
-
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
-                         listener: ValidationCallback.ValidationListener) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
+                                  listener: ValidationCallback.ValidationListener) {
         Logger.notify("start onActivityResult validate")
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
@@ -222,8 +197,7 @@ open class Billing(
                     getAdvertingId { advertingId ->
                         if (product != null && isSubs)
                             listener.onValidationShowProgress()
-                        validateRequest(validationBody(product!!, advertingId),
-                                baseUrl, apiKey, secretKey, listener)
+                        validateRequest(validationBody(product!!, advertingId), listener)
                     }
                 }
             }
@@ -247,12 +221,6 @@ open class Billing(
         Logger.notify("validateRequest finish")
     }
 
-    private fun validateRequest(body: ValidationBody, baseUrl: String, apiKey: String,
-                                secretKey: String, listener: ValidationCallback.ValidationListener) {
-        setValidationParams(baseUrl, apiKey, secretKey)
-        validateRequest(body, listener)
-    }
-
     private fun validationBody(product: InAppProduct, adInfoId: String) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken",
@@ -273,5 +241,13 @@ open class Billing(
                 success(default)
             }
         })
+    }
+
+    interface BillingListener {
+        fun billingContext(): Context?
+        fun billingConnectBody(products: (List<InAppProduct>)?)
+        fun billingErrorAuth()
+        fun billingErrorConnect()
+        fun billingCanceled()
     }
 }
