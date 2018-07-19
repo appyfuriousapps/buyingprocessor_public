@@ -65,16 +65,13 @@ open class Billing(
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
                     syncProducts(products, listSubs)
                     isAuth = products != null
-                    if (products != null)
-                        listener?.billingConnectBody(products)
-                    else listener?.billingErrorAuth()
+                    listener?.billingConnectBody(products)
                 } else {
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
                 isSubsStart()
             } catch (ex: Exception) {
-                //listener?.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
                 isSubsBody?.invoke(false)
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
@@ -98,7 +95,6 @@ open class Billing(
                 context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
                 (context as? Activity)?.runOnUiThread {
-                    listener?.billingErrorConnect("init error ${ex.message} ${ex.printStackTrace()}")
                     isSubsBody?.invoke(false)
                 }
                 Logger.exception("init")
@@ -147,22 +143,20 @@ open class Billing(
     override fun getInAppBillingService() = inAppBillingService
 
     override fun showFormPurchaseProduct(product: InAppProduct, body: ((BillingResponseType) -> Unit)?) {
-        if (isConnected && isAuth) {
-            val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), "")
-            val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
-            activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
-                    Intent(), 0, 0, 0)
-        } else {
-            if (isConnected && isAuth)
-                body?.invoke(BillingResponseType.SUCCESS)
+        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, context.packageName,
+                product.getSku(), product.getType(), "")
+        val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
+        activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
+                Intent(), 0, 0, 0)
+
+        if (isConnected && isAuth)
+            body?.invoke(BillingResponseType.SUCCESS)
+        else
+            if (!isConnected)
+                body?.invoke(BillingResponseType.NOT_CONNECTED)
             else
-                if (!isConnected)
-                    body?.invoke(BillingResponseType.NOT_CONNECTED)
-                else
-                    if (!isAuth)
-                        body?.invoke(BillingResponseType.NOT_AUTH)
-        }
+                if (!isAuth)
+                    body?.invoke(BillingResponseType.NOT_AUTH)
     }
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
@@ -287,8 +281,6 @@ open class Billing(
 
     interface BillingListener {
         fun billingConnectBody(products: (List<InAppProduct>)?)
-        fun billingErrorAuth()
-        fun billingErrorConnect(message: String)
         fun billingCanceled()
     }
 }
