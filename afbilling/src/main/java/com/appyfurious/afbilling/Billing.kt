@@ -54,6 +54,8 @@ open class Billing(
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
 
+    private var isSubsBody: ((Boolean) -> Unit)? = null
+
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             try {
@@ -70,8 +72,8 @@ open class Billing(
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
-                isSubsBody?.let {
-                    isSubs(it)
+                isSubs { isSubs ->
+                    isSubsBody?.invoke(isSubs)
                 }
             } catch (ex: Exception) {
                 //listener?.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
@@ -85,8 +87,6 @@ open class Billing(
             Logger.notify("onServiceDisconnected inAppBillingService = null")
         }
     }
-
-    private var isSubsBody: ((Boolean) -> Unit)? = null
 
     init {
         if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
