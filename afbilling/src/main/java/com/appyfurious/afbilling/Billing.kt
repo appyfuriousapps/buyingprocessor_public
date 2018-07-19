@@ -143,12 +143,13 @@ open class Billing(
     override fun getInAppBillingService() = inAppBillingService
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
-        val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                product?.getSku(), product?.getType(), "")
-        val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
-        activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
-                Intent(), 0, 0, 0)
-
+        if (product != null) {
+            val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
+                    product.getSku(), product.getType(), "")
+            val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
+            activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
+                    Intent(), 0, 0, 0)
+        }
         if (isConnected && isAuth)
             body?.invoke(BillingResponseType.SUCCESS)
         else
