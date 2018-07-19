@@ -12,6 +12,6 @@ interface BaseBilling {
 
     fun isSubs(body: (Boolean) -> Unit)
     fun isSubs(body: (Boolean, InAppProduct?) -> Unit)
-    fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String)
+    fun showFormPurchaseProduct(product: InAppProduct, body: ((Billing.BillingResponseType) -> Unit)?)
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, listener: ValidationCallback.ValidationListener)
 }

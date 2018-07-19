@@ -22,8 +22,14 @@ open class Billing(
         private val baseUrl: String,
         private val apiKey: String,
         private val secretKey: String,
-        private val listener: BillingListener,
+        private val listener: BillingListener?,
         private val listSubs: List<ProductPreview>? = null) : BaseBilling {
+
+    constructor(baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean) -> Unit)
+            : this(baseUrl, apiKey, secretKey, null, null)
+
+    constructor(baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean, InAppProduct?) -> Unit)
+            : this(baseUrl, apiKey, secretKey, null, null)
 
     companion object {
         const val REQUEST_CODE_BUY = 1234
@@ -42,24 +48,30 @@ open class Billing(
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
+    private var isAuth = false
+    private var isConnected = false
+
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             try {
+                isConnected = true
                 inAppBillingService = IInAppBillingService.Stub.asInterface(service)
                 if (listSubs != null) {
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
                     syncProducts(products, listSubs)
+                    isAuth = products != null
                     if (products != null)
-                        listener.billingConnectBody(products)
-                    else listener.billingErrorAuth()
+                        listener?.billingConnectBody(products)
+                    else listener?.billingErrorAuth()
                 } else {
-                    listener.billingConnectBody(null)
+                    isAuth = true
+                    listener?.billingConnectBody(null)
                 }
             } catch (ex: Exception) {
-                //listener.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
+                //listener?.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
             }
@@ -72,14 +84,16 @@ open class Billing(
     }
 
     init {
+        if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
+            throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
         Thread {
             Logger.notify("init async start")
             try {
                 val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
                 serviceIntent.`package` = "com.android.vending"
-                listener.billingContext()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+                listener?.billingContext()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
-                (listener.billingContext() as? Activity)?.runOnUiThread {
+                (listener?.billingContext() as? Activity)?.runOnUiThread {
                     listener.billingErrorConnect("init error ${ex.message} ${ex.printStackTrace()}")
                 }
                 Logger.exception("init")
@@ -89,7 +103,7 @@ open class Billing(
         }.start()
     }
 
-    private fun activity() = (listener.billingContext() as Activity)
+    private fun activity() = (listener?.billingContext() as Activity)
 
     private fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
         productsPreview?.map { preview ->
@@ -107,7 +121,7 @@ open class Billing(
         query.putStringArrayList("ITEM_ID_LIST", skuList)
 
         val skuDetails = inAppBillingService?.getSkuDetails(
-                3, listener.billingContext()?.packageName, type, query)
+                3, listener?.billingContext()?.packageName, type, query)
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
         return responseList?.map {
@@ -119,12 +133,23 @@ open class Billing(
     override fun getProducts() = products
     override fun getInAppBillingService() = inAppBillingService
 
-    override fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String) {
-        val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener.billingContext()?.packageName,
-                product.getSku(), product.getType(), developerPayload)
-        val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
-        activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
-                Intent(), 0, 0, 0)
+    override fun showFormPurchaseProduct(product: InAppProduct, body: ((BillingResponseType) -> Unit)?) {
+        if (isConnected && isAuth) {
+            val buyIntentBundle = inAppBillingService!!.getBuyIntent(3, listener?.billingContext()?.packageName,
+                    product.getSku(), product.getType(), "")
+            val pendingIntent = buyIntentBundle.getParcelable<PendingIntent>("BUY_INTENT")
+            activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
+                    Intent(), 0, 0, 0)
+        } else {
+            if (isConnected && isAuth)
+                body?.invoke(BillingResponseType.SUCCESS)
+            else
+                if (!isConnected)
+                    body?.invoke(BillingResponseType.NOT_CONNECTED)
+                else
+                    if (!isAuth)
+                        body?.invoke(BillingResponseType.NOT_AUTH)
+        }
     }
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
@@ -170,7 +195,7 @@ open class Billing(
         val myProducts = ArrayList<InAppProduct>()
         do {
             val result = inAppBillingService!!.getPurchases(
-                    3, listener.billingContext()?.packageName, type, continuationToken)
+                    3, listener?.billingContext()?.packageName, type, continuationToken)
             if (result.getInt("RESPONSE_CODE", -1) != 0) {
                 throw Exception("Invalid response code")
             }
@@ -203,7 +228,7 @@ open class Billing(
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")
-                this.listener.billingCanceled()
+                this.listener?.billingCanceled()
             }
         }
         Logger.notify("finish onActivityResult validate")
@@ -224,12 +249,12 @@ open class Billing(
     private fun validationBody(product: InAppProduct, adInfoId: String) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken",
-                    product.productId, ValidationBody.PRODUCT_TYPE, listener.billingContext()?.packageName,
-                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener.billingContext()),
+                    product.productId, ValidationBody.PRODUCT_TYPE, listener?.billingContext()?.packageName,
+                    product.developerPayload, AppsFlyerLib.getInstance().getAppsFlyerUID(listener?.billingContext()),
                     adInfoId)
 
     private fun getAdvertingId(success: (String) -> Unit) {
-        AdvertisingIdClient.getAdvertisingId(listener.billingContext(), object : AdvertisingIdClient.Listener {
+        AdvertisingIdClient.getAdvertisingId(listener?.billingContext(), object : AdvertisingIdClient.Listener {
             private val default = "advertingId"
             override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo?) {
                 Logger.notify("onAdvertisingIdClientFinish ${adInfo?.id}")
@@ -241,6 +266,10 @@ open class Billing(
                 success(default)
             }
         })
+    }
+
+    enum class BillingResponseType {
+        SUCCESS, NOT_CONNECTED, NOT_AUTH
     }
 
     interface BillingListener {
