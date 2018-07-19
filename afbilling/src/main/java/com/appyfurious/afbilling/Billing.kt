@@ -115,8 +115,8 @@ open class Billing(
         }
     }
 
+    override fun getServiceConnection() = serviceConnection
     override fun getProducts() = products
-
     override fun getInAppBillingService() = inAppBillingService
 
     override fun showFormPurchaseProduct(product: InAppProduct, developerPayload: String) {
