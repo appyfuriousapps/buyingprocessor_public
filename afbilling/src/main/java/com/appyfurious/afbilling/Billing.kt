@@ -27,9 +27,9 @@ open class Billing(
         private val listSubs: List<ProductPreview>? = null) : BaseBilling {
 
     constructor(context: Context, baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean) -> Unit)
-            : this(context, baseUrl, apiKey, secretKey, null, null)
-    constructor(context: Context, baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean, InAppProduct?) -> Unit)
-            : this(context, baseUrl, apiKey, secretKey, null, null)
+            : this(context, baseUrl, apiKey, secretKey, null, null) {
+        isSubsBody = isSubs
+    }
 
     companion object {
         const val REQUEST_CODE_BUY = 1234
@@ -70,6 +70,9 @@ open class Billing(
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
+                isSubsBody?.let {
+                    isSubs(it)
+                }
             } catch (ex: Exception) {
                 //listener?.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
                 Logger.notify("serviceConnection")
@@ -82,6 +85,8 @@ open class Billing(
             Logger.notify("onServiceDisconnected inAppBillingService = null")
         }
     }
+
+    private var isSubsBody: ((Boolean) -> Unit)? = null
 
     init {
         if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
