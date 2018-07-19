@@ -47,22 +47,22 @@ open class Billing(
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            // try {
-            inAppBillingService = IInAppBillingService.Stub.asInterface(service)
-            if (listSubs != null) {
-                products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
-                syncProducts(products, listSubs)
-                if (products != null)
-                    listener.billingConnectBody(products)
-                else listener.billingErrorAuth()
-            } else {
-                listener.billingConnectBody(null)
-            }
-            /*} catch (ex: Exception) {
-                listener.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
+            try {
+                inAppBillingService = IInAppBillingService.Stub.asInterface(service)
+                if (listSubs != null) {
+                    products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
+                    syncProducts(products, listSubs)
+                    if (products != null)
+                        listener.billingConnectBody(products)
+                    else listener.billingErrorAuth()
+                } else {
+                    listener.billingConnectBody(null)
+                }
+            } catch (ex: Exception) {
+                //listener.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
-            }*/
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
