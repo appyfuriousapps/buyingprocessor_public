@@ -72,11 +72,10 @@ open class Billing(
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
-                isSubs { isSubs ->
-                    isSubsBody?.invoke(isSubs)
-                }
+                isSubsStart()
             } catch (ex: Exception) {
                 //listener?.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
+                isSubsBody?.invoke(false)
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
             }
@@ -100,12 +99,21 @@ open class Billing(
             } catch (ex: Exception) {
                 (context as? Activity)?.runOnUiThread {
                     listener?.billingErrorConnect("init error ${ex.message} ${ex.printStackTrace()}")
+                    isSubsBody?.invoke(false)
                 }
                 Logger.exception("init")
                 error(ex)
             }
             Logger.notify("init async finish")
         }.start()
+    }
+
+    private fun isSubsStart() {
+        isSubsBody?.let {
+            isSubs { isSubs, _ ->
+                isSubsBody?.invoke(isSubs)
+            }
+        }
     }
 
     private fun activity() = (context as Activity)
