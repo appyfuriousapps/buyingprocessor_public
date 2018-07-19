@@ -146,7 +146,7 @@ open class Billing(
         val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
                 product?.getSku(), product?.getType(), "")
         val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
-        activity().startIntentSenderForResult(pendingIntent!!.intentSender, REQUEST_CODE_BUY,
+        activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                 Intent(), 0, 0, 0)
 
         if (isConnected && isAuth)
