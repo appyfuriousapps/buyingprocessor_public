@@ -59,7 +59,7 @@ open class Billing(
                     listener.billingConnectBody(null)
                 }
             } catch (ex: Exception) {
-                listener.billingErrorConnect("serviceConnection error")
+                listener.billingErrorConnect("serviceConnection error ${ex.message} ${ex.printStackTrace()}")
                 Logger.notify("serviceConnection")
                 ex.printStackTrace()
             }
@@ -80,7 +80,7 @@ open class Billing(
                 listener.billingContext()?.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
             } catch (ex: Exception) {
                 (listener.billingContext() as? Activity)?.runOnUiThread {
-                    listener.billingErrorConnect("init error")
+                    listener.billingErrorConnect("init error ${ex.message} ${ex.printStackTrace()}")
                 }
                 Logger.exception("init")
                 error(ex)
