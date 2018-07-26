@@ -25,6 +25,7 @@ public class AdManager implements AdDownloadingCallback {
     private AdView mAdView;
     private LinearLayout mAdContainer;
     private boolean isAdSuccessfullyDownloaded;
+    private boolean isPremium;
 
     public void initBannerAd(Context context, String bannerAdKey) {
         mAdView = new AdView(context);
@@ -38,11 +39,15 @@ public class AdManager implements AdDownloadingCallback {
     }
 
     public void initBannerContainer(AppCompatActivity activity) {
-        mAdContainer =  activity.findViewById(R.id.ad_container);
+        mAdContainer = activity.findViewById(R.id.ad_container);
         if (mAdContainer != null) {
-            if (isAdSuccessfullyDownloaded) {
-                mAdContainer.setVisibility(View.VISIBLE);
-                loadAd(mAdContainer);
+            if (!isPremium) {
+                if (isAdSuccessfullyDownloaded) {
+                    mAdContainer.setVisibility(View.VISIBLE);
+                    loadAd(mAdContainer);
+                } else {
+                    mAdContainer.setVisibility(View.GONE);
+                }
             } else {
                 mAdContainer.setVisibility(View.GONE);
             }
@@ -69,8 +74,8 @@ public class AdManager implements AdDownloadingCallback {
         isAdSuccessfullyDownloaded = false;
     }
 
-    public boolean isAdSuccessfullyDownloaded() {
-        return isAdSuccessfullyDownloaded;
+    public void setPremium(boolean premium) {
+        isPremium = premium;
     }
 
 }
