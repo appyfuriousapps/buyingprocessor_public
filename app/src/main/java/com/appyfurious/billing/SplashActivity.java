@@ -19,7 +19,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        getApplicationAdManager().setPremium(false);
 
         new Handler().postDelayed(new Runnable() {
             @Override
