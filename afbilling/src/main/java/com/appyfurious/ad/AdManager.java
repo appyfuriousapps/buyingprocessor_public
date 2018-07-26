@@ -10,6 +10,7 @@ import com.appyfurious.afbilling.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 /**
  * AdManager.java
@@ -23,6 +24,7 @@ import com.google.android.gms.ads.AdView;
 public class AdManager implements AdDownloadingCallback {
 
     private AdView mAdView;
+    private InterstitialAd mInterstitialAd;
     private LinearLayout mAdContainer;
     private boolean isAdSuccessfullyDownloaded;
     private boolean isPremium;
@@ -62,6 +64,23 @@ public class AdManager implements AdDownloadingCallback {
         }
 
         adContainer.addView(mAdView);
+    }
+
+    public void initInterstitialAd(Context context, String interstitialAdKey) {
+        mInterstitialAd = new InterstitialAd(context);
+        mInterstitialAd.setAdUnitId(interstitialAdKey);
+        AdRequest adRequest = new AdRequest.Builder()
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
+    }
+
+    public void showInterstitial() {
+        if (mInterstitialAd != null) {
+            if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            }
+        }
     }
 
     @Override
