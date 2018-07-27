@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -35,8 +36,11 @@ dependencies {
     implementation 'com.android.installreferrer:installreferrer:1.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.33.0'
     implementation 'com.facebook.android:facebook-core:4.33.0'
-    implementation 'com.google.android.gms:play-services-ads:11.0.4'
-    implementation 'com.google.android.gms:play-services-base:11.0.4'
+    implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.google.android.gms:play-services-base:15.0.1'
+    implementation("com.crashlytics.sdk.android:crashlytics:2.9.4@aar") {
+        transitive = true
+    }
 }
 repositories {
     mavenCentral()
