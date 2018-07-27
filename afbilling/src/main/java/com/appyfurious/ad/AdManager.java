@@ -84,12 +84,14 @@ public class AdManager implements AdDownloadingCallback {
     }
 
     public void showInterstitial() {
-        if (mInterstitialAd != null) {
-            if (mInterstitialAd.isLoaded()) {
-                mInterstitialAd.show();
-            }
+        if (!isPremium) {
+            if (mInterstitialAd != null) {
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                }
 
-            loadInterstitialAd();
+                loadInterstitialAd();
+            }
         }
     }
 
