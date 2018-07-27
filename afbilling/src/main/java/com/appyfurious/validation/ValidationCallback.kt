@@ -2,7 +2,7 @@ package com.appyfurious.validation
 
 import android.content.Context
 import com.appyfurious.log.Logger
-import com.appyfurious.validation.event.FacebookInteractor
+import com.appyfurious.validation.event.Events
 import okhttp3.ResponseBody
 import org.json.JSONException
 import org.json.JSONObject
@@ -90,7 +90,7 @@ class ValidationCallback(private val mSecretKey: String,
         if (validationRestoreListener != null) {
             validationRestoreListener.validationRestoreSuccess()
         } else {
-            FacebookInteractor.logAddedToCartEvent(mValidationListener?.validationContext())
+            Events.logAddedToCartEvent(mValidationListener?.validationContext())
         }
     }
 
