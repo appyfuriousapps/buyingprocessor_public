@@ -29,6 +29,9 @@ public class AdManager implements AdDownloadingCallback {
     private boolean isAdSuccessfullyDownloaded;
     private boolean isPremium;
 
+    private Context mApplicationContext;
+    private String mInterstitialKey;
+
     public void initBannerAd(Context context, String bannerAdKey) {
         mAdView = new AdView(context);
         mAdView.setAdSize(AdSize.BANNER);
@@ -67,10 +70,15 @@ public class AdManager implements AdDownloadingCallback {
     }
 
     public void initInterstitialAd(Context context, String interstitialAdKey) {
-        mInterstitialAd = new InterstitialAd(context);
-        mInterstitialAd.setAdUnitId(interstitialAdKey);
-        AdRequest adRequest = new AdRequest.Builder()
-                .build();
+        this.mApplicationContext = context;
+        this.mInterstitialKey = interstitialAdKey;
+        loadInterstitialAd();
+    }
+
+    public void loadInterstitialAd() {
+        mInterstitialAd = new InterstitialAd(mApplicationContext);
+        mInterstitialAd.setAdUnitId(mInterstitialKey);
+        AdRequest adRequest = new AdRequest.Builder().build();
 
         mInterstitialAd.loadAd(adRequest);
     }
@@ -80,6 +88,8 @@ public class AdManager implements AdDownloadingCallback {
             if (mInterstitialAd.isLoaded()) {
                 mInterstitialAd.show();
             }
+
+            loadInterstitialAd();
         }
     }
 
