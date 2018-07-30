@@ -2,12 +2,17 @@ package com.appyfurious.afbilling
 
 import android.app.Activity
 import android.app.PendingIntent
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v4.app.FragmentActivity
+import android.util.Log
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
@@ -24,7 +29,7 @@ open class Billing(
         private val apiKey: String,
         private val secretKey: String,
         private val listener: BillingListener?,
-        private val listSubs: List<ProductPreview>? = null) : BaseBilling {
+        private val listSubs: List<ProductPreview>? = null) : BaseBilling, LifecycleObserver {
 
     constructor(context: Context, baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean) -> Unit)
             : this(context, baseUrl, apiKey, secretKey, null, null) {
@@ -48,18 +53,17 @@ open class Billing(
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
+    private val lifecycle: Lifecycle
     private var isAuth = false
     private var isConnected = false
-
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
-
     private var isSubsBody: ((Boolean) -> Unit)? = null
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            isConnected = true
             try {
-                isConnected = true
                 inAppBillingService = IInAppBillingService.Stub.asInterface(service)
                 if (listSubs != null) {
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
@@ -70,7 +74,11 @@ open class Billing(
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
-                isSubsStart()
+                isSubsBody?.let {
+                    isSubs { isSubs, _ ->
+                        isSubsBody?.invoke(isSubs)
+                    }
+                }
             } catch (ex: Exception) {
                 isSubsBody?.invoke(false)
                 Logger.notify("serviceConnection")
@@ -79,6 +87,7 @@ open class Billing(
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
+            isConnected = false
             inAppBillingService = null
             Logger.notify("onServiceDisconnected inAppBillingService = null")
         }
@@ -87,29 +96,30 @@ open class Billing(
     init {
         if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
             throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
-        Thread {
-            Logger.notify("init async start")
-            try {
-                val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
-                serviceIntent.`package` = "com.android.vending"
-                context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-            } catch (ex: Exception) {
-                (context as? Activity)?.runOnUiThread {
-                    isSubsBody?.invoke(false)
-                }
-                Logger.exception("init")
-                error(ex)
-            }
-            Logger.notify("init async finish")
-        }.start()
+        lifecycle = (context as FragmentActivity).lifecycle
     }
 
-    private fun isSubsStart() {
-        isSubsBody?.let {
-            isSubs { isSubs, _ ->
-                isSubsBody?.invoke(isSubs)
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private fun onResume() {
+        Logger.notify("onResume connected")
+        try {
+            val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
+            serviceIntent.`package` = "com.android.vending"
+            context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        } catch (ex: Exception) {
+            (context as? Activity)?.runOnUiThread {
+                isSubsBody?.invoke(false)
             }
+            Logger.exception("init")
+            error(ex)
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private fun onPause() {
+        Logger.notify("onPause disconnected, flag isConnected: $isConnected")
+        if (isConnected)
+            activity().unbindService(serviceConnection)
     }
 
     private fun activity() = (context as Activity)
