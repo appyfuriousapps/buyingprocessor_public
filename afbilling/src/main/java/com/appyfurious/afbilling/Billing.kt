@@ -123,6 +123,11 @@ open class Billing(
             activity().unbindService(serviceConnection)
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    private fun onDestroy() {
+        lifecycle.removeObserver(this)
+    }
+
     private fun activity() = (context as Activity)
 
     private fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
