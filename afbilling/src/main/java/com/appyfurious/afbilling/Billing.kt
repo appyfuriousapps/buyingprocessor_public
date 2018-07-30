@@ -97,6 +97,7 @@ open class Billing(
         if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
             throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
         lifecycle = (context as FragmentActivity).lifecycle
+        lifecycle.addObserver(this)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
