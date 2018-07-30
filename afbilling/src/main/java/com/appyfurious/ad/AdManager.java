@@ -11,6 +11,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
 /**
  * AdManager.java
@@ -25,15 +28,25 @@ public class AdManager implements AdDownloadingCallback {
 
     private AdView mAdView;
     private InterstitialAd mInterstitialAd;
+    private RewardedVideoAd mRewardedVideoAd;
     private LinearLayout mAdContainer;
     private boolean isAdSuccessfullyDownloaded;
     private boolean isPremium;
 
     private Context mApplicationContext;
     private String mInterstitialKey;
+    private String mRewardedVideoAdKey;
 
-    public void initBannerAd(Context context, String bannerAdKey) {
-        mAdView = new AdView(context);
+    public AdManager(Context context) {
+        this.mApplicationContext = context;
+    }
+
+    public void initMobileAds(String appAdKey) {
+        MobileAds.initialize(mApplicationContext, appAdKey);
+    }
+
+    public void initBannerAd(String bannerAdKey) {
+        mAdView = new AdView(mApplicationContext);
         mAdView.setAdSize(AdSize.BANNER);
         mAdView.setAdUnitId(bannerAdKey);
 
@@ -69,8 +82,7 @@ public class AdManager implements AdDownloadingCallback {
         adContainer.addView(mAdView);
     }
 
-    public void initInterstitialAd(Context context, String interstitialAdKey) {
-        this.mApplicationContext = context;
+    public void initInterstitialAd(String interstitialAdKey) {
         this.mInterstitialKey = interstitialAdKey;
         loadInterstitialAd();
     }
@@ -84,13 +96,30 @@ public class AdManager implements AdDownloadingCallback {
     }
 
     public void showInterstitial() {
-        if (!isPremium) {
-            if (mInterstitialAd != null) {
-                if (mInterstitialAd.isLoaded()) {
-                    mInterstitialAd.show();
-                }
+        if (mInterstitialAd != null) {
+            if (mInterstitialAd.isLoaded()) {
+                mInterstitialAd.show();
+            }
 
-                loadInterstitialAd();
+            loadInterstitialAd();
+        }
+    }
+
+    public void initRewardedVideoAd(String rewardedVideoAdKey) {
+        this.mRewardedVideoAdKey = rewardedVideoAdKey;
+    }
+
+    public void loadRewardedVideoAd(AppCompatActivity context, RewardedVideoAdListener listener) {
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(context);
+        mRewardedVideoAd.setRewardedVideoAdListener(listener);
+        mRewardedVideoAd.loadAd(mRewardedVideoAdKey,
+                new AdRequest.Builder().build());
+    }
+
+    public void showRewardedVideoAd() {
+        if (mRewardedVideoAd != null) {
+            if (mRewardedVideoAd.isLoaded()) {
+                mRewardedVideoAd.show();
             }
         }
     }

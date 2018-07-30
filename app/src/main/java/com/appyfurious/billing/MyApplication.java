@@ -22,8 +22,9 @@ public class MyApplication extends Application implements AdManagerApplication {
     public void onCreate() {
         super.onCreate();
 
-        adManager = new AdManager();
-        adManager.initBannerAd(this, "ca-app-pub-3940256099942544/6300978111");
+        adManager = new AdManager(this);
+        adManager.initMobileAds("ca-app-pub-3940256099942544/5224354917");
+        adManager.initRewardedVideoAd("ca-app-pub-3940256099942544/5224354917");
     }
 
     @Override

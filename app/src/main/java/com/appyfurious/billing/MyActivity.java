@@ -23,6 +23,12 @@ public class MyActivity extends BaseActivity {
         setContentView(R.layout.activity_example);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getApplicationAdManager().showInterstitial();
+    }
+
     public void onClickButton(View view) {
         Intent i = new Intent(this, My2Activity.class);
         startActivity(i);
