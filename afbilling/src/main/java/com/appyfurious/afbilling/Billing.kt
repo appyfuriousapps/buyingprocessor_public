@@ -99,8 +99,8 @@ class Billing(
         lifecycle.addObserver(this)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    private fun onStart() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private fun onResume() {
         Logger.notify("onResume connected")
         try {
             val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
@@ -115,11 +115,12 @@ class Billing(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    private fun onStop() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private fun onPause() {
         Logger.notify("onPause disconnected, flag isConnected: $isConnected")
         if (isConnected)
             activity().unbindService(serviceConnection)
+        isConnected = false
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
