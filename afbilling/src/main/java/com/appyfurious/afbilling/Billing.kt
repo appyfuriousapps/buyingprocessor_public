@@ -12,7 +12,6 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
@@ -23,7 +22,7 @@ import com.appyfurious.validation.utils.AdvertisingIdClient
 import com.google.gson.GsonBuilder
 import java.util.*
 
-open class Billing(
+class Billing(
         private val context: Context,
         private val baseUrl: String,
         private val apiKey: String,
@@ -100,8 +99,8 @@ open class Billing(
         lifecycle.addObserver(this)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    private fun onResume() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    private fun onStart() {
         Logger.notify("onResume connected")
         try {
             val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
@@ -116,8 +115,8 @@ open class Billing(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    private fun onPause() {
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    private fun onStop() {
         Logger.notify("onPause disconnected, flag isConnected: $isConnected")
         if (isConnected)
             activity().unbindService(serviceConnection)
