@@ -38,17 +38,17 @@ class Billing(
     companion object {
         const val REQUEST_CODE_BUY = 1234
         const val BILLING_RESPONSE_RESULT_OK = 0
-        const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
-        const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2
-        const val BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3
-        const val BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 4
-        const val BILLING_RESPONSE_RESULT_DEVELOPER_ERROR = 5
-        const val BILLING_RESPONSE_RESULT_ERROR = 6
-        const val BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7
-        const val BILLING_RESPONSE_RESULT_ITEM_NOT_OWNED = 8
+        //const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
+        //const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2
+        //const val BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3
+        //const val BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 4
+        //const val BILLING_RESPONSE_RESULT_DEVELOPER_ERROR = 5
+        //const val BILLING_RESPONSE_RESULT_ERROR = 6
+        //const val BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7
+        //const val BILLING_RESPONSE_RESULT_ITEM_NOT_OWNED = 8
         const val PURCHASE_STATUS_PURCHASED = 0
         const val PURCHASE_STATUS_CANCELLED = 1
-        const val PURCHASE_STATUS_REFUNDED = 2
+        //const val PURCHASE_STATUS_REFUNDED = 2
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
@@ -117,7 +117,7 @@ class Billing(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     private fun onPause() {
-        Logger.notify("onPause disconnected, flag isConnected: $isConnected")
+        Logger.notify("onPause disconnected")
         if (isConnected)
             activity().unbindService(serviceConnection)
         isConnected = false
@@ -178,7 +178,7 @@ class Billing(
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
-        readMyPurchases(InAppProduct.SUBS) {
+        readMyPurchases(InAppProduct.SUBS) { it ->
             Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
             var product: InAppProduct? = null
             val isSubs = it.isNotEmpty() && it.filter {
