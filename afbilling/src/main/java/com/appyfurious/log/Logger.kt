@@ -7,6 +7,7 @@ class Logger {
         const val NOTIFY = "notify"
         const val EXCEPTION = "exception"
         const val TAG = "validation"
+        const val TAG_AD = "AdManager"
         private var isDebug = false
         private var isPrintExceptionObject = false
 
@@ -42,6 +43,12 @@ class Logger {
         fun print(key: String, message: String) {
             if (isDebug) {
                 Log.d(TAG, "$key: $message")
+            }
+        }
+
+        fun logAd(message: String) {
+            if (isDebug) {
+                Log.d(TAG_AD,  message)
             }
         }
     }

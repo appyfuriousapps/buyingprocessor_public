@@ -1,6 +1,8 @@
 package com.appyfurious.billing;
 
 import android.app.Application;
+import android.os.Build;
+import android.widget.Toast;
 
 import com.appyfurious.ad.AdManager;
 import com.appyfurious.ad.AdManagerApplication;
@@ -22,12 +24,12 @@ public class MyApplication extends Application implements AdManagerApplication {
     public void onCreate() {
         super.onCreate();
 
-        adManager = new AdManager();
-        adManager.initBannerAd(this, "ca-app-pub-3940256099942544/6300978111");
+        adManager = new AdManager(this);
     }
 
     @Override
     public AdManager getAdManager() {
         return adManager;
     }
+
 }

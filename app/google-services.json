@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "682066672797",
+    "firebase_url": "https://billing-library.firebaseio.com",
+    "project_id": "billing-library",
+    "storage_bucket": "billing-library.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682066672797:android:e14302891dcbf501",
+        "android_client_info": {
+          "package_name": "com.appyfurious.billing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "682066672797-hlm98arn5c11nnv26rmgmjtobrok27r2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnJrQF4yI4v5qtEzuPy1veZBRnQGcEDVE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.widget.LinearLayout;
 
 /**
  * MyActivity.java
@@ -21,6 +20,13 @@ public class MyActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_example);
+        getApplicationAdManager().requestInterstitial("EnterInActivity1");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        getApplicationAdManager().requestInterstitial("ExitFromActivity2");
     }
 
     public void onClickButton(View view) {
