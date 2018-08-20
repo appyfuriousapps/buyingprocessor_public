@@ -2,12 +2,16 @@ package com.appyfurious.afbilling
 
 import android.app.Activity
 import android.app.PendingIntent
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v4.app.FragmentActivity
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
@@ -18,13 +22,13 @@ import com.appyfurious.validation.utils.AdvertisingIdClient
 import com.google.gson.GsonBuilder
 import java.util.*
 
-open class Billing(
+class Billing(
         private val context: Context,
         private val baseUrl: String,
         private val apiKey: String,
         private val secretKey: String,
         private val listener: BillingListener?,
-        private val listSubs: List<ProductPreview>? = null) : BaseBilling {
+        private val listSubs: List<ProductPreview>? = null) : BaseBilling, LifecycleObserver {
 
     constructor(context: Context, baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean) -> Unit)
             : this(context, baseUrl, apiKey, secretKey, null, null) {
@@ -34,32 +38,31 @@ open class Billing(
     companion object {
         const val REQUEST_CODE_BUY = 1234
         const val BILLING_RESPONSE_RESULT_OK = 0
-        const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
-        const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2
-        const val BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3
-        const val BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 4
-        const val BILLING_RESPONSE_RESULT_DEVELOPER_ERROR = 5
-        const val BILLING_RESPONSE_RESULT_ERROR = 6
-        const val BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7
-        const val BILLING_RESPONSE_RESULT_ITEM_NOT_OWNED = 8
+        //const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
+        //const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2
+        //const val BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3
+        //const val BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 4
+        //const val BILLING_RESPONSE_RESULT_DEVELOPER_ERROR = 5
+        //const val BILLING_RESPONSE_RESULT_ERROR = 6
+        //const val BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7
+        //const val BILLING_RESPONSE_RESULT_ITEM_NOT_OWNED = 8
         const val PURCHASE_STATUS_PURCHASED = 0
         const val PURCHASE_STATUS_CANCELLED = 1
-        const val PURCHASE_STATUS_REFUNDED = 2
+        //const val PURCHASE_STATUS_REFUNDED = 2
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
+    private val lifecycle: Lifecycle
     private var isAuth = false
     private var isConnected = false
-
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
-
     private var isSubsBody: ((Boolean) -> Unit)? = null
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            isConnected = true
             try {
-                isConnected = true
                 inAppBillingService = IInAppBillingService.Stub.asInterface(service)
                 if (listSubs != null) {
                     products = getInAppPurchases(InAppProduct.SUBS, listSubs.map { it.id })
@@ -70,7 +73,11 @@ open class Billing(
                     isAuth = true
                     listener?.billingConnectBody(null)
                 }
-                isSubsStart()
+                isSubsBody?.let {
+                    isSubs { isSubs, _ ->
+                        isSubsBody?.invoke(isSubs)
+                    }
+                }
             } catch (ex: Exception) {
                 isSubsBody?.invoke(false)
                 Logger.notify("serviceConnection")
@@ -79,6 +86,7 @@ open class Billing(
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
+            isConnected = false
             inAppBillingService = null
             Logger.notify("onServiceDisconnected inAppBillingService = null")
         }
@@ -87,29 +95,37 @@ open class Billing(
     init {
         if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
             throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
-        Thread {
-            Logger.notify("init async start")
-            try {
-                val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
-                serviceIntent.`package` = "com.android.vending"
-                context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
-            } catch (ex: Exception) {
-                (context as? Activity)?.runOnUiThread {
-                    isSubsBody?.invoke(false)
-                }
-                Logger.exception("init")
-                error(ex)
-            }
-            Logger.notify("init async finish")
-        }.start()
+        lifecycle = (context as FragmentActivity).lifecycle
+        lifecycle.addObserver(this)
     }
 
-    private fun isSubsStart() {
-        isSubsBody?.let {
-            isSubs { isSubs, _ ->
-                isSubsBody?.invoke(isSubs)
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private fun onResume() {
+        Logger.notify("onResume connected")
+        try {
+            val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
+            serviceIntent.`package` = "com.android.vending"
+            context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        } catch (ex: Exception) {
+            (context as? Activity)?.runOnUiThread {
+                isSubsBody?.invoke(false)
             }
+            Logger.exception("init")
+            error(ex)
         }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    private fun onPause() {
+        Logger.notify("onPause disconnected")
+        if (isConnected)
+            activity().unbindService(serviceConnection)
+        isConnected = false
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    private fun onDestroy() {
+        lifecycle.removeObserver(this)
     }
 
     private fun activity() = (context as Activity)
@@ -162,7 +178,7 @@ open class Billing(
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
-        readMyPurchases(InAppProduct.SUBS) {
+        readMyPurchases(InAppProduct.SUBS) { it ->
             Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
             var product: InAppProduct? = null
             val isSubs = it.isNotEmpty() && it.filter {
