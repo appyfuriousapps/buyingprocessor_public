@@ -1,6 +1,8 @@
 package com.appyfurious.billing;
 
 import android.app.Application;
+import android.os.Build;
+import android.widget.Toast;
 
 import com.appyfurious.ad.AdManager;
 import com.appyfurious.ad.AdManagerApplication;
@@ -23,12 +25,11 @@ public class MyApplication extends Application implements AdManagerApplication {
         super.onCreate();
 
         adManager = new AdManager(this);
-        adManager.initMobileAds("ca-app-pub-3940256099942544/5224354917");
-        adManager.initRewardedVideoAd("ca-app-pub-3940256099942544/5224354917");
     }
 
     @Override
     public AdManager getAdManager() {
         return adManager;
     }
+
 }
