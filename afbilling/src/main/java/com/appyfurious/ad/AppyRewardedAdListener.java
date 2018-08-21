@@ -22,7 +22,7 @@ public class AppyRewardedAdListener implements RewardedVideoAdListener {
     private RewardedCallback mRewardedCallback;
     private Button mButton;
 
-    public AppyRewardedAdListener(@NotNull RewardedCallback<? extends AppCompatActivity> callback, Button button) {
+    public AppyRewardedAdListener(@NotNull RewardedCallback callback, Button button) {
         mRewardedCallback = callback;
         mButton = button;
         mButton.setVisibility(View.GONE);
