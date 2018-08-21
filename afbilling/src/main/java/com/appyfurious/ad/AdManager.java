@@ -224,7 +224,7 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
         this.mRewardedVideoAdKey = rewardedVideoId;
     }
 
-    public void loadRewardedVideoAd(AppCompatActivity context, RewardedCallback<? extends AppCompatActivity> callback, Button button) {
+    public void loadRewardedVideoAd(AppCompatActivity context, RewardedCallback callback, Button button) {
         mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
         mRewardedVideoAd.setRewardedVideoAdListener(new AppyRewardedAdListener(callback, button));
         mRewardedVideoAd.loadAd(mRewardedVideoAdKey,
