@@ -30,10 +30,12 @@ public class AdConfigParser {
 
     private String mOriginal;
     private ParserListener mParserListener;
+    private boolean isDebug;
 
-    public AdConfigParser(String original, ParserListener listener) {
+    public AdConfigParser(String original, ParserListener listener, boolean isDebug) {
         this.mOriginal = original;
         this.mParserListener = listener;
+        this.isDebug = isDebug;
         parse();
     }
 
@@ -48,7 +50,7 @@ public class AdConfigParser {
         if (source != null) {
             try {
                 String appId;
-                if (BuildConfig.DEBUG) {
+                if (isDebug) {
                     appId = DebugConfig.DEBUG_APP_ID;
                 } else {
                     appId = (String) source.get(APPLICATION_ID);
@@ -60,7 +62,7 @@ public class AdConfigParser {
 
             try {
                 String bannerId;
-                if (BuildConfig.DEBUG) {
+                if (isDebug) {
                     bannerId = DebugConfig.DEBUG_BANNER_ID;
                 } else {
                     bannerId = (String) source.get(BANNER_ID);
@@ -72,7 +74,7 @@ public class AdConfigParser {
 
             try {
                 String interstitialId;
-                if (BuildConfig.DEBUG) {
+                if (isDebug) {
                     interstitialId = DebugConfig.DEBUG_INTERSTITIAL_ID;
                 } else {
                     interstitialId = (String) source.get(INTERSTITIAL_ID);
@@ -84,7 +86,7 @@ public class AdConfigParser {
 
             try {
                 String rewardedVideoId;
-                if (BuildConfig.DEBUG) {
+                if (isDebug) {
                     rewardedVideoId = DebugConfig.DEBUG_REWARDED_VIDEO_ID;
                 } else {
                     rewardedVideoId = (String) source.get(REWARDED_VIDEO_ID);
