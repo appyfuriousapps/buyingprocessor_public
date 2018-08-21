@@ -1,5 +1,6 @@
 package com.appyfurious.ad;
 
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -22,16 +23,20 @@ public class AppyRewardedAdListener implements RewardedVideoAdListener {
     private RewardedCallback mRewardedCallback;
     private Button mButton;
 
-    public AppyRewardedAdListener(@NotNull RewardedCallback callback, Button button) {
+    public AppyRewardedAdListener(@NotNull RewardedCallback callback, @Nullable Button button) {
         mRewardedCallback = callback;
         mButton = button;
-        mButton.setVisibility(View.GONE);
+        if (mButton != null) {
+            mButton.setEnabled(false);
+        }
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
+        if (mButton != null) {
+            mButton.setEnabled(true);
+        }
         mRewardedCallback.onRewardedVideoAdLoaded();
-
     }
 
     @Override
