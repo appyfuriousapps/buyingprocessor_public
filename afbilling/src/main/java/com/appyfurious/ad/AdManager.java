@@ -77,12 +77,12 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
     private int mCurrentCountPerSession;
 
 
-    public AdManager(Context context) {
+    public AdManager(Context context, boolean isDebug) {
         this.mApplicationContext = context;
-        initAdManager();
+        initAdManager(isDebug);
     }
 
-    private void initAdManager() {
+    private void initAdManager(final boolean isDebug) {
         final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
@@ -98,7 +98,7 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
                                          // values are returned.
                                          mFirebaseRemoteConfig.activateFetched();
                                          new AdConfigParser(mFirebaseRemoteConfig
-                                                 .getString("ads_config_android"), AdManager.this);
+                                                 .getString("ads_config_android"), AdManager.this, isDebug);
                                      } else {
                                          Toast.makeText(mApplicationContext, "Fetch Failed",
                                                  Toast.LENGTH_SHORT).show();

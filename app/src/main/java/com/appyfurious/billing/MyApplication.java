@@ -24,7 +24,9 @@ public class MyApplication extends Application implements AdManagerApplication {
     public void onCreate() {
         super.onCreate();
 
-        adManager = new AdManager(this);
+
+
+        adManager = new AdManager(this, BuildConfig.DEBUG);
     }
 
     @Override
