@@ -58,6 +58,7 @@ class Billing(
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
     private var isSubsBody: ((Boolean) -> Unit)? = null
+    private val developerPayload = UUID.randomUUID().toString()
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -161,7 +162,7 @@ class Billing(
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), "")
+                    product.getSku(), product.getType(), developerPayload)
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)
@@ -265,7 +266,7 @@ class Billing(
         Logger.notify("baseUrl $baseUrl, apiKey $apiKey, secretKey $secretKey")
         val service = ValidationClient.getValidationService(secretKey, baseUrl)
         val call = service.validate(apiKey, body)
-        val validationCallback = ValidationCallback(secretKey, listener, restoreListener)
+        val validationCallback = ValidationCallback(secretKey, developerPayload, listener, restoreListener)
         call.enqueue(validationCallback)
         Logger.notify("validateRequest finish")
     }
