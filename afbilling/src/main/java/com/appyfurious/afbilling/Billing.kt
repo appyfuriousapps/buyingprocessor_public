@@ -266,7 +266,7 @@ class Billing(
         Logger.notify("baseUrl $baseUrl, apiKey $apiKey, secretKey $secretKey")
         val service = ValidationClient.getValidationService(secretKey, baseUrl)
         val call = service.validate(apiKey, body)
-        val validationCallback = ValidationCallback(secretKey, developerPayload, listener, restoreListener)
+        val validationCallback = ValidationCallback(secretKey, listener, restoreListener)
         call.enqueue(validationCallback)
         Logger.notify("validateRequest finish")
     }
