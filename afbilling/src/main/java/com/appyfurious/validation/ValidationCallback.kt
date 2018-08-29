@@ -23,7 +23,6 @@ import java.io.IOException
  */
 
 class ValidationCallback(private val mSecretKey: String,
-                         private val developerPayload: String,
                          private val mValidationListener: ValidationListener? = null,
                          private val validationRestoreListener: ValidationRestoreListener? = null)
     : Callback<ResponseBody> {
@@ -43,9 +42,7 @@ class ValidationCallback(private val mSecretKey: String,
                 Logger.notify(jsonData.toString())
                 val isValid = jsonData.getBoolean("isValid")
                 Logger.notify(isValid.toString())
-                val developerPayload = jsonData.getString("developerPayload")
-                Logger.notify("developerPayload $developerPayload")
-                if (isValid && this.developerPayload == developerPayload) {
+                if (isValid) {
                     Logger.notify("isValid validationSuccess")
                     validationSuccess()
                 } else {
