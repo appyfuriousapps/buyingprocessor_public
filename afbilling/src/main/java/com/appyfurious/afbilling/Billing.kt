@@ -241,8 +241,10 @@ open class Billing(
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
+
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
                 isSubs { isSubs, product ->
+                    Logger.notify("onActivityResult product: ${product?.toString()}")
                     getAdvertingId { advertingId ->
                         if (product != null && isSubs)
                             listener.onValidationShowProgress()

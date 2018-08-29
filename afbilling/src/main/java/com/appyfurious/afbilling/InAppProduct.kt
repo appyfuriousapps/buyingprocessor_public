@@ -68,4 +68,8 @@ open class InAppProduct {
     fun getSku(): String? = productId
 
     fun getType() = SUBS
+
+    override fun toString() = "$orderId, $packageName, $productId, $purchaseTime," +
+            "$purchaseState, $developerPayload, $purchaseToken, $autoRenewing, $price," +
+            "$priceAmountMicros, $priceCurrencyCode, $subscriptionPeriod, $title, $description"
 }
