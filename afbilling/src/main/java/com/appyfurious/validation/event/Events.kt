@@ -15,10 +15,10 @@ object Events {
     const val PREMIUM_SCREEN_SHOWN = "Premium_Screen_Shown"
     const val PREMIUM_OPTION_SELECTED = "Premium_Option_Selected"
 
-    const val SEGMENT_ID = "Segment ID"
-    const val SCREEN_ID = "Screen ID"
+    const val SEGMENT_ID = "Segment_ID"
+    const val SCREEN_ID = "Screen_ID"
     const val SOURCE = "Source"
-    const val PRODUCT_ID = "Product ID"
+    const val PRODUCT_ID = "Product_ID"
     const val PREMIUM_OPTION_PURCHASED = "Premium_Option_Purchased"
 
     const val DEFAULT_VALUE = "default"
