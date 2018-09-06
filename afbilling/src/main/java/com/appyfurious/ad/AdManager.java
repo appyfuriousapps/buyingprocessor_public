@@ -1,16 +1,25 @@
 package com.appyfurious.ad;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.amazon.device.ads.AdRegistration;
 import com.appyfurious.afbilling.R;
+import com.google.ads.mediation.facebook.FacebookAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.mopub.mobileads.dfp.adapters.MoPubAdapter;
+import com.vungle.mediation.VungleAdapter;
+import com.vungle.mediation.VungleExtrasBuilder;
+import com.vungle.mediation.VungleInterstitialAdapter;
 
 /**
  * AdManager.java
@@ -32,12 +41,34 @@ public class AdManager implements AdDownloadingCallback {
     private Context mApplicationContext;
     private String mInterstitialKey;
 
+    private AdRequest adRequest;
+
+    public void initMediation(Context context, String adUnitId) {
+        SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(adUnitId).build();
+        MoPub.initializeSdk(context, sdkConfiguration, null);
+
+        Bundle bundleMoPub = new MoPubAdapter.BundleBuilder().build();
+        Bundle bundleFacebook = new FacebookAdapter.FacebookExtrasBundleBuilder().build();
+        Bundle bundleVungle = new VungleExtrasBuilder(new String[]{"ACTIVITY_NAME_1", "ACTIVITY_NAME_2"}).build();
+
+        AdRegistration.setAppKey("AMAZON_KEY");
+
+        adRequest = new AdRequest.Builder()
+                //unity init in gradle
+                //smaato init in gradle
+                .addNetworkExtrasBundle(MoPubAdapter.class, bundleMoPub)//MoPub init
+                .addNetworkExtrasBundle(FacebookAdapter.class, bundleFacebook)//Facebook init
+                .addNetworkExtrasBundle(VungleAdapter.class, bundleVungle)//Vungle init
+                .addNetworkExtrasBundle(VungleInterstitialAdapter.class, bundleVungle)//Vungle Interstitial init
+                .build();
+    }
+
     public void initBannerAd(Context context, String bannerAdKey) {
         mAdView = new AdView(context);
         mAdView.setAdSize(AdSize.BANNER);
         mAdView.setAdUnitId(bannerAdKey);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adRequest = new AdRequest.Builder().build();//TODO AD
 
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AppyAdListener(this));
@@ -78,7 +109,7 @@ public class AdManager implements AdDownloadingCallback {
     public void loadInterstitialAd() {
         mInterstitialAd = new InterstitialAd(mApplicationContext);
         mInterstitialAd.setAdUnitId(mInterstitialKey);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adRequest = new AdRequest.Builder().build();//TODO AD
 
         mInterstitialAd.loadAd(adRequest);
     }
