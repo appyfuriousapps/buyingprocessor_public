@@ -3,7 +3,6 @@ package com.appyfurious.ad;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,9 +17,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -86,25 +83,24 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
         final FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults);
 
-        mFirebaseRemoteConfig.fetch(720)
-                             .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                 @Override
-                                 public void onComplete(@NonNull Task<Void> task) {
-                                     if (task.isSuccessful()) {
-                                         Toast.makeText(mApplicationContext, "Fetch Succeeded",
-                                                 Toast.LENGTH_SHORT).show();
+        mFirebaseRemoteConfig.fetch(720).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(mApplicationContext, "Fetch Succeeded",
+                            Toast.LENGTH_SHORT).show();
 
-                                         // After config data is successfully fetched, it must be activated before newly fetched
-                                         // values are returned.
-                                         mFirebaseRemoteConfig.activateFetched();
-                                         new AdConfigParser(mFirebaseRemoteConfig
-                                                 .getString("ads_config_android"), AdManager.this, isDebug);
-                                     } else {
-                                         Toast.makeText(mApplicationContext, "Fetch Failed",
-                                                 Toast.LENGTH_SHORT).show();
-                                     }
-                                 }
-                             });
+                    // After config data is successfully fetched, it must be activated before newly fetched
+                    // values are returned.
+                    mFirebaseRemoteConfig.activateFetched();
+                    new AdConfigParser(mFirebaseRemoteConfig
+                            .getString("ads_config_android"), AdManager.this, isDebug);
+                } else {
+                    Toast.makeText(mApplicationContext, "Fetch Failed",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void initBannerContainer(AppCompatActivity activity) {
