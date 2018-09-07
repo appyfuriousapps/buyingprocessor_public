@@ -45,7 +45,7 @@ dependencies {
     implementation("com.crashlytics.sdk.android:crashlytics:2.9.4@aar") {
         transitive = true
     }
-    compileOnly("com.google.firebase:firebase-config:$currentFirebaseVersion") {
+    implementation("com.google.firebase:firebase-config:$currentFirebaseVersion") {
         exclude group: 'org.json', module: 'json'
     }
 }

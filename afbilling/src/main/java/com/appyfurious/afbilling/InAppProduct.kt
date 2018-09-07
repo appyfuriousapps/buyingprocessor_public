@@ -2,6 +2,7 @@ package com.appyfurious.afbilling
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.util.regex.Pattern
 
 open class InAppProduct {
 
@@ -43,7 +44,7 @@ open class InAppProduct {
 
     @SerializedName("price")
     @Expose
-    val price: String? = null
+    var price: String? = null
 
     @SerializedName("price_amount_micros")
     @Expose
@@ -51,21 +52,31 @@ open class InAppProduct {
 
     @SerializedName("price_currency_code")
     @Expose
-    val priceCurrencyCode: String? = null
+    var priceCurrencyCode: String? = null
 
     @SerializedName("subscriptionPeriod")
     @Expose
-    val subscriptionPeriod: String? = null
+    var subscriptionPeriod: String? = null
 
     @SerializedName("title")
     @Expose
-    val title: String? = null
+    var title: String? = null
 
     @SerializedName("description")
     @Expose
-    val description: String? = null
+    var description: String? = null
 
     fun getSku(): String? = productId
 
     fun getType() = SUBS
+
+    fun gerPriceParse(): Double {
+        var result = 0.0
+        val resultParse = Pattern.compile("([0-9]+.*[0-9]*)").matcher(price)
+        if (resultParse.find()) {
+            val resultText = resultParse.group()
+            result = resultText.toDouble()
+        }
+        return result
+    }
 }

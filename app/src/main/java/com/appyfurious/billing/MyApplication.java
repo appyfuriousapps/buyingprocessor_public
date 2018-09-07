@@ -1,11 +1,11 @@
 package com.appyfurious.billing;
 
 import android.app.Application;
-import android.os.Build;
-import android.widget.Toast;
 
 import com.appyfurious.ad.AdManager;
 import com.appyfurious.ad.AdManagerApplication;
+import com.appyfurious.analytics.ScreenManager;
+import com.appyfurious.validation.ValidKeys;
 
 /**
  * MyApplication.java
@@ -24,8 +24,8 @@ public class MyApplication extends Application implements AdManagerApplication {
     public void onCreate() {
         super.onCreate();
 
-
-
+        ScreenManager.Companion.init(this); // read screen names init
+        ValidKeys.INSTANCE.init("", "", "");
         adManager = new AdManager(this, BuildConfig.DEBUG);
     }
 

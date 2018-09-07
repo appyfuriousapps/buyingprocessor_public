@@ -14,7 +14,10 @@ import android.os.IBinder
 import android.support.v4.app.FragmentActivity
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
+import com.appyfurious.analytics.Events
+import com.appyfurious.analytics.ScreenManager
 import com.appyfurious.log.Logger
+import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
 import com.appyfurious.validation.ValidationClient
 import com.appyfurious.validation.body.ValidationBody
@@ -24,34 +27,23 @@ import java.util.*
 
 class Billing(
         private val context: Context,
-        private val baseUrl: String,
-        private val apiKey: String,
-        private val secretKey: String,
         private val listener: BillingListener?,
         private val listSubs: List<ProductPreview>? = null) : BaseBilling, LifecycleObserver {
 
-    constructor(context: Context, baseUrl: String, apiKey: String, secretKey: String, isSubs: (Boolean) -> Unit)
-            : this(context, baseUrl, apiKey, secretKey, null, null) {
+    constructor(context: Context, isSubs: (Boolean) -> Unit) : this(context, null, null) {
+        checkInit()
         isSubsBody = isSubs
     }
 
     companion object {
         const val REQUEST_CODE_BUY = 1234
         const val BILLING_RESPONSE_RESULT_OK = 0
-        //const val BILLING_RESPONSE_RESULT_USER_CANCELED = 1
-        //const val BILLING_RESPONSE_RESULT_SERVICE_UNAVAILABLE = 2
-        //const val BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE = 3
-        //const val BILLING_RESPONSE_RESULT_ITEM_UNAVAILABLE = 4
-        //const val BILLING_RESPONSE_RESULT_DEVELOPER_ERROR = 5
-        //const val BILLING_RESPONSE_RESULT_ERROR = 6
-        //const val BILLING_RESPONSE_RESULT_ITEM_ALREADY_OWNED = 7
-        //const val BILLING_RESPONSE_RESULT_ITEM_NOT_OWNED = 8
         const val PURCHASE_STATUS_PURCHASED = 0
         const val PURCHASE_STATUS_CANCELLED = 1
-        //const val PURCHASE_STATUS_REFUNDED = 2
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
+    private val screenNames = ScreenManager.getInstance().getTwoScreenName()
     private val lifecycle: Lifecycle
     private var isAuth = false
     private var isConnected = false
@@ -94,10 +86,15 @@ class Billing(
     }
 
     init {
-        if (baseUrl.isEmpty() || apiKey.isEmpty() || secretKey.isEmpty())
-            throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
+        checkInit()
         lifecycle = (context as FragmentActivity).lifecycle
         lifecycle.addObserver(this)
+        Events.logPremiumScreenShownEvent(context, Events.DEFAULT_VALUE, screenNames.screenName, screenNames.callScreenName)
+    }
+
+    private fun checkInit() {
+        if (ValidKeys.baseUrl.isEmpty() || ValidKeys.apiKey.isEmpty() || ValidKeys.secretKey.isEmpty())
+            throw throw IllegalArgumentException("Invalid baseUrl or apiKey or secretKey")
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
@@ -167,9 +164,11 @@ class Billing(
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)
         }
-        if (isConnected && isAuth)
+        if (isConnected && isAuth) {
             body?.invoke(BillingResponseType.SUCCESS)
-        else
+            Events.logPremiumOptionSelectedEvent(context, Events.DEFAULT_VALUE, screenNames.screenName,
+                    screenNames.callScreenName, product?.productId)
+        } else
             if (!isConnected)
                 body?.invoke(BillingResponseType.NOT_CONNECTED)
             else
@@ -188,7 +187,7 @@ class Billing(
             getAdvertingId { advertingId ->
                 Logger.notify("advertingId: $advertingId, isSubs: $isSubs, product != null -> ${product != null}")
                 if (product != null && isSubs) {
-                    validateRequest(validationBody(product!!, advertingId), restoreListener =
+                    validateRequest(product!!, validationBody(product!!, advertingId), restoreListener =
                     object : ValidationCallback.ValidationRestoreListener {
                         override fun validationRestoreSuccess() {
                             Logger.notify("validationRestoreSuccess")
@@ -247,7 +246,7 @@ class Billing(
                     getAdvertingId { advertingId ->
                         if (product != null && isSubs)
                             listener.onValidationShowProgress()
-                        validateRequest(validationBody(product!!, advertingId), listener)
+                        validateRequest(product!!, validationBody(product!!, advertingId), listener)
                     }
                 }
             }
@@ -259,14 +258,16 @@ class Billing(
         Logger.notify("finish onActivityResult validate")
     }
 
-    private fun validateRequest(body: ValidationBody, listener: ValidationCallback.ValidationListener? = null,
+    private fun validateRequest(product: InAppProduct, body: ValidationBody,
+                                listener: ValidationCallback.ValidationListener? = null,
                                 restoreListener: ValidationCallback.ValidationRestoreListener? = null) {
         Logger.notify("validateRequest start")
         Logger.notify("validateRequest ValidationBody: $body")
-        Logger.notify("baseUrl $baseUrl, apiKey $apiKey, secretKey $secretKey")
-        val service = ValidationClient.getValidationService(secretKey, baseUrl)
-        val call = service.validate(apiKey, body)
-        val validationCallback = ValidationCallback(secretKey, listener, restoreListener)
+        Logger.notify("baseUrl ${ValidKeys.baseUrl}, apiKey ${ValidKeys.apiKey}, secretKey ${ValidKeys.secretKey}")
+        val service = ValidationClient.getValidationService(ValidKeys.secretKey, ValidKeys.baseUrl)
+        val call = service.validate(ValidKeys.apiKey, body)
+        val validationCallback = ValidationCallback(context, product, screenNames,
+                ValidKeys.secretKey, listener, restoreListener)
         call.enqueue(validationCallback)
         Logger.notify("validateRequest finish")
     }

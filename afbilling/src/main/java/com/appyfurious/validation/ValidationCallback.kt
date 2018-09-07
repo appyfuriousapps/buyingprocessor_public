@@ -1,8 +1,10 @@
 package com.appyfurious.validation
 
 import android.content.Context
+import com.appyfurious.afbilling.InAppProduct
+import com.appyfurious.analytics.ActivityLifecycle
+import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
-import com.appyfurious.validation.event.Events
 import okhttp3.ResponseBody
 import org.json.JSONException
 import org.json.JSONObject
@@ -11,30 +13,22 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
-/**
- * ValidationCallback.java
- * getfitandroid
- *
- *
- * Created by o.davidovich on 25.05.2018.
- *
- *
- * Copyright © 2018 Appyfurious. All rights reserved.
- */
-
-class ValidationCallback(private val mSecretKey: String,
-                         private val mValidationListener: ValidationListener? = null,
+class ValidationCallback(private val context: Context,
+                         private val product: InAppProduct,
+                         private val screenNames: ActivityLifecycle.Result,
+                         private val secretKey: String,
+                         private val validationListener: ValidationListener? = null,
                          private val validationRestoreListener: ValidationRestoreListener? = null)
     : Callback<ResponseBody> {
 
-    private var mEncryptor: CryptoAES128? = null
+    private var encryptor: CryptoAES128? = null
 
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
         val body = response.body()?.string()
         if (response.isSuccessful) {
-            mEncryptor = CryptoAES128(mSecretKey)
+            encryptor = CryptoAES128(secretKey)
             try {
-                val decryptString = mEncryptor?.decrypt(body)
+                val decryptString = encryptor?.decrypt(body)
                 Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
                 val jsonResponse = JSONObject(decryptString)
                 Logger.notify(jsonResponse.toString())
@@ -63,7 +57,7 @@ class ValidationCallback(private val mSecretKey: String,
             }
         } else {
             Logger.notify("response.isSuccessful == false onValidationFailure")
-            //val decryptString = mEncryptor?.decrypt(body)
+            //val decryptString = encryptor?.decrypt(body)
             //Logger.notify("isNotNull: ${decryptString != null}, decryptString: $decryptString")
             //if ((response.code() in 500..599)) {
             Logger.notify("((response.code() in 500..599)) validationSuccess")
@@ -72,7 +66,7 @@ class ValidationCallback(private val mSecretKey: String,
             //   validationFailure()
             //}
         }
-        mValidationListener?.onValidationHideProgress()
+        validationListener?.onValidationHideProgress()
         Logger.notify("response body: $body")
         Logger.notify("response all: $response")
         //val headers = response.headers().toMultimap().map { "${it.key} + ${it.value}" }.joinToString(", ")
@@ -82,20 +76,22 @@ class ValidationCallback(private val mSecretKey: String,
     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
         Logger.notify("onFailure validationSuccess")
         validationSuccess()
-        mValidationListener?.onValidationHideProgress()
+        validationListener?.onValidationHideProgress()
     }
 
     private fun validationSuccess() {
-        mValidationListener?.onValidationSuccess()
+        validationListener?.onValidationSuccess()
         if (validationRestoreListener != null) {
             validationRestoreListener.validationRestoreSuccess()
         } else {
-            Events.logAddedToCartEvent(mValidationListener?.validationContext())
+            Events.logPremiumOptionPurchasedEvent(context, Events.DEFAULT_VALUE, screenNames.screenName,
+                    screenNames.callScreenName, product.productId)
+            Events.logPurchaseEvents(validationListener?.validationContext(), product)
         }
     }
 
     private fun validationFailure(errorMessage: String = "Validation Error") {
-        mValidationListener?.onValidationFailure(errorMessage)
+        validationListener?.onValidationFailure(errorMessage)
         validationRestoreListener?.validationRestoreFailure(errorMessage)
     }
 
