@@ -33,7 +33,6 @@ object Analytics {
             AppsFlyerLib.getInstance().init(appsflyerDevKey, listener, application)
             AppsFlyerLib.getInstance().startTracking(application)
         }
-        ScreenManager.init(application)
         Logger.notify("finish Analytics init")
     }
 

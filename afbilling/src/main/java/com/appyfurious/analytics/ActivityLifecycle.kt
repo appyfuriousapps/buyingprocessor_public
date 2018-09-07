@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.appyfurious.log.Logger
 import java.util.*
 
+@Deprecated("")
 class ActivityLifecycle(application: Application) : Application.ActivityLifecycleCallbacks {
 
     private val screenNames = Stack<String?>()

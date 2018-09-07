@@ -3,6 +3,7 @@ package com.appyfurious.analytics
 import android.app.Application
 import com.appyfurious.log.Logger
 
+@Deprecated("")
 class ScreenManager private constructor(application: Application) {
 
     companion object {

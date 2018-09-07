@@ -14,8 +14,6 @@ import android.os.IBinder
 import android.support.v4.app.FragmentActivity
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
-import com.appyfurious.analytics.Events
-import com.appyfurious.analytics.ScreenManager
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
@@ -43,14 +41,13 @@ class Billing(
         const val RESPONSE_CODE = "RESPONSE_CODE"
     }
 
-    private val screenNames = ScreenManager.getInstance().getTwoScreenName()
     private val lifecycle: Lifecycle
     private var isAuth = false
     private var isConnected = false
     private var products: List<InAppProduct>? = null
     private var inAppBillingService: IInAppBillingService? = null
     private var isSubsBody: ((Boolean) -> Unit)? = null
-    private val developerPayload = UUID.randomUUID().toString()
+    private val developerPayload = UUID.randomUUID().toString()//todo
 
     private var serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -89,7 +86,6 @@ class Billing(
         checkInit()
         lifecycle = (context as FragmentActivity).lifecycle
         lifecycle.addObserver(this)
-        Events.logPremiumScreenShownEvent(context, Events.DEFAULT_VALUE, screenNames.screenName, screenNames.callScreenName)
     }
 
     private fun checkInit() {
@@ -166,8 +162,6 @@ class Billing(
         }
         if (isConnected && isAuth) {
             body?.invoke(BillingResponseType.SUCCESS)
-            Events.logPremiumOptionSelectedEvent(context, Events.DEFAULT_VALUE, screenNames.screenName,
-                    screenNames.callScreenName, product?.productId)
         } else
             if (!isConnected)
                 body?.invoke(BillingResponseType.NOT_CONNECTED)
@@ -266,8 +260,7 @@ class Billing(
         Logger.notify("baseUrl ${ValidKeys.baseUrl}, apiKey ${ValidKeys.apiKey}, secretKey ${ValidKeys.secretKey}")
         val service = ValidationClient.getValidationService(ValidKeys.secretKey, ValidKeys.baseUrl)
         val call = service.validate(ValidKeys.apiKey, body)
-        val validationCallback = ValidationCallback(context, product, screenNames,
-                ValidKeys.secretKey, listener, restoreListener)
+        val validationCallback = ValidationCallback(product, ValidKeys.secretKey, listener, restoreListener)
         call.enqueue(validationCallback)
         Logger.notify("validateRequest finish")
     }

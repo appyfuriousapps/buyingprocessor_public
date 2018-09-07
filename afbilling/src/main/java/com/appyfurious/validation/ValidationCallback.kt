@@ -13,9 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
-class ValidationCallback(private val context: Context,
-                         private val product: InAppProduct,
-                         private val screenNames: ActivityLifecycle.Result,
+class ValidationCallback(private val product: InAppProduct,
                          private val secretKey: String,
                          private val validationListener: ValidationListener? = null,
                          private val validationRestoreListener: ValidationRestoreListener? = null)
@@ -84,8 +82,6 @@ class ValidationCallback(private val context: Context,
         if (validationRestoreListener != null) {
             validationRestoreListener.validationRestoreSuccess()
         } else {
-            Events.logPremiumOptionPurchasedEvent(context, Events.DEFAULT_VALUE, screenNames.screenName,
-                    screenNames.callScreenName, product.productId)
             Events.logPurchaseEvents(validationListener?.validationContext(), product)
         }
     }

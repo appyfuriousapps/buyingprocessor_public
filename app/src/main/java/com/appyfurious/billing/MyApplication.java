@@ -4,7 +4,7 @@ import android.app.Application;
 
 import com.appyfurious.ad.AdManager;
 import com.appyfurious.ad.AdManagerApplication;
-import com.appyfurious.analytics.ScreenManager;
+import com.appyfurious.analytics.Analytics;
 import com.appyfurious.validation.ValidKeys;
 
 /**
@@ -24,7 +24,7 @@ public class MyApplication extends Application implements AdManagerApplication {
     public void onCreate() {
         super.onCreate();
 
-        ScreenManager.Companion.init(this); // read screen names init
+        Analytics.INSTANCE.init(this, "");
         ValidKeys.INSTANCE.init("", "", "");
         adManager = new AdManager(this, BuildConfig.DEBUG);
     }
