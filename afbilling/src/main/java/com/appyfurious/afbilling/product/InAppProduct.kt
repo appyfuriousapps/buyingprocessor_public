@@ -85,6 +85,8 @@ open class InAppProduct {
 
     fun gerPriceParse(): Double {
         var result = 0.0
+        if (price == null)
+            return result
         val resultParse = Pattern.compile("([0-9]+.*[0-9]*)").matcher(price)
         if (resultParse.find()) {
             val resultText = resultParse.group()
