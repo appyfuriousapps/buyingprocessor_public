@@ -72,7 +72,7 @@ open class InAppProduct {
 
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
-        val obj = gson.toJson(devPayload)
+        val obj = gson.toJson(devPayload).replace("\n", "")
         developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
     }
 
