@@ -76,7 +76,7 @@ open class InAppProduct {
         val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
         Logger.notify("setDeveloperPayload $obj")
         Logger.notify("setDeveloperPayload $result")
-        return result
+        return result.replace("\\n", "")
     }
 
     fun getSku(): String? = productId
