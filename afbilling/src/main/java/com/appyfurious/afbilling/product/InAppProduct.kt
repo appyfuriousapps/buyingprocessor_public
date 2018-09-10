@@ -71,12 +71,6 @@ open class InAppProduct {
     @Expose
     var description: String? = null
 
-    fun getDeveloperPayload(): ByteArray {
-        val result = Base64.decode(developerPayload, Base64.DEFAULT)
-        Logger.notify("getDevPayload BYTE: $result")
-        return result
-    }
-
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
         val obj = gson.toJson(devPayload)

@@ -128,7 +128,7 @@ class Billing(
         if (product != null) {
             product.setDeveloperPayload(productManager.devPayload)
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), String(product.getDeveloperPayload(), Charset.defaultCharset()))
+                    product.getSku(), product.getType(), product.developerPayload)
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)
