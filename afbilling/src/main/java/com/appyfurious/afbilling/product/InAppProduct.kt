@@ -83,7 +83,7 @@ open class InAppProduct {
 
     fun getType() = SUBS
 
-    fun gerPriceParse(): Double {
+    fun getPriceParse(): Double {
         var result = 0.0
         if (price == null)
             return result

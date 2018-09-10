@@ -125,8 +125,10 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
+            val devPayload = product.getDeveloperPayloadBase64(productManager.devPayload)
+            Logger.notify("showFormPurchaseProduct devPayload $devPayload")
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), product.getDeveloperPayloadBase64(productManager.devPayload))
+                    product.getSku(), product.getType(), devPayload)
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)
@@ -143,7 +145,7 @@ class Billing(
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
-        productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) { it ->
+        productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) {
             readMyPurchasesResult(body, it)
         }
     }

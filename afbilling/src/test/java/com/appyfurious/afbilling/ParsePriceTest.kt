@@ -16,7 +16,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$0"
         val expected = 0.0
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -24,7 +24,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$22.99"
         val expected = 22.99
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -32,7 +32,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$5.99"
         val expected = 5.99
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -40,7 +40,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$2.5"
         val expected = 2.5
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -48,7 +48,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$5"
         val expected = 5.0
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -56,7 +56,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$0.9"
         val expected = 0.9
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -64,7 +64,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = null
         val expected = 0.0
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -72,7 +72,7 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$-0.5"
         val expected = -0.5
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 
     @Test
@@ -80,6 +80,6 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$0.0"
         val expected = 0.0
-        assertEquals(expected, 0.0, product.gerPriceParse())
+        assertEquals(expected, 0.0, product.getPriceParse())
     }
 }

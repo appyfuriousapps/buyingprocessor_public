@@ -9,6 +9,7 @@ import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
+import com.google.firebase.analytics.FirebaseAnalytics
 
 object Events {
 
@@ -28,28 +29,39 @@ object Events {
     const val AF_PURCHASE = "af_purchase"
     const val AF_PRICE = "af_price"
 
-    private fun logger(context: Context?, body: (AppEventsLogger) -> Unit) {
+    private fun facebook(context: Context?, body: (AppEventsLogger) -> Unit) {
         context?.let {
-            body(AppEventsLogger.newLogger(it))
+            if (Analytics.isInitFacebook)
+                body(AppEventsLogger.newLogger(it))
+        }
+    }
+
+    private fun firebase(context: Context?, body: (FirebaseAnalytics) -> Unit) {
+        context?.let {
+            body(FirebaseAnalytics.getInstance(it))//todo use
         }
     }
 
     fun logPurchaseEvents(context: Context?, product: InAppProduct) {
-        val bundle = Bundle().apply {
-            putString(AppEventsConstants.EVENT_PARAM_CONTENT, product.title)
-            putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, product.productId)
-            putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, product.getType())
-            putString(AppEventsConstants.EVENT_PARAM_CURRENCY, product.priceCurrencyCode)
-        }
-        logger(context) {
-            it.logEvent(AppEventsConstants.EVENT_NAME_ADDED_TO_CART, product.gerPriceParse(), bundle)
+        facebook(context) {
+            val bundle = Bundle().apply {
+                putString(AppEventsConstants.EVENT_PARAM_CONTENT, product.title)
+                putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, product.productId)
+                putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, product.getType())
+                putString(AppEventsConstants.EVENT_PARAM_CURRENCY, product.priceCurrencyCode)
+            }
+            it.logEvent(AppEventsConstants.EVENT_NAME_ADDED_TO_CART, product.getPriceParse(), bundle)
             Logger.notify("logPurchaseEvents ADDED_TO_CART")
         }
 
-        val map = HashMap<String, Any>()
-        map[AF_PRICE] = product.gerPriceParse()
-        AppsFlyerLib.getInstance().trackEvent(context, AF_PURCHASE, map)
-        Logger.notify("logPurchaseEvents AF_PURCHASE")
+        if (Analytics.isInitAppsflyer) {
+            val map = HashMap<String, Any>()
+            map[AF_PRICE] = product.getPriceParse()
+            AppsFlyerLib.getInstance().trackEvent(context, AF_PURCHASE, map)
+            Logger.notify("logPurchaseEvents AF_PURCHASE")
+        }
+
+        Logger.notify("logPurchaseEvents price: ${product.getPriceParse()}")
     }
 
     fun logPremiumScreenShownEvent(context: Context?, segment: String, screenName: String, callScreenName: String) {
@@ -71,7 +83,7 @@ object Events {
 
     fun logEvent(context: Context?, eventName: String, segment: String, screenName: String,
                  callScreenName: String, productId: String? = null) {
-        logger(context) {
+        facebook(context) {
             it.logEvent(eventName, Bundle().apply {
                 putString(SEGMENT_ID, segment)
                 putString(SCREEN_ID, screenName)
@@ -81,30 +93,28 @@ object Events {
                 }
             })
         }
-
-        val event = CustomEvent(eventName)
-                .putCustomAttribute(SEGMENT_ID, segment)
-                .putCustomAttribute(SCREEN_ID, screenName)
-                .putCustomAttribute(SOURCE, callScreenName)
-        if (productId != null) {
-            event.putCustomAttribute(PRODUCT_ID, productId)
+        if (Analytics.isInitFabric) {
+            val event = CustomEvent(eventName)
+                    .putCustomAttribute(SEGMENT_ID, segment)
+                    .putCustomAttribute(SCREEN_ID, screenName)
+                    .putCustomAttribute(SOURCE, callScreenName)
+            if (productId != null) {
+                event.putCustomAttribute(PRODUCT_ID, productId)
+            }
+            Answers.getInstance().logCustom(event)
         }
-        Answers.getInstance().logCustom(event)
     }
 
     fun logEventUniversal(context: Context?, eventName: String, vararg params: Param) {
-        logger(context) { l ->
+        facebook(context) { l ->
             l.logEvent(eventName, Bundle().apply {
                 params.map { putString(it.key, it.value) }
             })
         }
-
-        val map = HashMap<String, Any>()
-        params.map { map[it.key] = it.value }
-        AppsFlyerLib.getInstance().trackEvent(context, eventName, map)
-
-        val event = CustomEvent(eventName)
-        params.map { event.putCustomAttribute(it.key, it.value) }
-        Answers.getInstance().logCustom(event)
+        if (Analytics.isInitFabric) {
+            val event = CustomEvent(eventName)
+            params.map { event.putCustomAttribute(it.key, it.value) }
+            Answers.getInstance().logCustom(event)
+        }
     }
 }
