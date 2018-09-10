@@ -37,6 +37,10 @@ open class InAppProduct {
     @SerializedName("devPayload")
     @Expose
     var developerPayload: String? = null
+    get() {
+        Logger.notify("developerPayload get $field")
+        return field
+    }
 
     @SerializedName("purchaseToken")
     @Expose
@@ -72,13 +76,14 @@ open class InAppProduct {
 
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
-        val obj = gson.toJson(devPayload).replace("\\n", "")
+        val obj = gson.toJson(devPayload)
         developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
+        Logger.notify("setDeveloperPayload $developerPayload")
     }
 
     fun getAppsflyerId(): String {
         val gson = GsonBuilder().create()
-        Logger.notify("getAdvertingId developerPayload $developerPayload")
+        Logger.notify("getAppsflyerId developerPayload $developerPayload")
         val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
         val result = gson.fromJson(value, DeveloperPayload::class.java)
         Logger.notify("getAppsflyerId $result")
