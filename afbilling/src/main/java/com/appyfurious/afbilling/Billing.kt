@@ -125,7 +125,7 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
-            product.setDeveloperPayload(productManager.appsflyerId, productManager.advertingId)
+            product.setDeveloperPayload(productManager.devPayload)
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
                     product.getSku(), product.getType(), product.getDeveloperPayload().toString())
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
@@ -145,28 +145,33 @@ class Billing(
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
         productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) { it ->
-            Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
-            var product: InAppProduct? = null
-            val isSubs = it.isNotEmpty() && it.filter {
-                it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
-            }.map { product = it }.isNotEmpty()
-            Logger.notify("advertingId: ${productManager.advertingId}, isSubs: $isSubs, product != null -> ${product != null}")
-            if (product != null && isSubs) {
-                validationBilling.validateRequest(product!!, productManager.advertingId, object : ValidationCallback.RestoreListener {
-                    override fun validationRestoreSuccess() {
-                        Logger.notify("validationRestoreSuccess")
-                        body(true, product)
-                    }
+            readMyPurchasesResult(body, it)
+        }
+    }
 
-                    override fun validationRestoreFailure(errorMessage: String) {
-                        Logger.notify("validationRestoreFailure")
-                        body(false, null)
-                    }
-                })
-            } else {
-                Logger.notify("ELSE validationRestoreFailure")
-                body(false, product)
-            }
+    private val readMyPurchasesResult = { body: (Boolean, InAppProduct?) -> Unit, it: List<InAppProduct> ->
+        Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
+        var product: InAppProduct? = null
+        val isSubs = it.isNotEmpty() && it.filter {
+            it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
+        }.map { product = it }.isNotEmpty()
+        val advertingId = productManager.devPayload.advertingId ?: ""
+        Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
+        if (product != null && isSubs) {
+            validationBilling.validateRequest(product!!, advertingId, object : ValidationCallback.RestoreListener {
+                override fun validationRestoreSuccess() {
+                    Logger.notify("validationRestoreSuccess")
+                    body(true, product)
+                }
+
+                override fun validationRestoreFailure(errorMessage: String) {
+                    Logger.notify("validationRestoreFailure")
+                    body(false, null)
+                }
+            })
+        } else {
+            Logger.notify("ELSE validationRestoreFailure")
+            body(false, product)
         }
     }
 

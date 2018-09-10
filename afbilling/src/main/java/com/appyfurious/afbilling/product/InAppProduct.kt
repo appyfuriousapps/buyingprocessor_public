@@ -1,7 +1,9 @@
 package com.appyfurious.afbilling.product
 
 import android.util.Base64
+import com.appyfurious.afbilling.utils.DeveloperPayload
 import com.appyfurious.log.Logger
+import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.regex.Pattern
@@ -32,7 +34,7 @@ open class InAppProduct {
     @Expose
     var purchaseState: Int? = null
 
-    @SerializedName("developerPayload")
+    @SerializedName("devPayload")
     @Expose
     var developerPayload: String? = null
 
@@ -70,23 +72,27 @@ open class InAppProduct {
 
     fun getDeveloperPayload(): ByteArray {
         val result = Base64.decode(developerPayload, Base64.DEFAULT)
-        Logger.notify("getDeveloperPayload BYTE: $result")
+        Logger.notify("getDevPayload BYTE: $result")
         return result
     }
-    fun setDeveloperPayload(appsflyerId: String, advertingId: String) {
-        developerPayload = "$appsflyerId $advertingId"
+
+    fun setDeveloperPayload(devPayload: DeveloperPayload) {
+        val gson = GsonBuilder().create()
+        developerPayload = gson.toJson(devPayload)
     }
 
     fun getAppsflyerId(): String {
-        val result = developerPayload?.split(" ")?.get(0) ?: ""
+        val gson = GsonBuilder().create()
+        val result = gson.fromJson(developerPayload, DeveloperPayload::class.java)
         Logger.notify("getAppsflyerId $result")
-        return result
+        return result.appsflyerId ?: ""
     }
 
     fun getAdvertingId(): String {
-        val result = developerPayload?.split(" ")?.get(1) ?: ""
+        val gson = GsonBuilder().create()
+        val result = gson.fromJson(developerPayload, DeveloperPayload::class.java)
         Logger.notify("getAdvertingId $result")
-        return result
+        return result.advertingId ?: ""
     }
 
     fun getSku(): String? = productId

@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.afbilling.utils.Adverting
+import com.appyfurious.afbilling.utils.DeveloperPayload
 import com.appyfurious.log.Logger
 import com.google.gson.GsonBuilder
 import java.util.*
@@ -12,13 +13,15 @@ import java.util.*
 class InAppProductsManager(context: Context) {
 
     private val packageName = context.packageName
-    val appsflyerId = AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!
-    lateinit var advertingId: String
+
+    val devPayload = DeveloperPayload().apply {
+        appsflyerId = AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!
+    }
 
     init {
         Adverting(context) {
-            advertingId = it
-            Logger.notify("advertingId: $advertingId")
+            devPayload.advertingId = it
+            Logger.notify("advertingId: ${devPayload.advertingId}")
         }
     }
 

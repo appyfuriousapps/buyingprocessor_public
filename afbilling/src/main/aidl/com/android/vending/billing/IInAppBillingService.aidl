@@ -88,7 +88,7 @@ interface IInAppBillingService {
      * @param sku the SKU of the in-app item as published in the developer console
      * @param type of the in-app item being purchased ("inapp" for one-time purchases
      *        and "subs" for subscriptions)
-     * @param developerPayload optional argument to be sent back with the purchase information
+     * @param devPayload optional argument to be sent back with the purchase information
      * @return Bundle containing the following key-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, appropriate response codes
      *                         on failures.
@@ -105,7 +105,7 @@ interface IInAppBillingService {
      *                                   "productId":"exampleSku",
      *                                   "purchaseTime":1345678900000,
      *                                   "purchaseToken" : "122333444455555",
-     *                                   "developerPayload":"example developer payload" }'
+     *                                   "devPayload":"example developer payload" }'
      *         "INAPP_DATA_SIGNATURE" - String containing the signature of the purchase data that
      *                                  was signed with the private key of the developer
      */
@@ -164,7 +164,7 @@ interface IInAppBillingService {
      *        if null or empty this method will behave like {@link #getBuyIntent}
      * @param newSku the SKU that the user is upgrading or downgrading to
      * @param type of the item being purchased, currently must be "subs"
-     * @param developerPayload optional argument to be sent back with the purchase information
+     * @param devPayload optional argument to be sent back with the purchase information
      * @return Bundle containing the following key-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, appropriate response codes
      *                         on failures.
@@ -181,7 +181,7 @@ interface IInAppBillingService {
      *                                   "productId":"exampleSku",
      *                                   "purchaseTime":1345678900000,
      *                                   "purchaseToken" : "122333444455555",
-     *                                   "developerPayload":"example developer payload" }'
+     *                                   "devPayload":"example developer payload" }'
      *         "INAPP_DATA_SIGNATURE" - String containing the signature of the purchase data that
      *                                  was signed with the private key of the developer
      */
