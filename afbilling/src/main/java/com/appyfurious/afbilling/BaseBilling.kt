@@ -3,6 +3,7 @@ package com.appyfurious.afbilling
 import android.content.Intent
 import android.content.ServiceConnection
 import com.android.vending.billing.IInAppBillingService
+import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.validation.ValidationCallback
 
 interface BaseBilling {

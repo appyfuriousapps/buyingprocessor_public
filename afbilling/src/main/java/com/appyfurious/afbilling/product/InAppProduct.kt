@@ -1,5 +1,7 @@
-package com.appyfurious.afbilling
+package com.appyfurious.afbilling.product
 
+import android.util.Base64
+import com.appyfurious.log.Logger
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import java.util.regex.Pattern
@@ -65,6 +67,27 @@ open class InAppProduct {
     @SerializedName("description")
     @Expose
     var description: String? = null
+
+    fun getDeveloperPayload(): ByteArray {
+        val result = Base64.decode(developerPayload, Base64.DEFAULT)
+        Logger.notify("getDeveloperPayload BYTE: $result")
+        return result
+    }
+    fun setDeveloperPayload(appsflyerId: String, advertingId: String) {
+        developerPayload = "$appsflyerId $advertingId"
+    }
+
+    fun getAppsflyerId(): String {
+        val result = developerPayload?.split(" ")?.get(0) ?: ""
+        Logger.notify("getAppsflyerId $result")
+        return result
+    }
+
+    fun getAdvertingId(): String {
+        val result = developerPayload?.split(" ")?.get(1) ?: ""
+        Logger.notify("getAdvertingId $result")
+        return result
+    }
 
     fun getSku(): String? = productId
 

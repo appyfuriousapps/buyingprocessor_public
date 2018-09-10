@@ -1,4 +1,4 @@
-package com.appyfurious.afbilling
+package com.appyfurious.afbilling.product
 
 open class ProductPreview(
         val id: String,

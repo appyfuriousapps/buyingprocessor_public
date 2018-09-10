@@ -1,8 +1,8 @@
 package com.appyfurious.afbilling
 
+import com.appyfurious.afbilling.product.InAppProduct
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.regex.Pattern
 
 /**
  * Example local unit test, which will execute on the development machine (host).

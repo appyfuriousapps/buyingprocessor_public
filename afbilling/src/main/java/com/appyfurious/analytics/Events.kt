@@ -3,7 +3,7 @@ package com.appyfurious.analytics
 import android.content.Context
 import android.os.Bundle
 import com.appsflyer.AppsFlyerLib
-import com.appyfurious.afbilling.InAppProduct
+import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.log.Logger
 import com.crashlytics.android.answers.Answers
 import com.crashlytics.android.answers.CustomEvent

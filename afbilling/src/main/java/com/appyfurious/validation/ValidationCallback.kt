@@ -1,8 +1,7 @@
 package com.appyfurious.validation
 
 import android.content.Context
-import com.appyfurious.afbilling.InAppProduct
-import com.appyfurious.analytics.ActivityLifecycle
+import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
 import okhttp3.ResponseBody
@@ -16,7 +15,7 @@ import java.io.IOException
 class ValidationCallback(private val product: InAppProduct,
                          private val secretKey: String,
                          private val validationListener: ValidationListener? = null,
-                         private val validationRestoreListener: ValidationRestoreListener? = null)
+                         private val restoreListener: RestoreListener? = null)
     : Callback<ResponseBody> {
 
     private var encryptor: CryptoAES128? = null
@@ -79,8 +78,8 @@ class ValidationCallback(private val product: InAppProduct,
 
     private fun validationSuccess() {
         validationListener?.onValidationSuccess()
-        if (validationRestoreListener != null) {
-            validationRestoreListener.validationRestoreSuccess()
+        if (restoreListener != null) {
+            restoreListener.validationRestoreSuccess()
         } else {
             Events.logPurchaseEvents(validationListener?.validationContext(), product)
         }
@@ -88,7 +87,7 @@ class ValidationCallback(private val product: InAppProduct,
 
     private fun validationFailure(errorMessage: String = "Validation Error") {
         validationListener?.onValidationFailure(errorMessage)
-        validationRestoreListener?.validationRestoreFailure(errorMessage)
+        restoreListener?.validationRestoreFailure(errorMessage)
     }
 
     interface ValidationListener {
@@ -99,7 +98,7 @@ class ValidationCallback(private val product: InAppProduct,
         fun onValidationHideProgress()
     }
 
-    interface ValidationRestoreListener {
+    interface RestoreListener {
         fun validationRestoreSuccess()
         fun validationRestoreFailure(errorMessage: String)
     }
