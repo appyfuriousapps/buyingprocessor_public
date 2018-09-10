@@ -18,7 +18,6 @@ import com.appyfurious.afbilling.product.ProductPreview
 import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidationCallback
-import java.nio.charset.Charset
 
 class Billing(
         private val context: Context,
@@ -41,7 +40,7 @@ class Billing(
     private var isSubsBody: ((Boolean) -> Unit)? = null
 
     private val productManager = InAppProductsManager(context)
-    private val validationBilling = ValidationBilling(context.packageName)
+    private val validationBilling = ValidationBilling(context.packageName, productManager.devPayload)
 
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -126,9 +125,8 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
-            product.setDeveloperPayload(productManager.devPayload)
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), product.developerPayload)
+                    product.getSku(), product.getType(), product.getDeveloperPayloadBase64(productManager.devPayload))
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)

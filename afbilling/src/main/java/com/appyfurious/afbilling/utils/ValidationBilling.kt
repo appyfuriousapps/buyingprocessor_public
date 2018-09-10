@@ -8,7 +8,7 @@ import com.appyfurious.validation.ValidationClient
 import com.appyfurious.validation.body.ValidationBody
 import java.util.*
 
-class ValidationBilling(private val packageName: String) {
+class ValidationBilling(private val packageName: String, private val developerPayload: DeveloperPayload) {
 
     companion object {
         fun checkInit() {
@@ -18,14 +18,14 @@ class ValidationBilling(private val packageName: String) {
     }
 
     fun validateRequest(product: InAppProduct, listener: ValidationCallback.ValidationListener? = null) {
-        validateRequest(product, product.getAdvertingId(), listener, null)
+        validateRequest(product, developerPayload.advertingId, listener, null)
     }
 
     fun validateRequest(product: InAppProduct, advertingId: String, restoreListener: ValidationCallback.RestoreListener? = null) {
         validateRequest(product, advertingId, null, restoreListener)
     }
 
-    private fun validateRequest(product: InAppProduct, advertingId: String, listener: ValidationCallback.ValidationListener? = null,
+    private fun validateRequest(product: InAppProduct, advertingId: String?, listener: ValidationCallback.ValidationListener? = null,
                                 restoreListener: ValidationCallback.RestoreListener? = null) {
         val body = validationBody(product, advertingId)
         Logger.notify("validateRequest start")
@@ -38,8 +38,9 @@ class ValidationBilling(private val packageName: String) {
         Logger.notify("validateRequest finish")
     }
 
-    private fun validationBody(product: InAppProduct, advertingId: String) =
+    private fun validationBody(product: InAppProduct, advertingId: String?) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken", product.productId, ValidationBody.PRODUCT_TYPE,
-                    packageName, product.developerPayload, product.getAppsflyerId(), advertingId)
+                    packageName, product.getDeveloperPayloadBase64(developerPayload),
+                    developerPayload.appsflyerId, advertingId)
 }

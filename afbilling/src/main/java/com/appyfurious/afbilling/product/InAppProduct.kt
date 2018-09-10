@@ -37,10 +37,6 @@ open class InAppProduct {
     @SerializedName("devPayload")
     @Expose
     var developerPayload: String? = null
-    get() {
-        Logger.notify("developerPayload get $field")
-        return field
-    }
 
     @SerializedName("purchaseToken")
     @Expose
@@ -74,29 +70,13 @@ open class InAppProduct {
     @Expose
     var description: String? = null
 
-    fun setDeveloperPayload(devPayload: DeveloperPayload) {
+    fun getDeveloperPayloadBase64(devPayload: DeveloperPayload): String {
         val gson = GsonBuilder().create()
         val obj = gson.toJson(devPayload)
-        developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
-        Logger.notify("setDeveloperPayload $developerPayload")
-    }
-
-    fun getAppsflyerId(): String {
-        val gson = GsonBuilder().create()
-        Logger.notify("getAppsflyerId developerPayload $developerPayload")
-        val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
-        val result = gson.fromJson(value, DeveloperPayload::class.java)
-        Logger.notify("getAppsflyerId $result")
-        return result.appsflyerId ?: ""
-    }
-
-    fun getAdvertingId(): String {
-        val gson = GsonBuilder().create()
-        Logger.notify("getAdvertingId developerPayload $developerPayload")
-        val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
-        val result = gson.fromJson(value, DeveloperPayload::class.java)
-        Logger.notify("getAdvertingId $result")
-        return result.advertingId ?: ""
+        val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
+        Logger.notify("setDeveloperPayload $obj")
+        Logger.notify("setDeveloperPayload $result")
+        return result
     }
 
     fun getSku(): String? = productId
