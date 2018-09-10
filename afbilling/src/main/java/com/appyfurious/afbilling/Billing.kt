@@ -156,7 +156,7 @@ class Billing(
         val isSubs = it.isNotEmpty() && it.filter {
             it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
         }.map { product = it }.isNotEmpty()
-        val advertingId = productManager.developerPayload.advertingId ?: ""
+        val advertingId = productManager.developerPayload.idfa
         Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
         if (product != null && isSubs) {
             validationBilling.validateRequest(product!!, advertingId, object : ValidationCallback.RestoreListener {
