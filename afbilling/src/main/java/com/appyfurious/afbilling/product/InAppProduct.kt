@@ -74,7 +74,7 @@ open class InAppProduct {
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
         val obj = gson.toJson(devPayload)
-        developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT), Charset.defaultCharset())
+        developerPayload = Base64.encodeToString(obj.toByteArray(), Base64.DEFAULT)
     }
 
     fun getAppsflyerId(): String {
