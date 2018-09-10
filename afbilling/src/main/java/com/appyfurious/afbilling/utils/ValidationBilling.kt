@@ -22,7 +22,7 @@ class ValidationBilling(private val packageName: String) {
     }
 
     fun validateRequest(product: InAppProduct, advertingId: String, restoreListener: ValidationCallback.RestoreListener? = null) {
-        validateRequest(product, advertingId, restoreListener)
+        validateRequest(product, advertingId, null, restoreListener)
     }
 
     private fun validateRequest(product: InAppProduct, advertingId: String, listener: ValidationCallback.ValidationListener? = null,
