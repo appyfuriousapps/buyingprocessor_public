@@ -6,7 +6,6 @@ import com.appyfurious.log.Logger
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import java.nio.charset.Charset
 import java.util.regex.Pattern
 
 open class InAppProduct {
@@ -74,12 +73,12 @@ open class InAppProduct {
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
         val obj = gson.toJson(devPayload)
-        developerPayload = Base64.encodeToString(obj.toByteArray(), Base64.DEFAULT)
+        developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
     }
 
     fun getAppsflyerId(): String {
         val gson = GsonBuilder().create()
-        val value = String(Base64.decode(developerPayload, Base64.DEFAULT), Charset.defaultCharset())
+        val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
         val result = gson.fromJson(value, DeveloperPayload::class.java)
         Logger.notify("getAppsflyerId $result")
         return result.appsflyerId ?: ""
@@ -87,7 +86,7 @@ open class InAppProduct {
 
     fun getAdvertingId(): String {
         val gson = GsonBuilder().create()
-        val value = String(Base64.decode(developerPayload, Base64.DEFAULT), Charset.defaultCharset())
+        val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
         val result = gson.fromJson(value, DeveloperPayload::class.java)
         Logger.notify("getAdvertingId $result")
         return result.advertingId ?: ""
