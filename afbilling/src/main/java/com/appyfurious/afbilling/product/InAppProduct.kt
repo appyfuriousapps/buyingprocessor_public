@@ -1,8 +1,8 @@
 package com.appyfurious.afbilling.product
 
 import android.util.Base64
-import com.appyfurious.afbilling.utils.DeveloperPayload
 import com.appyfurious.log.Logger
+import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
@@ -34,7 +34,7 @@ open class InAppProduct {
     @Expose
     var purchaseState: Int? = null
 
-    @SerializedName("devPayload")
+    @SerializedName("developerPayload")
     @Expose
     var developerPayload: String? = null
 
@@ -70,13 +70,13 @@ open class InAppProduct {
     @Expose
     var description: String? = null
 
-    fun getDeveloperPayloadBase64(devPayload: DeveloperPayload): String {
+    fun getDeveloperPayloadBase64(developerPayload: DeviceData): String {
         val gson = GsonBuilder().create()
-        val obj = gson.toJson(devPayload)
+        val obj = gson.toJson(developerPayload)
         val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
         Logger.notify("setDeveloperPayload $obj")
         Logger.notify("setDeveloperPayload $result")
-        return result.replace("\\n", "")
+        return result.replace("\\n", "").replace("\n", "")
     }
 
     fun getSku(): String? = productId

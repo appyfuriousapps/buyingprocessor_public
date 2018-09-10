@@ -14,14 +14,14 @@ class InAppProductsManager(context: Context) {
 
     private val packageName = context.packageName
 
-    val devPayload = DeveloperPayload().apply {
+    val developerPayload = DeveloperPayload().apply {
         appsflyerId = AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!
     }
 
     init {
         Adverting(context) {
-            devPayload.advertingId = it
-            Logger.notify("advertingId: ${devPayload.advertingId}")
+            developerPayload.advertingId = it
+            Logger.notify("advertingId: ${developerPayload.advertingId}")
         }
     }
 

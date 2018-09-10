@@ -40,7 +40,7 @@ class Billing(
     private var isSubsBody: ((Boolean) -> Unit)? = null
 
     private val productManager = InAppProductsManager(context)
-    private val validationBilling = ValidationBilling(context.packageName, productManager.devPayload)
+    private val validationBilling = ValidationBilling(context.packageName, productManager.developerPayload)
 
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -125,10 +125,10 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
-            val devPayload = product.getDeveloperPayloadBase64(productManager.devPayload)
-            Logger.notify("showFormPurchaseProduct devPayload $devPayload")
+            val developerPayload = product.getDeveloperPayloadBase64(productManager.developerPayload)
+            Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), devPayload)
+                    product.getSku(), product.getType(), developerPayload)
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
                     Intent(), 0, 0, 0)
@@ -156,7 +156,7 @@ class Billing(
         val isSubs = it.isNotEmpty() && it.filter {
             it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
         }.map { product = it }.isNotEmpty()
-        val advertingId = productManager.devPayload.advertingId ?: ""
+        val advertingId = productManager.developerPayload.advertingId ?: ""
         Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
         if (product != null && isSubs) {
             validationBilling.validateRequest(product!!, advertingId, object : ValidationCallback.RestoreListener {

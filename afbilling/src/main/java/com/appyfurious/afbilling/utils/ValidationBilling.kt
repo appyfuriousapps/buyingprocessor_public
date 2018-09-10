@@ -5,10 +5,11 @@ import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
 import com.appyfurious.validation.ValidationClient
+import com.appyfurious.validation.body.DeviceData
 import com.appyfurious.validation.body.ValidationBody
 import java.util.*
 
-class ValidationBilling(private val packageName: String, private val developerPayload: DeveloperPayload) {
+class ValidationBilling(private val packageName: String, private val developerPayload: DeviceData) {
 
     companion object {
         fun checkInit() {
@@ -18,7 +19,7 @@ class ValidationBilling(private val packageName: String, private val developerPa
     }
 
     fun validateRequest(product: InAppProduct, listener: ValidationCallback.ValidationListener? = null) {
-        validateRequest(product, developerPayload.advertingId, listener, null)
+        validateRequest(product, developerPayload.idfa, listener, null)
     }
 
     fun validateRequest(product: InAppProduct, advertingId: String, restoreListener: ValidationCallback.RestoreListener? = null) {

@@ -20,7 +20,7 @@ public class ValidationBody {
     @SerializedName("productId") private String productId;
     @SerializedName("type") private String type;
     @SerializedName("package") private String _package;
-    @SerializedName("devPayload") private String developerPayload;
+    @SerializedName("developerPayload") private String developerPayload;
     @SerializedName("deviceData") private DeviceData deviceData;
 
     public ValidationBody(String hash, String purchaseToken, String productId, String type,
@@ -93,7 +93,7 @@ public class ValidationBody {
     @Override
     public String toString() {
         return "hash:" + hash + " purchaseToken:" + purchaseToken + " productId:" + productId + " type:" + type + " _package:" +
-                _package + " devPayload:" + developerPayload + " deviceData.getAppsflyerId:" + deviceData.getAppsflyerId()
+                _package + " developerPayload:" + developerPayload + " deviceData.getAppsflyerId:" + deviceData.getAppsflyerId()
                 + "deviceData.getIdfa():" + deviceData.getIdfa();
     }
 }
