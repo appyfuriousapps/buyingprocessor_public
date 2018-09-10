@@ -72,12 +72,13 @@ open class InAppProduct {
 
     fun setDeveloperPayload(devPayload: DeveloperPayload) {
         val gson = GsonBuilder().create()
-        val obj = gson.toJson(devPayload).replace("\n", "")
+        val obj = gson.toJson(devPayload).replace("\\n", "")
         developerPayload = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
     }
 
     fun getAppsflyerId(): String {
         val gson = GsonBuilder().create()
+        Logger.notify("getAdvertingId developerPayload $developerPayload")
         val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
         val result = gson.fromJson(value, DeveloperPayload::class.java)
         Logger.notify("getAppsflyerId $result")
@@ -86,6 +87,7 @@ open class InAppProduct {
 
     fun getAdvertingId(): String {
         val gson = GsonBuilder().create()
+        Logger.notify("getAdvertingId developerPayload $developerPayload")
         val value = String(Base64.decode(developerPayload, Base64.DEFAULT))
         val result = gson.fromJson(value, DeveloperPayload::class.java)
         Logger.notify("getAdvertingId $result")
