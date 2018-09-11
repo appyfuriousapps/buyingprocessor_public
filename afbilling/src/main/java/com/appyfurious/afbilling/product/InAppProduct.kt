@@ -98,7 +98,7 @@ open class InAppProduct {
                 }
             }
             textResult = textResult.replace(".", "").replace(" ", "")
-            val result = textResult.toInt().div(Math.pow(10.0, index.toDouble()))
+            val result = textResult.trim().toInt().div(Math.pow(10.0, index.toDouble()))
             result
         } catch (ex: Exception) {
             Logger.exception(ex.message ?: "exception!")
