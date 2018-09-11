@@ -42,6 +42,7 @@ class Billing(
 
     private val productManager = InAppProductsManager(context)
     private val validationBilling = ValidationBilling(context.packageName, productManager.developerPayload)
+    private var selectedProduct: InAppProduct? = null
 
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -126,6 +127,7 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
+            selectedProduct = product
             val developerPayload = product.getDeveloperPayloadBase64(productManager.developerPayload)
             Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
             val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
@@ -185,8 +187,7 @@ class Billing(
         isSubs(newBody)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?,
-                                  listener: ValidationCallback.ValidationListener) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, listener: ValidationCallback.ValidationListener) {
         Logger.notify("start onActivityResult validate")
         if (requestCode == REQUEST_CODE_BUY) {
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
@@ -195,7 +196,7 @@ class Billing(
                 isSubs { isSubs, product ->
                     if (product != null && isSubs) {
                         listener.onValidationShowProgress()
-                        validationBilling.validateRequest(product, listener)
+                        validationBilling.validateRequest(selectedProduct ?: product, listener)
                     }
                 }
             }
