@@ -198,7 +198,7 @@ class Billing(
                 listener.onValidationShowProgress()
                 isSubs(listener) { isSubs, product ->
                     if (isSubs && product != null) {
-                        Events.logPurchaseEvents(context, product)
+                        Events.logPurchaseEvents(context, selectedProductCopy)
                     }
                 }
             }

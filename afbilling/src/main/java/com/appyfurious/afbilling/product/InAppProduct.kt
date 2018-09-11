@@ -98,6 +98,26 @@ open class InAppProduct {
             1.0
         }
     }
+    /* fun getPriceParse(): Double {
+        var textResult = price?.replace("-", "")
+                ?.replace("$", "")
+                ?.replace(" ", "")
+                ?.replace(",", ".")
+        if (textResult != null && textResult.find { it == '.' } == null)
+            textResult += ".0"
+        return try {
+            val reverseText = textResult?.reversed()
+            var index = -1
+            reverseText?.mapIndexed { i, c ->
+                if (c == '.') {
+                    index = i
+                }
+            }
+            1.0
+        } catch (ex: Exception) {
+            1.0
+        }
+    }*/
 
     fun set(product: InAppProduct) {
         orderId = product.orderId
