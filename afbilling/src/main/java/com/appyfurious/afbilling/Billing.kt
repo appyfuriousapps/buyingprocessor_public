@@ -17,6 +17,7 @@ import com.appyfurious.afbilling.product.InAppProductsManager
 import com.appyfurious.afbilling.product.ProductPreview
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.afbilling.utils.ValidationBilling
+import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidationCallback
 
@@ -59,7 +60,7 @@ class Billing(
                     listener?.billingConnectBody(null)
                 }
                 isSubsBody?.let {
-                    isSubs { isSubs, _ ->
+                    isSubs(null) { isSubs, _ ->
                         isSubsBody?.invoke(isSubs)
                     }
                 }
@@ -146,17 +147,18 @@ class Billing(
                     body?.invoke(BillingResponseType.NOT_AUTH)
     }
 
-    override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
+    override fun isSubs(listener: ValidationCallback.ValidationListener?, body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
         productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) { products ->
             Adverting(context) { idfa ->
                 productManager.developerPayload.idfa = idfa
-                readMyPurchasesResult(body, products)
+                readMyPurchasesResult(listener, body, products)
             }
         }
     }
 
-    private val readMyPurchasesResult = { body: (Boolean, InAppProduct?) -> Unit, it: List<InAppProduct> ->
+    private val readMyPurchasesResult = { listener: ValidationCallback.ValidationListener?,
+                                          body: (Boolean, InAppProduct?) -> Unit, it: List<InAppProduct> ->
         Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
         var product: InAppProduct? = null
         val isSubs = it.isNotEmpty() && it.filter {
@@ -165,7 +167,7 @@ class Billing(
         val advertingId = productManager.developerPayload.idfa
         Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
         if (product != null && isSubs) {
-            validationBilling.validateRequest(product!!, advertingId, object : ValidationCallback.RestoreListener {
+            validationBilling.validateRequest(product!!, advertingId, listener, object : ValidationCallback.RestoreListener {
                 override fun validationRestoreSuccess() {
                     Logger.notify("validationRestoreSuccess")
                     body(true, product)
@@ -184,7 +186,7 @@ class Billing(
 
     override fun isSubs(body: (Boolean) -> Unit) {
         val newBody = { isSubs: Boolean, _: InAppProduct? -> body(isSubs) }
-        isSubs(newBody)
+        isSubs(null, newBody)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, listener: ValidationCallback.ValidationListener) {
@@ -194,7 +196,11 @@ class Billing(
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
                 listener.onValidationShowProgress()
-                validationBilling.validateRequest(selectedProductCopy, listener)
+                isSubs(listener) { isSubs, product ->
+                    if (isSubs && product != null) {
+                        Events.logPurchaseEvents(context, product)
+                    }
+                }
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")

@@ -18,16 +18,8 @@ class ValidationBilling(private val packageName: String, private val developerPa
         }
     }
 
-    fun validateRequest(product: InAppProduct, listener: ValidationCallback.ValidationListener? = null) {
-        validateRequest(product, developerPayload.idfa, listener, null)
-    }
-
-    fun validateRequest(product: InAppProduct, advertingId: String, restoreListener: ValidationCallback.RestoreListener? = null) {
-        validateRequest(product, advertingId, null, restoreListener)
-    }
-
-    private fun validateRequest(product: InAppProduct, advertingId: String?, listener: ValidationCallback.ValidationListener? = null,
-                                restoreListener: ValidationCallback.RestoreListener? = null) {
+    fun validateRequest(product: InAppProduct, advertingId: String?, listener: ValidationCallback.ValidationListener? = null,
+                        restoreListener: ValidationCallback.RestoreListener? = null) {
         val body = validationBody(product, advertingId)
         Logger.notify("validateRequest start")
         Logger.notify("validateRequest ValidationBody: $body")

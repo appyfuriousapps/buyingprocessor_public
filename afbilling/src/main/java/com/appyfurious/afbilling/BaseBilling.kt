@@ -12,7 +12,7 @@ interface BaseBilling {
     fun getServiceConnection(): ServiceConnection
 
     fun isSubs(body: (Boolean) -> Unit)
-    fun isSubs(body: (Boolean, InAppProduct?) -> Unit)
+    fun isSubs(listener: ValidationCallback.ValidationListener?, body: (Boolean, InAppProduct?) -> Unit)
     fun showFormPurchaseProduct(product: InAppProduct?, body: ((Billing.BillingResponseType) -> Unit)?)
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?, listener: ValidationCallback.ValidationListener)
 }

@@ -78,11 +78,7 @@ class ValidationCallback(private val product: InAppProduct,
 
     private fun validationSuccess() {
         validationListener?.onValidationSuccess()
-        if (restoreListener != null) {
-            restoreListener.validationRestoreSuccess()
-        } else {
-            Events.logPurchaseEvents(validationListener?.validationContext(), product)
-        }
+        restoreListener?.validationRestoreSuccess()
     }
 
     private fun validationFailure(errorMessage: String = "Validation Error") {
