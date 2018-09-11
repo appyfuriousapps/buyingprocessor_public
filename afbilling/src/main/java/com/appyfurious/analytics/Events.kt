@@ -91,15 +91,19 @@ object Events {
 
     fun logEvent(context: Context?, eventName: String, segment: String, screenName: String,
                  callScreenName: String, productId: String? = null) {
+        val bundle = Bundle().apply {
+            putString(SEGMENT_ID, segment)
+            putString(SCREEN_ID, screenName)
+            putString(SOURCE, callScreenName)
+            if (productId != null) {
+                putString(PRODUCT_ID, productId)
+            }
+        }
         facebook(context) {
-            it.logEvent(eventName, Bundle().apply {
-                putString(SEGMENT_ID, segment)
-                putString(SCREEN_ID, screenName)
-                putString(SOURCE, callScreenName)
-                if (productId != null) {
-                    putString(PRODUCT_ID, productId)
-                }
-            })
+            it.logEvent(eventName, bundle)
+        }
+        firebase(context) {
+            it.logEvent(eventName, bundle)
         }
         if (Analytics.isInitFabric) {
             val event = CustomEvent(eventName)
@@ -115,6 +119,11 @@ object Events {
 
     fun logEventUniversal(context: Context?, eventName: String, vararg params: Param) {
         facebook(context) { l ->
+            l.logEvent(eventName, Bundle().apply {
+                params.map { putString(it.key, it.value) }
+            })
+        }
+        firebase(context) { l ->
             l.logEvent(eventName, Bundle().apply {
                 params.map { putString(it.key, it.value) }
             })
