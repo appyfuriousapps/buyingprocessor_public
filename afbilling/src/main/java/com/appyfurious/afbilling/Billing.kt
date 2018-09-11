@@ -167,7 +167,7 @@ class Billing(
         val advertingId = productManager.developerPayload.idfa
         Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
         if (product != null && isSubs) {
-            validationBilling.validateRequest(product!!, advertingId, listener, object : ValidationCallback.RestoreListener {
+            val restore = object : ValidationCallback.RestoreListener {
                 override fun validationRestoreSuccess() {
                     Logger.notify("validationRestoreSuccess")
                     body(true, product)
@@ -177,7 +177,8 @@ class Billing(
                     Logger.notify("validationRestoreFailure")
                     body(false, null)
                 }
-            })
+            }
+            validationBilling.validateRequest(product!!, advertingId, listener, restore)
         } else {
             Logger.notify("ELSE validationRestoreFailure")
             body(false, product)

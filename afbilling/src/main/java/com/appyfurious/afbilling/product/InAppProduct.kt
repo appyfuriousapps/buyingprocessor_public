@@ -75,7 +75,8 @@ open class InAppProduct {
         val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
         Logger.notify("setDeveloperPayload $obj")
         Logger.notify("setDeveloperPayload $result")
-        return result.replace("\\n", "").replace("\n", "")
+        this.developerPayload = result.replace("\\n", "").replace("\n", "")
+        return this.developerPayload ?: ""
     }
 
     fun getSku(): String? = productId
@@ -102,6 +103,8 @@ open class InAppProduct {
             else textResult.toDouble()
             result
         } catch (ex: Exception) {
+            Logger.exception(ex.message ?: "exception!")
+            Logger.exception(ex)
             1.0
         }
     }

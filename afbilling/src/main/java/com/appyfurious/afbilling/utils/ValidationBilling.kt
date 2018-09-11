@@ -34,6 +34,5 @@ class ValidationBilling(private val packageName: String, private val developerPa
     private fun validationBody(product: InAppProduct, advertingId: String?) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken", product.productId, ValidationBody.PRODUCT_TYPE,
-                    packageName, product.getDeveloperPayloadBase64(developerPayload),
-                    developerPayload.appsflyerId, advertingId)
+                    packageName, product.developerPayload, developerPayload.appsflyerId, advertingId)
 }
