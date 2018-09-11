@@ -71,7 +71,7 @@ class ParsePriceTest {
     fun parse_price_is_correct_7() {
         val product = InAppProduct()
         product.price = "$-0.5"
-        val expected = -0.5
+        val expected = 0.5
         assertEquals(expected, 0.0, product.getPriceParse())
     }
 
@@ -80,6 +80,38 @@ class ParsePriceTest {
         val product = InAppProduct()
         product.price = "$0.0"
         val expected = 0.0
+        assertEquals(expected, 0.0, product.getPriceParse())
+    }
+
+    @Test
+    fun parse_price_is_correct_9() {
+        val product = InAppProduct()
+        product.price = "1.1$"
+        val expected = 1.1
+        assertEquals(expected, 0.0, product.getPriceParse())
+    }
+
+    @Test
+    fun parse_price_is_correct_10() {
+        val product = InAppProduct()
+        product.price = "49.99 $"
+        val expected = 49.99
+        assertEquals(expected, 0.0, product.getPriceParse())
+    }
+
+    @Test
+    fun parse_price_is_correct_11() {
+        val product = InAppProduct()
+        product.price = "5$"
+        val expected = 5.0
+        assertEquals(expected, 0.0, product.getPriceParse())
+    }
+
+    @Test
+    fun parse_price_is_correct_12() {
+        val product = InAppProduct()
+        product.price = "-5$"
+        val expected = 5.0
         assertEquals(expected, 0.0, product.getPriceParse())
     }
 }

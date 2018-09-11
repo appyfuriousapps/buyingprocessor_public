@@ -6,7 +6,6 @@ import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import java.util.regex.Pattern
 
 open class InAppProduct {
 
@@ -84,15 +83,16 @@ open class InAppProduct {
     fun getType() = SUBS
 
     fun getPriceParse(): Double {
-        var result = 0.0
-        if (price == null)
-            return result
-        val resultParse = Pattern.compile("([0-9]+.*[0-9]*)").matcher(price)
-        if (resultParse.find()) {
-            val resultText = resultParse.group()
-            result = resultText.toDouble()
+        var textResult = price?.replace("-", "")
+                ?.replace("$", "")
+                ?.replace(" ", "")
+        if (textResult != null && textResult.find { it == '.' } == null)
+            textResult += ".0"
+        return try {
+            textResult?.toDouble() ?: 1.0
+        } catch (ex: Exception) {
+            1.0
         }
-        return result
     }
 
     fun set(product: InAppProduct) {

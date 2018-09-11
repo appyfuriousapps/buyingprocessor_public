@@ -38,7 +38,7 @@ object Events {
 
     private fun firebase(context: Context?, body: (FirebaseAnalytics) -> Unit) {
         context?.let {
-            body(FirebaseAnalytics.getInstance(it))//todo use
+            body(FirebaseAnalytics.getInstance(it))
         }
     }
 
