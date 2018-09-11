@@ -118,7 +118,7 @@ class ParsePriceTest {
     @Test
     fun parse_price_is_correct_13() {
         val product = InAppProduct()
-        product.price = "19,99 $"
+        product.price = "19, 99  $ "
         val expected = 19.99
         assertEquals(expected, 0.0, product.getPriceParse())
     }

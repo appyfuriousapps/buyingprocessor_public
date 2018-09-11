@@ -193,12 +193,8 @@ class Billing(
             val responseCode = data?.getIntExtra(RESPONSE_CODE, -1)
             if (responseCode == BILLING_RESPONSE_RESULT_OK) {
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
-                isSubs { isSubs, product ->
-                    if (product != null && isSubs) {
-                        listener.onValidationShowProgress()
-                        validationBilling.validateRequest(selectedProductCopy, listener)
-                    }
-                }
+                listener.onValidationShowProgress()
+                validationBilling.validateRequest(selectedProductCopy, listener)
             }
             if (responseCode == PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")

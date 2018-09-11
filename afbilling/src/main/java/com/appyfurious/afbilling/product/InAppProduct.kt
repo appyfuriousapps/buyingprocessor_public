@@ -6,6 +6,7 @@ import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.text.DecimalFormat
 
 open class InAppProduct {
 
@@ -90,7 +91,9 @@ open class InAppProduct {
         if (textResult != null && textResult.find { it == '.' } == null)
             textResult += ".0"
         return try {
-            textResult?.toDouble() ?: 1.0
+            val formatter = DecimalFormat("0.00")
+            val result = formatter.parse(textResult)
+            result.toDouble()
         } catch (ex: Exception) {
             1.0
         }
