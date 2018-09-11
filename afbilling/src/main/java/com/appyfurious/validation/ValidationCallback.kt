@@ -2,7 +2,6 @@ package com.appyfurious.validation
 
 import android.content.Context
 import com.appyfurious.afbilling.product.InAppProduct
-import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
 import okhttp3.ResponseBody
 import org.json.JSONException
@@ -52,6 +51,9 @@ class ValidationCallback(private val product: InAppProduct,
                 Logger.notify("Exception validationSuccess")
                 validationSuccess()
             }
+        } else if (response.code() in 400..499) {
+            Logger.notify("if (response.code() in 400..499) onValidationFailure")
+            validationFailure()
         } else {
             Logger.notify("response.isSuccessful == false onValidationFailure")
             //val decryptString = encryptor?.decrypt(body)

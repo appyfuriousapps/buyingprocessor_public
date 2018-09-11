@@ -91,16 +91,14 @@ open class InAppProduct {
         if (textResult.find { it == '.' } == null)
             textResult += ".0"
         return try {
-            var index = -1
+            var index = 0
             textResult.mapIndexed { i, c ->
                 if (c == '.') {
                     index = textResult.length - 1 - i
                 }
             }
-            textResult = textResult.replace(".", "")
-            val result = if (index != -1)
-                textResult.toInt().div(Math.pow(10.0, index.toDouble()))
-            else textResult.toDouble()
+            textResult = textResult.replace(".", "").replace(" ", "")
+            val result = textResult.toInt().div(Math.pow(10.0, index.toDouble()))
             result
         } catch (ex: Exception) {
             Logger.exception(ex.message ?: "exception!")
