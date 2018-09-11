@@ -20,6 +20,7 @@
         tools:text="This is TextView" />
 
     <include
+        android:id="@+id/ad_container"
         layout="@layout/ad_container"
         android:layout_width="match_parent"
         android:layout_height="50dp"

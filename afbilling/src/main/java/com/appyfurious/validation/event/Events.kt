@@ -3,8 +3,6 @@ package com.appyfurious.validation.event
 import android.content.Context
 import android.os.Bundle
 import com.appsflyer.AppsFlyerLib
-import com.crashlytics.android.answers.Answers
-import com.crashlytics.android.answers.CustomEvent
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 
@@ -71,14 +69,14 @@ object Events {
         }
         AppsFlyerLib.getInstance().trackEvent(context, eventName, map)
 
-        val event = CustomEvent(eventName)
-                .putCustomAttribute(SEGMENT_ID, segment)
-                .putCustomAttribute(SCREEN_ID, screenName)
-                .putCustomAttribute(SOURCE, callScreenName)
-        if (productId != null) {
-            event.putCustomAttribute(PRODUCT_ID, productId)
-        }
-        Answers.getInstance().logCustom(event)
+//        val event = CustomEvent(eventName)
+//                .putCustomAttribute(SEGMENT_ID, segment)
+//                .putCustomAttribute(SCREEN_ID, screenName)
+//                .putCustomAttribute(SOURCE, callScreenName)
+//        if (productId != null) {
+//            event.putCustomAttribute(PRODUCT_ID, productId)
+//        }
+//        Answers.getInstance().logCustom(event)
     }
 
     fun logEventUniversal(context: Context?, eventName: String, vararg params: Param) {
@@ -91,9 +89,9 @@ object Events {
         val map = HashMap<String, Any>()
         params.map { map[it.key] = it.value }
         AppsFlyerLib.getInstance().trackEvent(context, eventName, map)
-
-        val event = CustomEvent(eventName)
-        params.map { event.putCustomAttribute(it.key, it.value) }
-        Answers.getInstance().logCustom(event)
+//
+//        val event = CustomEvent(eventName)
+//        params.map { event.putCustomAttribute(it.key, it.value) }
+//        Answers.getInstance().logCustom(event)
     }
 }

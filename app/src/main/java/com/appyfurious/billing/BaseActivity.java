@@ -3,9 +3,8 @@ package com.appyfurious.billing;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ViewGroup;
 
-import com.appyfurious.ad.AdManager;
+import com.appyfurious.ad.AFAdManager;
 
 /**
  * BaseActivity.java
@@ -26,10 +25,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getApplicationAdManager().initBannerContainer(this);
+        AFAdManager.getInstance().initBannerContainer(this);
     }
 
-    public AdManager getApplicationAdManager() {
-        return ((MyApplication) getApplication()).getAdManager();
-    }
 }

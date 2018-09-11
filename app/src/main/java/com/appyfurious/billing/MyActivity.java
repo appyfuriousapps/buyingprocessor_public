@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import com.appyfurious.ad.AFAdManager;
+
 /**
  * MyActivity.java
  * buyingprocessor_public
@@ -20,13 +22,13 @@ public class MyActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_example);
-        getApplicationAdManager().requestInterstitial("EnterInActivity1");
+        AFAdManager.getInstance().requestInterstitial("EnterInActivity1");
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        getApplicationAdManager().requestInterstitial("ExitFromActivity2");
+        AFAdManager.getInstance().requestInterstitial("ExitFromActivity2");
     }
 
     public void onClickButton(View view) {

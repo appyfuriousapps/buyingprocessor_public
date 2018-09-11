@@ -1,14 +1,13 @@
 package com.appyfurious.ad.parser;
 
 import com.appyfurious.ad.DebugConfig;
-import com.appyfurious.afbilling.BuildConfig;
+import com.appyfurious.db.Action;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import io.realm.RealmList;
 
 /**
  * AdConfigParser.java
@@ -29,12 +28,18 @@ public class AdConfigParser {
     private static final String INTERSTITIALS_DELAY = "interstitials_delay";
 
     private String mOriginal;
-    private ParserListener mParserListener;
+
+    private String applicationId;
+    private String bannerId;
+    private String interstitialId;
+    private String rewardedVideoId;
+    private int interstitialsCountPerSession;
+    private int interstitialDelay;
+    private RealmList<Action> actions;
     private boolean isDebug;
 
-    public AdConfigParser(String original, ParserListener listener, boolean isDebug) {
+    public AdConfigParser(String original, boolean isDebug) {
         this.mOriginal = original;
-        this.mParserListener = listener;
         this.isDebug = isDebug;
         parse();
     }
@@ -51,99 +56,99 @@ public class AdConfigParser {
             try {
                 String appId;
                 if (isDebug) {
-                    appId = DebugConfig.DEBUG_APP_ID;
+                    applicationId = DebugConfig.DEBUG_APP_ID;
                 } else {
-                    appId = (String) source.get(APPLICATION_ID);
+                    applicationId = (String) source.get(APPLICATION_ID);
                 }
-                mParserListener.applicationId(appId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                String bannerId;
                 if (isDebug) {
                     bannerId = DebugConfig.DEBUG_BANNER_ID;
                 } else {
                     bannerId = (String) source.get(BANNER_ID);
                 }
-                mParserListener.bannerId(bannerId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                String interstitialId;
                 if (isDebug) {
                     interstitialId = DebugConfig.DEBUG_INTERSTITIAL_ID;
                 } else {
                     interstitialId = (String) source.get(INTERSTITIAL_ID);
                 }
-                mParserListener.interstitialId(interstitialId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                String rewardedVideoId;
                 if (isDebug) {
                     rewardedVideoId = DebugConfig.DEBUG_REWARDED_VIDEO_ID;
                 } else {
                     rewardedVideoId = (String) source.get(REWARDED_VIDEO_ID);
                 }
-                mParserListener.rewardedVideoId(rewardedVideoId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                int interstitialsCountPerSession = (int) source
+                interstitialsCountPerSession = (int) source
                         .get(INTERSTITIALS_COUNT_PER_SESSION);
-                mParserListener.interstitialsCountPerSession(interstitialsCountPerSession);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
-                int interstitialDelay = (int) source.get(INTERSTITIALS_DELAY);
-                mParserListener.interstitialDelay(interstitialDelay);
+                interstitialDelay = (int) source.get(INTERSTITIALS_DELAY);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             try {
                 JSONArray jsonArray = source.getJSONArray("actions");
-                Map<String, Boolean> actions = new HashMap<>();
+                actions = new RealmList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject obj = (JSONObject) jsonArray.get(i);
-                    int bool = (Integer) obj.get("is_enabled");
-                    if (bool == 0 || bool == 1) {
-                        actions.put((String) obj.get("action_title"), bool == 1);
-                    }
+                    int actionId = Integer.parseInt((String) obj.get("ID"));
+                    String  actionTitle = (String) obj.get("action_title");
+                    int isEnabled = (int) obj.get("is_enabled");
+                    actions.add(new Action(actionId, actionTitle, isEnabled));
                 }
-                mParserListener.actionsMap(actions);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    public String getApplicationId() {
+        return applicationId;
+    }
 
-    public interface ParserListener {
+    public String getBannerId() {
+        return bannerId;
+    }
 
-        void applicationId(String applicationId);
+    public String getInterstitialId() {
+        return interstitialId;
+    }
 
-        void bannerId(String bannerId);
+    public String getRewardedVideoId() {
+        return rewardedVideoId;
+    }
 
-        void interstitialId(String interstitialId);
+    public int getInterstitialsCountPerSession() {
+        return interstitialsCountPerSession;
+    }
 
-        void rewardedVideoId(String rewardedVideoId);
+    public int getInterstitialDelay() {
+        return interstitialDelay;
+    }
 
-        void interstitialsCountPerSession(int interstitialsCountPerSession);
-
-        void interstitialDelay(int interstitialDelay);
-
-        void actionsMap(Map<String, Boolean> actions);
+    public RealmList<Action> getActions() {
+        return actions;
     }
 
 }

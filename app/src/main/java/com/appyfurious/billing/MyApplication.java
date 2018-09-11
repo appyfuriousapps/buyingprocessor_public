@@ -2,8 +2,8 @@ package com.appyfurious.billing;
 
 import android.app.Application;
 
-import com.appyfurious.ad.AdManager;
-import com.appyfurious.ad.AdManagerApplication;
+import com.appyfurious.ad.AFDataManager;
+import com.appyfurious.log.Logger;
 
 /**
  * MyApplication.java
@@ -14,19 +14,15 @@ import com.appyfurious.ad.AdManagerApplication;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public class MyApplication extends Application implements AdManagerApplication {
-
-    private AdManager adManager;
+public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        adManager = new AdManager(this, BuildConfig.DEBUG);
-    }
+        Logger.Companion.init(BuildConfig.DEBUG, true);
 
-    @Override
-    public AdManager getAdManager() {
-        return adManager;
+        AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults);
+        AFDataManager.getInstance().updateConfiguration(BuildConfig.DEBUG);
     }
 
 }

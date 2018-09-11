@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.appyfurious.ad.AFAdManager;
 import com.appyfurious.ad.RewardedCallback;
 
 /**
@@ -30,12 +31,12 @@ public class My2Activity extends BaseActivity implements View.OnClickListener, R
         mButton = findViewById(R.id.button3);
         mTextView = findViewById(R.id.textView);
         mButton.setOnClickListener(this);
-        getApplicationAdManager().loadRewardedVideoAd(this, this, mButton);
+        AFAdManager.getInstance().loadRewardedVideoAd(this, this, mButton);
     }
 
     @Override
     public void onClick(View view) {
-        getApplicationAdManager().requestRewardedVideoAd();
+        AFAdManager.getInstance().requestRewardedVideoAd();
     }
 
     @Override

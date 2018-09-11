@@ -8,6 +8,9 @@ class Logger {
         const val EXCEPTION = "exception"
         const val TAG = "validation"
         const val TAG_AD = "AdManager"
+        const val TAG_DB = "AFRealm"
+        const val TAG_LC = "AFLifecycle"
+        const val TAG_SH = "AFPreferences"
         private var isDebug = false
         private var isPrintExceptionObject = false
 
@@ -49,6 +52,30 @@ class Logger {
         fun logAd(message: String) {
             if (isDebug) {
                 Log.d(TAG_AD,  message)
+            }
+        }
+
+        fun logDbChange(message: String) {
+            if (isDebug) {
+                Log.d(TAG_DB, message)
+            }
+        }
+
+        fun logMoveToForeground(message: String) {
+            if (isDebug) {
+                Log.d(TAG_LC, message)
+            }
+        }
+
+        fun logMoveToBackground(message: String) {
+            if (isDebug) {
+                Log.d(TAG_LC, message)
+            }
+        }
+
+        fun logSharedPreferences(message: String) {
+            if (isDebug) {
+                Log.d(TAG_SH, message)
             }
         }
     }
