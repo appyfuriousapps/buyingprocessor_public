@@ -6,7 +6,6 @@ import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import java.text.DecimalFormat
 
 open class InAppProduct {
 
@@ -87,37 +86,25 @@ open class InAppProduct {
         var textResult = price?.replace("-", "")
                 ?.replace("$", "")
                 ?.replace(" ", "")
-                ?.replace(",", ".")
-        if (textResult != null && textResult.find { it == '.' } == null)
+                ?.replace(",", ".") ?: ""
+        if (textResult.find { it == '.' } == null)
             textResult += ".0"
         return try {
-            val formatter = DecimalFormat("0.00")
-            val result = formatter.parse(textResult)
-            result.toDouble()
+            var index = -1
+            textResult.mapIndexed { i, c ->
+                if (c == '.') {
+                    index = textResult.length - 1 - i
+                }
+            }
+            textResult = textResult.replace(".", "")
+            val result = if (index != -1)
+                textResult.toInt().div(Math.pow(10.0, index.toDouble()))
+            else textResult.toDouble()
+            result
         } catch (ex: Exception) {
             1.0
         }
     }
-    /* fun getPriceParse(): Double {
-        var textResult = price?.replace("-", "")
-                ?.replace("$", "")
-                ?.replace(" ", "")
-                ?.replace(",", ".")
-        if (textResult != null && textResult.find { it == '.' } == null)
-            textResult += ".0"
-        return try {
-            val reverseText = textResult?.reversed()
-            var index = -1
-            reverseText?.mapIndexed { i, c ->
-                if (c == '.') {
-                    index = i
-                }
-            }
-            1.0
-        } catch (ex: Exception) {
-            1.0
-        }
-    }*/
 
     fun set(product: InAppProduct) {
         orderId = product.orderId
