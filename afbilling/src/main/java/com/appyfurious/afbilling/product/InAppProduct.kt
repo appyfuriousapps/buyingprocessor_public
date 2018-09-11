@@ -52,7 +52,7 @@ open class InAppProduct {
 
     @SerializedName("price_amount_micros")
     @Expose
-    val priceAmountMicros: Int? = null
+    var priceAmountMicros: Int? = null
 
     @SerializedName("price_currency_code")
     @Expose
@@ -93,5 +93,22 @@ open class InAppProduct {
             result = resultText.toDouble()
         }
         return result
+    }
+
+    fun set(product: InAppProduct) {
+        orderId = product.orderId
+        packageName = product.packageName
+        productId = product.productId
+        purchaseTime = product.purchaseTime
+        purchaseState = product.purchaseState
+        developerPayload = product.developerPayload
+        purchaseToken = product.purchaseToken
+        autoRenewing = product.autoRenewing
+        price = product.price
+        priceAmountMicros = product.priceAmountMicros
+        priceCurrencyCode = product.priceCurrencyCode
+        subscriptionPeriod = product.subscriptionPeriod
+        title = product.title
+        description = product.description
     }
 }
