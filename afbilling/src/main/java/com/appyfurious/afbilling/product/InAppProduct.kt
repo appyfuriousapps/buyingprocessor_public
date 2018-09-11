@@ -86,6 +86,7 @@ open class InAppProduct {
         var textResult = price?.replace("-", "")
                 ?.replace("$", "")
                 ?.replace(" ", "")
+                ?.replace(",", ".")
         if (textResult != null && textResult.find { it == '.' } == null)
             textResult += ".0"
         return try {
