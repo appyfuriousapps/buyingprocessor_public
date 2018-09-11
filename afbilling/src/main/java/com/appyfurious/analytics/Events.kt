@@ -51,6 +51,14 @@ object Events {
                 putString(AppEventsConstants.EVENT_PARAM_CURRENCY, product.priceCurrencyCode)
             }
             it.logEvent(AppEventsConstants.EVENT_NAME_ADDED_TO_CART, product.getPriceParse(), bundle)
+            Logger.notify("""
+                |ADDED_TO_CART eventName: ${AppEventsConstants.EVENT_NAME_ADDED_TO_CART}
+                |${AppEventsConstants.EVENT_PARAM_CONTENT}, ${product.title}
+                |${AppEventsConstants.EVENT_PARAM_CONTENT_ID}, ${product.productId}
+                |${AppEventsConstants.EVENT_PARAM_CONTENT_TYPE}, ${product.getType()}
+                |${AppEventsConstants.EVENT_PARAM_CURRENCY}, ${product.priceCurrencyCode}
+                |price: ${product.getPriceParse()}, original: ${product.price}
+            """.trimMargin())
             Logger.notify("logPurchaseEvents ADDED_TO_CART")
         }
 
@@ -58,7 +66,7 @@ object Events {
             val map = HashMap<String, Any>()
             map[AF_PRICE] = product.getPriceParse()
             AppsFlyerLib.getInstance().trackEvent(context, AF_PURCHASE, map)
-            Logger.notify("logPurchaseEvents AF_PURCHASE")
+            Logger.notify("logPurchaseEvents AF_PURCHASE $AF_PURCHASE price: ${map[AF_PRICE]}")
         }
 
         Logger.notify("logPurchaseEvents price: ${product.getPriceParse()}")

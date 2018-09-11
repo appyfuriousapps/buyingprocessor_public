@@ -15,6 +15,7 @@ import com.android.vending.billing.IInAppBillingService
 import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.afbilling.product.InAppProductsManager
 import com.appyfurious.afbilling.product.ProductPreview
+import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidationCallback
@@ -145,8 +146,11 @@ class Billing(
 
     override fun isSubs(body: (Boolean, InAppProduct?) -> Unit) {
         Logger.notify("restore init")
-        productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) {
-            readMyPurchasesResult(body, it)
+        productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) { products ->
+            Adverting(context) { idfa ->
+                productManager.developerPayload.idfa = idfa
+                readMyPurchasesResult(body, products)
+            }
         }
     }
 
