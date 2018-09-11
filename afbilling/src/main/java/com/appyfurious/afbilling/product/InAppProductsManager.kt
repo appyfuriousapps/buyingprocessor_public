@@ -65,6 +65,7 @@ class InAppProductsManager(context: Context) {
         val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
         val gson = GsonBuilder().create()
         return responseList?.map {
+            Logger.notify("getInAppPurchases $it")
             gson.fromJson(it, InAppProduct::class.java)
         }
     }
