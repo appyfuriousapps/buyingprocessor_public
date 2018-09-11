@@ -86,8 +86,9 @@ open class InAppProduct {
     fun getPriceParse(): Double {
         var textResult = price?.replace("-", "")
                 ?.replace("$", "")
+                ?.replace(",", ".")
                 ?.replace(" ", "")
-                ?.replace(",", ".") ?: ""
+                ?.trim() ?: ""
         if (textResult.find { it == '.' } == null)
             textResult += ".0"
         return try {
@@ -97,8 +98,8 @@ open class InAppProduct {
                     index = textResult.length - 1 - i
                 }
             }
-            textResult = textResult.replace(".", "").replace(" ", "")
-            val result = textResult.trim().toInt().div(Math.pow(10.0, index.toDouble()))
+            textResult = textResult.replace(".", "").replace(" ", "").trim()
+            val result = textResult.toInt().div(Math.pow(10.0, index.toDouble()))
             result
         } catch (ex: Exception) {
             Logger.exception(ex.message ?: "exception!")
