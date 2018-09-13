@@ -13,7 +13,6 @@ class BillingService(context: Context, private val connected: (IInAppBillingServ
 
     var inAppBillingService: IInAppBillingService? = null
         private set
-    var isAuth = false
     var isConnected = false
 
     val isConnectedInit = MutableLiveData<Boolean>()
@@ -41,7 +40,6 @@ class BillingService(context: Context, private val connected: (IInAppBillingServ
             serviceIntent.`package` = "com.android.vending"
             context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
         } catch (ex: Exception) {
-            isAuth = false
             Logger.exception("init")
         }
     }
@@ -54,17 +52,14 @@ class BillingService(context: Context, private val connected: (IInAppBillingServ
     }
 
     fun getStatus(body: ((BillingResponseType) -> Unit)? = null) {
-        if (isConnected && isAuth) {
+        if (isConnected) {
             body?.invoke(BillingResponseType.SUCCESS)
-        } else
-            if (!isConnected)
-                body?.invoke(BillingResponseType.NOT_CONNECTED)
-            else
-                if (!isAuth)
-                    body?.invoke(BillingResponseType.NOT_AUTH)
+        } else {
+            body?.invoke(BillingResponseType.NOT_CONNECTED)
+        }
     }
 
     enum class BillingResponseType {
-        SUCCESS, NOT_CONNECTED, NOT_AUTH
+        SUCCESS, NOT_CONNECTED
     }
 }

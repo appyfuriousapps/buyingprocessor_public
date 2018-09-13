@@ -20,6 +20,7 @@ class ValidationBilling(private val packageName: String, private val deviceData:
 
     fun validateRequest(product: MyProduct, listener: ValidationCallback.ValidationListener? = null,
                         restoreListener: ValidationCallback.RestoreListener? = null) {
+        checkInit()
         val body = validationBody(product, deviceData)
         Logger.notify("validateRequest start")
         Logger.notify("validateRequest ValidationBody: $body")

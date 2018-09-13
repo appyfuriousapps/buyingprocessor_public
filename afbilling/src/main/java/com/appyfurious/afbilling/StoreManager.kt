@@ -125,8 +125,9 @@ object StoreManager {
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
             if (billingService.isConnected) {
-                isSubs(null) { _, isSubs ->
+                isSubs(null) { product, isSubs ->
                     isSubsData.value = isSubs
+                    Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
                 }
             }
         }
