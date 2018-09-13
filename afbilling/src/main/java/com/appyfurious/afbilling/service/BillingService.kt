@@ -1,6 +1,5 @@
 package com.appyfurious.afbilling.service
 
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -9,9 +8,10 @@ import android.os.IBinder
 import com.android.vending.billing.IInAppBillingService
 import com.appyfurious.log.Logger
 
-class BillingService(private val connected: (IInAppBillingService) -> Unit) : ServiceConnection {
+class BillingService(context: Context, private val connected: (IInAppBillingService?) -> Unit) : ServiceConnection {
 
-    lateinit var inAppBillingService: IInAppBillingService
+    var inAppBillingService: IInAppBillingService? = null
+        private set
     var isAuth = false
     var isConnected = false
 
@@ -23,18 +23,21 @@ class BillingService(private val connected: (IInAppBillingService) -> Unit) : Se
 
     override fun onServiceDisconnected(name: ComponentName?) {
         isConnected = false
+        inAppBillingService = null
     }
 
-    fun bind(context: Context, error: () -> Unit) {
+    init {
+        bind(context)
+    }
+
+    fun bind(context: Context) {
         Logger.notify("onResume connected")
         try {
             val serviceIntent = Intent("com.android.vending.billing.InAppBillingService.BIND")
             serviceIntent.`package` = "com.android.vending"
             context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)
         } catch (ex: Exception) {
-            (context as? Activity)?.runOnUiThread {
-                error()
-            }
+            isAuth = false
             Logger.exception("init")
         }
     }

@@ -42,7 +42,7 @@ object StoreManager {
         ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
         ValidKeys.init(baseUrl, apiKey, secretKey)
         productManager = ProductsManager(application)
-        billingService = BillingService { service ->
+        billingService = BillingService(application) { service ->
             inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
             Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
         }
@@ -119,7 +119,7 @@ object StoreManager {
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
-            if (billingService.isConnected) {
+            if (billingService.inAppBillingService != null) {
                 isSubs { isSubs ->
                     isSubsData.value = isSubs
                 }
