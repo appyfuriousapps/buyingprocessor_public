@@ -35,6 +35,8 @@ object StoreManager {
         private set
     val isSubsData = MutableLiveData<Boolean>()
 
+    fun getInAppProduct(productId: String) = inAppProducts.firstOrNull { it.productId == productId }
+
     fun init(application: Application, inAppProductsId: List<String>, baseUrl: String, apiKey: String, secretKey: String) {
         this.application = application
         ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
@@ -117,8 +119,10 @@ object StoreManager {
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
-            isSubs { isSubs ->
-                isSubsData.value = isSubs
+            if (billingService.isConnected) {
+                isSubs { isSubs ->
+                    isSubsData.value = isSubs
+                }
             }
         }
 
