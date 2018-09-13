@@ -27,6 +27,9 @@ ext {
     currentFirebaseVersion = "11.8.0"
 }
 
+project.ext {
+    archLifecycleVersion = "1.1.0"
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -49,6 +52,11 @@ dependencies {
     implementation("com.google.firebase:firebase-config:$currentFirebaseVersion") {
         exclude group: 'org.json', module: 'json'
     }
+
+    implementation "android.arch.lifecycle:extensions:$project.archLifecycleVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$project.archLifecycleVersion"
+    kapt "android.arch.lifecycle:compiler:$project.archLifecycleVersion"
+    implementation "android.arch.lifecycle:livedata:$project.archLifecycleVersion"
 }
 repositories {
     mavenCentral()

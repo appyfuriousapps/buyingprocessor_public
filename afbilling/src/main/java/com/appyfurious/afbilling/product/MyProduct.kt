@@ -1,9 +1,6 @@
 package com.appyfurious.afbilling.product
 
-import android.util.Base64
-import com.appyfurious.log.Logger
-import com.appyfurious.validation.body.DeviceData
-import com.google.gson.GsonBuilder
+import com.appyfurious.afbilling.Billing
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -40,4 +37,6 @@ class MyProduct {
     @SerializedName("autoRenewing")
     @Expose
     var autoRenewing: Boolean? = null
+
+    fun isActive() = purchaseState == Billing.PURCHASE_STATUS_PURCHASED
 }

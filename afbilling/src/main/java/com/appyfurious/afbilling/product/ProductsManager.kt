@@ -1,36 +1,42 @@
 package com.appyfurious.afbilling.product
 
+import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
+import com.appyfurious.afbilling.Billing
+import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
 
-class ProductsManager(context: Context) {
+class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Unit)? = null) {
 
     private val packageName = context.packageName
 
     private val deviceData = DeviceData(AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!, "")
 
     init {
-        Adverting(context) {
-            deviceData.idfa = it
-            Logger.notify("advertingId: ${deviceData.idfa}")
+        completedDeviceData?.let {
+            getDeviceData(context, it)
         }
     }
 
     fun getDeviceData(context: Context, body: (DeviceData) -> Unit) {
         if (deviceData.idfa == "") {
-            Adverting(context) { adverting ->
-                deviceData.idfa = adverting
+            Adverting(context) { idfa ->
+                deviceData.idfa = idfa
                 body(deviceData)
+                Logger.notify("ProductManager getDeviceData new $deviceData")
             }
         } else {
             body(deviceData)
+            Logger.notify("ProductManager getDeviceData actual $deviceData")
         }
     }
 
@@ -69,17 +75,31 @@ class ProductsManager(context: Context) {
         Logger.notify("finish readMyPurchases")
     }
 
-    fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct>? {
+    fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct> {
         val skuList = ArrayList(productIds)
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
 
         val skuDetails = service?.getSkuDetails(3, packageName, type, query)
-        val responseList = skuDetails?.getStringArrayList("DETAILS_LIST")
+        val responseList = skuDetails?.getStringArrayList("DETAILS_LIST") ?: listOf<String>()
         val gson = GsonBuilder().create()
-        return responseList?.map {
+        return responseList.map {
             Logger.notify("getInAppPurchases $it")
             gson.fromJson(it, InAppProduct::class.java)
+        }
+    }
+
+    fun showPurchaseProduct(activity: Activity, billingService: BillingService, product: InAppProduct,
+                            body: ((BillingService.BillingResponseType) -> Unit)?) {
+        getDeviceData(activity) { deviceData ->
+            val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
+            Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
+            val buyIntentBundle = billingService.inAppBillingService.getBuyIntent(3,
+                    activity.packageName, product.getSku(), product.type, developerPayload)
+            val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
+            activity.startIntentSenderForResult(pendingIntent?.intentSender, Billing.REQUEST_CODE_BUY,
+                    Intent(), 0, 0, 0)
+            billingService.getStatus(body)
         }
     }
 }
