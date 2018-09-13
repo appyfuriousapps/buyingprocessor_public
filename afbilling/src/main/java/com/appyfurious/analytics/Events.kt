@@ -47,7 +47,7 @@ object Events {
             val bundle = Bundle().apply {
                 putString(AppEventsConstants.EVENT_PARAM_CONTENT, product.title)
                 putString(AppEventsConstants.EVENT_PARAM_CONTENT_ID, product.productId)
-                putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, product.getType())
+                putString(AppEventsConstants.EVENT_PARAM_CONTENT_TYPE, product.type)
                 putString(AppEventsConstants.EVENT_PARAM_CURRENCY, product.priceCurrencyCode)
             }
             it.logEvent(AppEventsConstants.EVENT_NAME_ADDED_TO_CART, product.getPriceParse(), bundle)
@@ -55,7 +55,7 @@ object Events {
                 |ADDED_TO_CART eventName: ${AppEventsConstants.EVENT_NAME_ADDED_TO_CART}
                 |${AppEventsConstants.EVENT_PARAM_CONTENT}, ${product.title}
                 |${AppEventsConstants.EVENT_PARAM_CONTENT_ID}, ${product.productId}
-                |${AppEventsConstants.EVENT_PARAM_CONTENT_TYPE}, ${product.getType()}
+                |${AppEventsConstants.EVENT_PARAM_CONTENT_TYPE}, ${product.type}
                 |${AppEventsConstants.EVENT_PARAM_CURRENCY}, ${product.priceCurrencyCode}
                 |price: ${product.getPriceParse()}, original: ${product.price}
             """.trimMargin())
