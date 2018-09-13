@@ -20,7 +20,7 @@ class MyProduct {
 
     @SerializedName("purchaseTime")
     @Expose
-    var purchaseTime: Int? = null
+    var purchaseTime: Long? = null
 
     @SerializedName("purchaseState")
     @Expose
