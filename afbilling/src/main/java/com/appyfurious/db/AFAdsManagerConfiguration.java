@@ -24,7 +24,7 @@ public class AFAdsManagerConfiguration extends RealmObject {
     private int interstitialsDelay;
     private RealmList<Action> actions;
 
-    // optional
+    // custom
     private double interstitialsLastShowDate;
     private int currentInterstitialCountPerSession;
 

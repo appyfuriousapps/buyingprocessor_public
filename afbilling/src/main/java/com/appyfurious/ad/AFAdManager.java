@@ -63,6 +63,11 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
         MobileAds.initialize(applicationContext, mAFAdsManagerConfiguration.getApplicationId());
 
+//        SdkConfiguration sdkConfiguration =
+//                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
+//
+//        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
 

@@ -13,6 +13,8 @@ import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.AFSharedPreferencesManager;
 import com.appyfurious.log.Logger;
+import com.appyfurious.rating.AFRatingManager;
+import com.appyfurious.rating.RatingConfigParser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -74,8 +76,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                  // values are returned.
                                  mRemoteConfig.activateFetched();
 
-                                 AdConfigParser parser = new AdConfigParser(mRemoteConfig
+                                 AdConfigParser parser = new AdConfigParser(mRemoteConfig // TODO check null
                                          .getString("ads_config"), isDebug);
+
+                                 RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
 
                                  AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration(parser.getApplicationId(),
                                          parser.getBannerId(), parser.getInterstitialId(), parser.getRewardedVideoId(),
@@ -84,7 +88,9 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
                                  AFRealmDatabase.getInstance().initialize(mApplicationContext);
                                  AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
+                                 AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
                                  AFAdManager.getInstance().initialize(mApplicationContext);
+                                 AFRatingManager.getInstance().initialize();
 
                              } else {
                                  Toast.makeText(mApplicationContext, "Fetch Failed",
@@ -109,6 +115,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
     public void onMoveToBackground() {
         Logger.Companion.logMoveToBackground("App is going to background..");
         AFRealmDatabase.getInstance().resetInterstitialPerSession();
+        AFRealmDatabase.getInstance().resetActionCountOnRatingConfigs();
     }
 
 }

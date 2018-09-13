@@ -1,7 +1,5 @@
 package com.appyfurious.ad;
 
-import android.view.ViewGroup;
-
 /**
  * AdManagerApplication.java
  * buyingprocessor_public
@@ -13,6 +11,5 @@ import android.view.ViewGroup;
 
 public interface AdManagerApplication {
 
-    AdManager getAdManager();
 
 }

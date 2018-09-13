@@ -5,9 +5,12 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appyfurious.ad.AFAdManager;
 import com.appyfurious.ad.RewardedCallback;
+import com.appyfurious.db.AFRatingConfiguration;
+import com.appyfurious.rating.AFRatingManager;
 
 /**
  * My2Activity.java
@@ -32,6 +35,20 @@ public class My2Activity extends BaseActivity implements View.OnClickListener, R
         mTextView = findViewById(R.id.textView);
         mButton.setOnClickListener(this);
         AFAdManager.getInstance().loadRewardedVideoAd(this, this, mButton);
+
+        AFRatingConfiguration conf = AFRatingManager.getInstance().requestRating("Enter in Activity 2");
+        if (conf != null) {
+            Toast.makeText(this, "Rating Show", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        AFRatingConfiguration configuration = AFRatingManager.getInstance().requestRating("Exit from Activity 2");
+        if (configuration != null) {
+            Toast.makeText(this, "Rating Show", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

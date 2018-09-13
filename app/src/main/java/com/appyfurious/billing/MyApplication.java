@@ -3,7 +3,9 @@ package com.appyfurious.billing;
 import android.app.Application;
 
 import com.appyfurious.ad.AFDataManager;
+import com.appyfurious.analytics.Analytics;
 import com.appyfurious.log.Logger;
+import com.appyfurious.validation.ValidKeys;
 
 /**
  * MyApplication.java
