@@ -1,5 +1,6 @@
 package com.appyfurious.afbilling.service
 
+import android.arch.lifecycle.MutableLiveData
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -15,10 +16,13 @@ class BillingService(context: Context, private val connected: (IInAppBillingServ
     var isAuth = false
     var isConnected = false
 
+    val isConnectedInit = MutableLiveData<Boolean>()
+
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         isConnected = true
         inAppBillingService = IInAppBillingService.Stub.asInterface(service)
         connected(inAppBillingService)
+        isConnectedInit.value = true
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

@@ -33,6 +33,7 @@ object StoreManager {
         private set
     lateinit var inAppProducts: List<InAppProduct>
         private set
+
     val isSubsData = MutableLiveData<Boolean>()
 
     fun getInAppProduct(productId: String) = inAppProducts.firstOrNull { it.productId == productId }
@@ -76,9 +77,13 @@ object StoreManager {
         Logger.notify("finish onActivityResult validate")
     }
 
-    fun isSubs(body: (Boolean) -> Unit) {
-        isSubs(null) { _, isSubs ->
-            body(isSubs)
+    fun isSubs(owner: LifecycleOwner, body: (Boolean) -> Unit) {
+        if (billingService.isConnected) {
+            isSubs(null) { _, isSubs -> body(isSubs) }
+        } else {
+            billingService.isConnectedInit.observe(owner, Observer {
+                isSubs(null) { _, isSubs -> body(isSubs) }
+            })
         }
     }
 
@@ -87,12 +92,12 @@ object StoreManager {
             myProducts = products
             val product = myProducts.firstOrNull { it.isActive() }
             val isSubs = product?.isActive() == true
-            isSubsData.value = isSubs
             if (isSubs && product != null) {
                 validation(application, listener, product) { body(product, it) }
             } else {
                 body(product, false)
             }
+            isSubsData.value = isSubs
         }
     }
 
@@ -119,8 +124,8 @@ object StoreManager {
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
-            if (billingService.inAppBillingService != null) {
-                isSubs { isSubs ->
+            if (billingService.isConnected) {
+                isSubs(null) { _, isSubs ->
                     isSubsData.value = isSubs
                 }
             }
