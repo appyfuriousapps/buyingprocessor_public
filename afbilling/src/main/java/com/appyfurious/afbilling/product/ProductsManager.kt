@@ -94,7 +94,7 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
         getDeviceData(activity) { deviceData ->
             val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
             Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
-            val buyIntentBundle = billingService.inAppBillingService.getBuyIntent(3,
+            val buyIntentBundle = billingService.inAppBillingService?.getBuyIntent(3,
                     activity.packageName, product.getSku(), product.type, developerPayload)
             val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
             activity.startIntentSenderForResult(pendingIntent?.intentSender, StoreManager.Keys.REQUEST_CODE_BUY,
