@@ -1,6 +1,6 @@
 package com.appyfurious.afbilling.utils
 
-import com.appyfurious.afbilling.product.InAppProduct
+import com.appyfurious.afbilling.product.MyProduct
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
@@ -9,7 +9,7 @@ import com.appyfurious.validation.body.DeviceData
 import com.appyfurious.validation.body.ValidationBody
 import java.util.*
 
-class ValidationBilling(private val packageName: String, private val developerPayload: DeviceData) {
+class ValidationBilling(private val packageName: String, private val deviceData: DeviceData) {
 
     companion object {
         fun checkInit() {
@@ -18,21 +18,21 @@ class ValidationBilling(private val packageName: String, private val developerPa
         }
     }
 
-    fun validateRequest(product: InAppProduct, advertingId: String?, listener: ValidationCallback.ValidationListener? = null,
+    fun validateRequest(product: MyProduct, listener: ValidationCallback.ValidationListener? = null,
                         restoreListener: ValidationCallback.RestoreListener? = null) {
-        val body = validationBody(product, advertingId)
+        val body = validationBody(product, deviceData)
         Logger.notify("validateRequest start")
         Logger.notify("validateRequest ValidationBody: $body")
         Logger.notify("baseUrl ${ValidKeys.baseUrl}, apiKey ${ValidKeys.apiKey}, secretKey ${ValidKeys.secretKey}")
         val service = ValidationClient.getValidationService(ValidKeys.secretKey, ValidKeys.baseUrl)
         val call = service.validate(ValidKeys.apiKey, body)
-        val validationCallback = ValidationCallback(product, ValidKeys.secretKey, listener, restoreListener)
+        val validationCallback = ValidationCallback(ValidKeys.secretKey, listener, restoreListener)
         call.enqueue(validationCallback)
         Logger.notify("validateRequest finish")
     }
 
-    private fun validationBody(product: InAppProduct, advertingId: String?) =
+    private fun validationBody(product: MyProduct, deviceData: DeviceData) =
             ValidationBody(UUID.randomUUID().toString(), product.purchaseToken
                     ?: "product.purchaseToken", product.productId, ValidationBody.PRODUCT_TYPE,
-                    packageName, product.developerPayload, developerPayload.appsflyerId, advertingId)
+                    packageName, product.developerPayload, deviceData.appsflyerId, deviceData.idfa)
 }

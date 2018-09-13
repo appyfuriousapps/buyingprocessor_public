@@ -13,9 +13,9 @@ import android.os.IBinder
 import android.support.v4.app.FragmentActivity
 import com.android.vending.billing.IInAppBillingService
 import com.appyfurious.afbilling.product.InAppProduct
-import com.appyfurious.afbilling.product.InAppProductsManager
+import com.appyfurious.afbilling.product.ProductsManager
+import com.appyfurious.afbilling.product.MyProduct
 import com.appyfurious.afbilling.product.ProductPreview
-import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
@@ -41,9 +41,8 @@ class Billing(
     private var inAppBillingService: IInAppBillingService? = null
     private var isSubsBody: ((Boolean) -> Unit)? = null
 
-    private val productManager = InAppProductsManager(context)
-    private val validationBilling = ValidationBilling(context.packageName, productManager.developerPayload)
-    private val selectedProductCopy = InAppProduct()
+    private val productManager = ProductsManager(context)
+    private lateinit var selectedInAppProduct: InAppProduct
 
     private val serviceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -128,14 +127,16 @@ class Billing(
 
     override fun showFormPurchaseProduct(product: InAppProduct?, body: ((BillingResponseType) -> Unit)?) {
         if (product != null) {
-            selectedProductCopy.set(product)
-            val developerPayload = product.getDeveloperPayloadBase64(productManager.developerPayload)
-            Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
-            val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
-                    product.getSku(), product.getType(), developerPayload)
-            val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
-            activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
-                    Intent(), 0, 0, 0)
+            productManager.getDeviceData(context) { deviceData ->
+                selectedInAppProduct = product
+                val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
+                Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
+                val buyIntentBundle = inAppBillingService?.getBuyIntent(3, context.packageName,
+                        product.getSku(), product.type, developerPayload)
+                val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
+                activity().startIntentSenderForResult(pendingIntent?.intentSender, REQUEST_CODE_BUY,
+                        Intent(), 0, 0, 0)
+            }
         }
         if (isConnected && isAuth) {
             body?.invoke(BillingResponseType.SUCCESS)
@@ -147,25 +148,21 @@ class Billing(
                     body?.invoke(BillingResponseType.NOT_AUTH)
     }
 
-    override fun isSubs(listener: ValidationCallback.ValidationListener?, body: (Boolean, InAppProduct?) -> Unit) {
+    override fun isSubs(listener: ValidationCallback.ValidationListener?, body: (Boolean, MyProduct?) -> Unit) {
         Logger.notify("restore init")
         productManager.readMyPurchases(inAppBillingService, InAppProduct.SUBS) { products ->
-            Adverting(context) { idfa ->
-                productManager.developerPayload.idfa = idfa
-                readMyPurchasesResult(listener, body, products)
-            }
+            readMyPurchasesResult(listener, body, products)
         }
     }
 
     private val readMyPurchasesResult = { listener: ValidationCallback.ValidationListener?,
-                                          body: (Boolean, InAppProduct?) -> Unit, it: List<InAppProduct> ->
+                                          body: (Boolean, MyProduct?) -> Unit, it: List<MyProduct> ->
         Logger.notify(it.joinToString(", ") { it.productId ?: "product_id" })
-        var product: InAppProduct? = null
+        var product: MyProduct? = null
         val isSubs = it.isNotEmpty() && it.filter {
             it.purchaseState == Billing.PURCHASE_STATUS_PURCHASED
         }.map { product = it }.isNotEmpty()
-        val advertingId = productManager.developerPayload.idfa
-        Logger.notify("advertingId: $advertingId," + "isSubs: $isSubs, product != null -> ${product != null}")
+        Logger.notify("advertingId: DEPRICATE(advertingId)," + "isSubs: $isSubs, product != null -> ${product != null}")
         if (product != null && isSubs) {
             val restore = object : ValidationCallback.RestoreListener {
                 override fun validationRestoreSuccess() {
@@ -178,7 +175,9 @@ class Billing(
                     body(false, null)
                 }
             }
-            validationBilling.validateRequest(product!!, advertingId, listener, restore)
+            productManager.getDeviceData(context) { deviceData ->
+                ValidationBilling(context.packageName, deviceData).validateRequest(product!!, listener, restore)
+            }
         } else {
             Logger.notify("ELSE validationRestoreFailure")
             body(false, product)
@@ -186,7 +185,7 @@ class Billing(
     }
 
     override fun isSubs(body: (Boolean) -> Unit) {
-        val newBody = { isSubs: Boolean, _: InAppProduct? -> body(isSubs) }
+        val newBody = { isSubs: Boolean, _: MyProduct? -> body(isSubs) }
         isSubs(null, newBody)
     }
 
@@ -199,7 +198,7 @@ class Billing(
                 listener.onValidationShowProgress()
                 isSubs(listener) { isSubs, product ->
                     if (isSubs && product != null) {
-                        Events.logPurchaseEvents(context, selectedProductCopy)
+                        Events.logPurchaseEvents(context, selectedInAppProduct)
                     }
                 }
             }

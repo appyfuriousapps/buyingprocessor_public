@@ -1,7 +1,6 @@
 package com.appyfurious.validation
 
 import android.content.Context
-import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.log.Logger
 import okhttp3.ResponseBody
 import org.json.JSONException
@@ -11,8 +10,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
-class ValidationCallback(private val product: InAppProduct,
-                         private val secretKey: String,
+class ValidationCallback(private val secretKey: String,
                          private val validationListener: ValidationListener? = null,
                          private val restoreListener: RestoreListener? = null)
     : Callback<ResponseBody> {
@@ -89,7 +87,6 @@ class ValidationCallback(private val product: InAppProduct,
     }
 
     interface ValidationListener {
-        fun validationContext(): Context?
         fun onValidationSuccess()
         fun onValidationFailure(errorMessage: String)
         fun onValidationShowProgress()

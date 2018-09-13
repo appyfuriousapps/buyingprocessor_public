@@ -11,43 +11,19 @@ open class InAppProduct {
 
     companion object {
         const val SUBS = "subs"
-        const val INAPP = "inapp"
     }
-
-    @SerializedName("orderId")
-    @Expose
-    var orderId: String? = null
-
-    @SerializedName("packageName")
-    @Expose
-    var packageName: String? = null
 
     @SerializedName("productId")
     @Expose
     var productId: String? = null
 
-    @SerializedName("purchaseTime")
-    @Expose
-    var purchaseTime: Long? = null
-    @SerializedName("purchaseState")
-    @Expose
-    var purchaseState: Int? = null
-
-    @SerializedName("developerPayload")
-    @Expose
-    var developerPayload: String? = null
-
-    @SerializedName("purchaseToken")
-    @Expose
-    var purchaseToken: String? = null
-
-    @SerializedName("autoRenewing")
-    @Expose
-    var autoRenewing: Boolean? = null
-
     @SerializedName("price")
     @Expose
     var price: String? = null
+
+    @SerializedName("type")
+    @Expose
+    var type: String? = null
 
     @SerializedName("price_amount_micros")
     @Expose
@@ -69,19 +45,7 @@ open class InAppProduct {
     @Expose
     var description: String? = null
 
-    fun getDeveloperPayloadBase64(developerPayload: DeviceData): String {
-        val gson = GsonBuilder().create()
-        val obj = gson.toJson(developerPayload)
-        val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
-        Logger.notify("setDeveloperPayload $obj")
-        Logger.notify("setDeveloperPayload $result")
-        this.developerPayload = result.replace("\\n", "").replace("\n", "")
-        return this.developerPayload ?: ""
-    }
-
     fun getSku(): String? = productId
-
-    fun getType() = SUBS
 
     fun getPriceParse(): Double {
         var textResult = price?.replace("-", "")
@@ -108,20 +72,12 @@ open class InAppProduct {
         }
     }
 
-    fun set(product: InAppProduct) {
-        orderId = product.orderId
-        packageName = product.packageName
-        productId = product.productId
-        purchaseTime = product.purchaseTime
-        purchaseState = product.purchaseState
-        developerPayload = product.developerPayload
-        purchaseToken = product.purchaseToken
-        autoRenewing = product.autoRenewing
-        price = product.price
-        priceAmountMicros = product.priceAmountMicros
-        priceCurrencyCode = product.priceCurrencyCode
-        subscriptionPeriod = product.subscriptionPeriod
-        title = product.title
-        description = product.description
+    fun getNewDeveloperPayloadBase64(deviceData: DeviceData): String {
+        val gson = GsonBuilder().create()
+        val obj = gson.toJson(deviceData)
+        val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
+        Logger.notify("new DeveloperPayload $obj")
+        Logger.notify("new DeveloperPayload $result")
+        return result.replace("\\n", "").replace("\n", "")
     }
 }

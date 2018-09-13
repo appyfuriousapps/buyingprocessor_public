@@ -10,16 +10,27 @@ import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
 
-class InAppProductsManager(context: Context) {
+class ProductsManager(context: Context) {
 
     private val packageName = context.packageName
 
-    val developerPayload = DeviceData(AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!, "")
+    private val deviceData = DeviceData(AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!, "")
 
     init {
         Adverting(context) {
-            developerPayload.idfa = it
-            Logger.notify("advertingId: ${developerPayload.idfa}")
+            deviceData.idfa = it
+            Logger.notify("advertingId: ${deviceData.idfa}")
+        }
+    }
+
+    fun getDeviceData(context: Context, body: (DeviceData) -> Unit) {
+        if (deviceData.idfa == "") {
+            Adverting(context) { adverting ->
+                deviceData.idfa = adverting
+                body(deviceData)
+            }
+        } else {
+            body(deviceData)
         }
     }
 
@@ -34,11 +45,12 @@ class InAppProductsManager(context: Context) {
     }
 
     fun readMyPurchases(service: IInAppBillingService?, type: String,
-                        body: (products: List<InAppProduct>) -> Unit) {
+                        body: (products: List<MyProduct>) -> Unit) {
         Logger.notify("start readMyPurchases")
         var continuationToken: String? = null
         val gson = GsonBuilder().create()
-        val myProducts = ArrayList<InAppProduct>()
+        val myProducts = ArrayList<MyProduct>()
+
         do {
             val result = service?.getPurchases(3, packageName, type, continuationToken)
             if (result?.getInt("RESPONSE_CODE", -1) != 0) {
@@ -47,11 +59,12 @@ class InAppProductsManager(context: Context) {
             val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
             val serverProducts = responseList.map {
                 Logger.notify("readMyPurchases $it")
-                gson.fromJson(it, InAppProduct::class.java)
+                gson.fromJson(it, MyProduct::class.java)
             }
             myProducts.addAll(serverProducts)
             continuationToken = result.getString("INAPP_CONTINUATION_TOKEN")
         } while (continuationToken != null)
+
         body(myProducts)
         Logger.notify("finish readMyPurchases")
     }
