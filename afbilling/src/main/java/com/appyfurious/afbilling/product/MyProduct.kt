@@ -1,6 +1,6 @@
 package com.appyfurious.afbilling.product
 
-import com.appyfurious.afbilling.Billing
+import com.appyfurious.afbilling.StoreManager
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
@@ -38,5 +38,5 @@ class MyProduct {
     @Expose
     var autoRenewing: Boolean? = null
 
-    fun isActive() = purchaseState == Billing.PURCHASE_STATUS_PURCHASED
+    fun isActive() = purchaseState == StoreManager.Keys.PURCHASE_STATUS_PURCHASED
 }

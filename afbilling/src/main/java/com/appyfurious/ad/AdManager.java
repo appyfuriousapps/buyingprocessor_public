@@ -193,10 +193,10 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
                     }
                 }
             } else {
-                Logger.Companion.logAd("Interstitial aborted by interstitial count per session");
+                Logger.INSTANCE.logAd("Interstitial aborted by interstitial count per session");
             }
         } else {
-            Logger.Companion.logAd("Interstitial aborted by interstitials delay");
+            Logger.INSTANCE.logAd("Interstitial aborted by interstitials delay");
         }
     }
 

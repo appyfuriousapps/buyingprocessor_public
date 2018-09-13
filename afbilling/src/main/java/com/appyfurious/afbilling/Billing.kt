@@ -1,3 +1,4 @@
+/*
 package com.appyfurious.afbilling
 
 import android.app.Activity
@@ -25,13 +26,7 @@ class Billing(
         private val listener: BillingListener?,
         private val listSubs: List<ProductPreview>? = null) : BaseBilling, LifecycleObserver {
 
-    companion object {
-        const val REQUEST_CODE_BUY = 1234
-        const val BILLING_RESPONSE_RESULT_OK = 0
-        const val PURCHASE_STATUS_PURCHASED = 0
-        const val PURCHASE_STATUS_CANCELLED = 1
-        const val RESPONSE_CODE = "RESPONSE_CODE"
-    }
+
 
     private val lifecycle: Lifecycle
     private var products: List<InAppProduct>? = null
@@ -180,3 +175,4 @@ class Billing(
         fun billingCanceled()
     }
 }
+*/

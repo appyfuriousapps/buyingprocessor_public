@@ -17,6 +17,14 @@ import com.appyfurious.validation.ValidationCallback
 
 object StoreManager {
 
+    object Keys {
+        const val REQUEST_CODE_BUY = 1234
+        const val BILLING_RESPONSE_RESULT_OK = 0
+        const val PURCHASE_STATUS_PURCHASED = 0
+        const val PURCHASE_STATUS_CANCELLED = 1
+        const val RESPONSE_CODE = "RESPONSE_CODE"
+    }
+
     private lateinit var application: Application
     private lateinit var productManager: ProductsManager
     private lateinit var billingService: BillingService
@@ -45,9 +53,9 @@ object StoreManager {
 
     fun onActivityResult(requestCode: Int, data: Intent?, listener: ValidationCallback.ValidationListener) {
         Logger.notify("start onActivityResult validate")
-        if (requestCode == Billing.REQUEST_CODE_BUY) {
-            val responseCode = data?.getIntExtra(Billing.RESPONSE_CODE, -1)
-            if (responseCode == Billing.BILLING_RESPONSE_RESULT_OK) {
+        if (requestCode == Keys.REQUEST_CODE_BUY) {
+            val responseCode = data?.getIntExtra(Keys.RESPONSE_CODE, -1)
+            if (responseCode == Keys.BILLING_RESPONSE_RESULT_OK) {
                 Logger.notify("onActivityResult validate BILLING_RESPONSE_RESULT_OK")
                 listener.onValidationShowProgress()
                 isSubs(listener) { product, isSubs ->
@@ -59,7 +67,7 @@ object StoreManager {
                     }
                 }
             }
-            if (responseCode == Billing.PURCHASE_STATUS_CANCELLED) {
+            if (responseCode == Keys.PURCHASE_STATUS_CANCELLED) {
                 Logger.notify("onActivityResult validate PURCHASE_STATUS_CANCELLED")
             }
         }
