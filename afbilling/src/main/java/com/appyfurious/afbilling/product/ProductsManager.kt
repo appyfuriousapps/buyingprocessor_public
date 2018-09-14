@@ -51,7 +51,9 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
             val result = service?.getPurchases(3, packageName, type, continuationToken)
             if (result?.getInt("RESPONSE_CODE", -1) != 0) {
                 //throw Exception("Invalid response code")
-                break
+                body(myProducts)
+                Logger.exception("readMyPurchases Invalid response code")
+                return
             }
             val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
             val serverProducts = responseList.map {
