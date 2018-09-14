@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.afbilling.R;
@@ -87,8 +86,9 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Toast.makeText(mApplicationContext, "Fetch Succeeded",
-                            Toast.LENGTH_SHORT).show();
+                    /*Toast.makeText(mApplicationContext, "Fetch Succeeded",
+                            Toast.LENGTH_SHORT).show();*/
+                    Logger.INSTANCE.notify("Fetch Succeeded");
 
                     // After config data is successfully fetched, it must be activated before newly fetched
                     // values are returned.
@@ -96,8 +96,9 @@ public class AdManager implements AdDownloadingCallback, AdConfigParser.ParserLi
                     new AdConfigParser(mFirebaseRemoteConfig
                             .getString("ads_config_android"), AdManager.this, isDebug);
                 } else {
-                    Toast.makeText(mApplicationContext, "Fetch Failed",
-                            Toast.LENGTH_SHORT).show();
+                    /*Toast.makeText(mApplicationContext, "Fetch Failed",
+                            Toast.LENGTH_SHORT).show();*/
+                    Logger.INSTANCE.notify("Fetch Failed");
                 }
             }
         });
