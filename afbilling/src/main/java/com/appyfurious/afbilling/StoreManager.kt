@@ -28,6 +28,7 @@ object StoreManager {
     private lateinit var application: Application
     private lateinit var productManager: ProductsManager
     private lateinit var billingService: BillingService
+    private var isLazyInit = false
 
     lateinit var myProducts: List<MyProduct>
         private set
@@ -46,6 +47,10 @@ object StoreManager {
         billingService = BillingService(application) { service ->
             inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
             Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
+            if (isLazyInit) {
+                isLazyInit = false
+                isSubs(null, null)
+            }
         }
         Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
     }
@@ -87,17 +92,20 @@ object StoreManager {
         }
     }
 
-    private fun isSubs(listener: ValidationCallback.ValidationListener?, body: (MyProduct?, Boolean) -> Unit) {
+    private fun isSubs(listener: ValidationCallback.ValidationListener?, body: ((MyProduct?, Boolean) -> Unit)?) {
         productManager.readMyPurchases(billingService.inAppBillingService, InAppProduct.SUBS) { products ->
             myProducts = products
             val product = myProducts.firstOrNull { it.isActive() }
             val isSubs = product?.isActive() == true
             if (isSubs && product != null) {
-                validation(application, listener, product) { body(product, it) }
+                validation(application, listener, product) {
+                    isSubsData.value = isSubs
+                    body?.invoke(product, it)
+                }
             } else {
-                body(product, false)
+                isSubsData.value = isSubs
+                body?.invoke(product, false)
             }
-            isSubsData.value = isSubs
         }
     }
 
@@ -129,6 +137,8 @@ object StoreManager {
                     isSubsData.value = isSubs
                     Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
                 }
+            } else {
+                isLazyInit = true
             }
         }
 
