@@ -40,16 +40,6 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
         }
     }
 
-    fun syncProducts(products: List<InAppProduct>?, productsPreview: List<ProductPreview>?) {
-        productsPreview?.map { preview ->
-            products?.filter { preview.id == it.productId }
-                    ?.map { product ->
-                        preview.price = product.price!!
-                        preview.appProduct = product
-                    }
-        }
-    }
-
     fun readMyPurchases(service: IInAppBillingService?, type: String,
                         body: (products: List<MyProduct>) -> Unit) {
         Logger.notify("start readMyPurchases")
@@ -60,7 +50,8 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
         do {
             val result = service?.getPurchases(3, packageName, type, continuationToken)
             if (result?.getInt("RESPONSE_CODE", -1) != 0) {
-                throw Exception("Invalid response code")
+                //throw Exception("Invalid response code")
+                break
             }
             val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
             val serverProducts = responseList.map {
