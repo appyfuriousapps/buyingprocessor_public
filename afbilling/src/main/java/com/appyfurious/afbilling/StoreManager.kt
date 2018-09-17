@@ -30,6 +30,7 @@ object StoreManager {
     private lateinit var billingService: BillingService
     private var isLazyInit = false
 
+    private lateinit var inAppProductsId: List<String>
     lateinit var myProducts: List<MyProduct>
         private set
     lateinit var inAppProducts: List<InAppProduct>
@@ -41,17 +42,10 @@ object StoreManager {
 
     fun init(application: Application, inAppProductsId: List<String>, baseUrl: String, apiKey: String, secretKey: String) {
         this.application = application
+        this.inAppProductsId = inAppProductsId
         ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
         ValidKeys.init(baseUrl, apiKey, secretKey)
         productManager = ProductsManager(application)
-        billingService = BillingService(application) { service ->
-            inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
-            Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
-            if (isLazyInit) {
-                isLazyInit = false
-                isSubs(null, null)
-            }
-        }
         Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
     }
 
@@ -92,6 +86,35 @@ object StoreManager {
         }
     }
 
+    private val listener = object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun onMoveToForeground() {
+            Logger.notify("onMoveToForeground")
+            billingService = BillingService(application) { service ->
+                inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
+                Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
+                if (isLazyInit) {
+                    isLazyInit = false
+                    isSubs(null, null)
+                }
+            }
+            if (billingService.isConnected) {
+                isSubs(null) { product, isSubs ->
+                    isSubsData.value = isSubs
+                    Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
+                }
+            } else {
+                isLazyInit = true
+            }
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        fun onMoveToBackground() {
+            Logger.notify("onMoveToBackground")
+            billingService.unbind(application)
+        }
+    }
+
     private fun isSubs(listener: ValidationCallback.ValidationListener?, body: ((MyProduct?, Boolean) -> Unit)?) {
         productManager.readMyPurchases(billingService.inAppBillingService, InAppProduct.SUBS) { products ->
             myProducts = products
@@ -125,26 +148,6 @@ object StoreManager {
         override fun validationRestoreFailure(errorMessage: String) {
             Logger.notify("validationRestoreFailure")
             body(false)
-        }
-    }
-
-    private val listener = object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onMoveToForeground() {
-            Logger.notify("onMoveToForeground")
-            if (billingService.isConnected) {
-                isSubs(null) { product, isSubs ->
-                    isSubsData.value = isSubs
-                    Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
-                }
-            } else {
-                isLazyInit = true
-            }
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onMoveToBackground() {
-            Logger.notify("onMoveToBackground")
         }
     }
 }
