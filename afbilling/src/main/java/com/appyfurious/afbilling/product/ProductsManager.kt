@@ -29,8 +29,12 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
 
     fun getDeviceData(context: Context, body: (DeviceData) -> Unit) {
         if (deviceData.idfa == "") {
-            Adverting(context) { idfa ->
-                deviceData.idfa = idfa
+            Adverting(context) { idfa, isLimitAdTrackingEnabled ->
+                if (isLimitAdTrackingEnabled == false) {
+                    deviceData.idfa = idfa
+                } else {
+                    deviceData.idfa = null
+                }
                 body(deviceData)
                 Logger.notify("ProductManager getDeviceData new $deviceData")
             }

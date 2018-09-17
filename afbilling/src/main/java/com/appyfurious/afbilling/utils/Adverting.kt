@@ -4,7 +4,7 @@ import android.content.Context
 import com.appyfurious.log.Logger
 import com.appyfurious.validation.utils.AdvertisingIdClient
 
-class Adverting(context: Context, private val success: (String) -> Unit) : AdvertisingIdClient.Listener {
+class Adverting(context: Context, private val success: (String, Boolean?) -> Unit) : AdvertisingIdClient.Listener {
 
     init {
         AdvertisingIdClient.getAdvertisingId(context, this)
@@ -14,11 +14,11 @@ class Adverting(context: Context, private val success: (String) -> Unit) : Adver
 
     override fun onAdvertisingIdClientFinish(adInfo: AdvertisingIdClient.AdInfo?) {
         Logger.notify("onAdvertisingIdClientFinish ${adInfo?.id}")
-        success(adInfo?.id ?: default)
+        success(adInfo?.id ?: default, adInfo?.isLimitAdTrackingEnabled)
     }
 
     override fun onAdvertisingIdClientFail(exception: Exception) {
         Logger.notify("onAdvertisingIdClientFail advertingId")
-        success(default)
+        success(default, true)
     }
 }
