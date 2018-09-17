@@ -54,7 +54,7 @@ public class AFRealmDatabase {
         });
 
         AFAdsManagerConfiguration config = realm.where(AFAdsManagerConfiguration.class).findFirst();
-        if (config != null) {
+        if (config != null && listener != null) {
             config.addChangeListener(listener);
         }
     }

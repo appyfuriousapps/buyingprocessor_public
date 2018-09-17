@@ -48,10 +48,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         return mInstance;
     }
 
-    public void initialize(Context applicationContext, int remoteConfigFileLocation) {
+    public void initialize(Context applicationContext, int remoteConfigDefaultFileLocation) {
         this.mApplicationContext = applicationContext;
         mRemoteConfig = FirebaseRemoteConfig.getInstance();
-        mRemoteConfig.setDefaults(remoteConfigFileLocation);
+        mRemoteConfig.setDefaults(remoteConfigDefaultFileLocation);
 
         AFRealmDatabase.getInstance().initialize(mApplicationContext);
         AFSharedPreferencesManager.getInstance().initialize(mApplicationContext);
@@ -86,10 +86,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                          parser.getInterstitialsCountPerSession(), parser.getInterstitialDelay(),
                                          parser.getActions());
 
-                                 AFRealmDatabase.getInstance().initialize(mApplicationContext);
+                                // AFRealmDatabase.getInstance().initialize(mApplicationContext);
                                  AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
                                  AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
-                                 AFAdManager.getInstance().initialize(mApplicationContext);
+                                 AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
                                  AFRatingManager.getInstance().initialize();
 
                              } else {

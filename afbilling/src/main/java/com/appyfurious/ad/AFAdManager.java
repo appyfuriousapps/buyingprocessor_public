@@ -58,19 +58,41 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         return mInstance;
     }
 
-    public void initialize(Context applicationContext) {
+    public void initialize(Context applicationContext, AFAdsManagerConfiguration configuration) {
         this.applicationContext = applicationContext;
+
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
+        if (mAFAdsManagerConfiguration == null) {
+            this.mAFAdsManagerConfiguration = configuration;
+            AFRealmDatabase.getInstance().saveAd(configuration, null);
+        }
+
         MobileAds.initialize(applicationContext, mAFAdsManagerConfiguration.getApplicationId());
 
-//        SdkConfiguration sdkConfiguration =
-//                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
-//
-//        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+        //        SdkConfiguration sdkConfiguration =
+        //                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
+        //
+        //        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
 
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
+    }
 
+    public void updateConfiguration(Context applicationContext, AFAdsManagerConfiguration configuration) {
+        this.applicationContext = applicationContext;
+        this.mAFAdsManagerConfiguration = configuration;
+
+        AFRealmDatabase.getInstance().saveAd(configuration, null);
+
+        MobileAds.initialize(applicationContext, mAFAdsManagerConfiguration.getApplicationId());
+
+        //        SdkConfiguration sdkConfiguration =
+        //                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
+        //
+        //        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+
+        initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
+        initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
     }
 
     @Override
@@ -133,8 +155,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void requestInterstitial(String action) {
-        long unixTime = (System.currentTimeMillis() - (long) mAFAdsManagerConfiguration.getInterstitialsLastShowDate()) / 1000;
+        mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
+        long unixTime = (System.currentTimeMillis() - (long) mAFAdsManagerConfiguration
+                .getInterstitialsLastShowDate()) / 1000;
         if (unixTime > mAFAdsManagerConfiguration.getInterstitialsDelay()) {
+
+            int s = mAFAdsManagerConfiguration.getInterstitialsCountPerSession();
+            int s1 = mAFAdsManagerConfiguration.getCurrentInterstitialCountPerSession();
+
             if (mAFAdsManagerConfiguration.getInterstitialsCountPerSession() >
                     mAFAdsManagerConfiguration.getCurrentInterstitialCountPerSession()) {
 
@@ -145,11 +173,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                         if (mInterstitialAd != null) {
                             if (mInterstitialAd.isLoaded()) {
                                 mInterstitialAd.show();
-                                AFRealmDatabase.getInstance().setInterstitialsLastShowDate(System.currentTimeMillis());
-                                AFRealmDatabase.getInstance().incrementCurrentInterstitialCountPerSession();
+                                AFRealmDatabase.getInstance().setInterstitialsLastShowDate(System
+                                        .currentTimeMillis());
+                                AFRealmDatabase.getInstance()
+                                               .incrementCurrentInterstitialCountPerSession();
                             }
 
-                            loadInterstitialAd(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
+                            loadInterstitialAd(applicationContext, mAFAdsManagerConfiguration
+                                    .getInterstitialId());
                         }
                     }
                 }
@@ -162,7 +193,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void loadRewardedVideoAd(AppCompatActivity context, RewardedCallback callback, Button button) {
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
+        mRewardedVideoAd = MobileAds
+                .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
         mRewardedVideoAd.setRewardedVideoAdListener(new AppyRewardedAdListener(callback, button));
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
                 new AdRequest.Builder().build());

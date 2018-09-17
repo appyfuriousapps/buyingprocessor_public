@@ -90,13 +90,39 @@ public class AFAdsManagerConfiguration extends RealmObject {
     }
 
     public Action containsAction(String actionName) {
-        for (Action action : actions) {
-            if (action.getActionTitle().equals(actionName)) {
-                return action;
+        if (actions != null) {
+            for (Action action : actions) {
+                if (action.getActionTitle().equals(actionName)) {
+                    return action;
+                }
             }
         }
 
         return null;
+    }
+
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public void setBannerId(String bannerId) {
+        this.bannerId = bannerId;
+    }
+
+    public void setInterstitialId(String interstitialId) {
+        this.interstitialId = interstitialId;
+    }
+
+    public void setRewardedVideoId(String rewardedVideoId) {
+        this.rewardedVideoId = rewardedVideoId;
+    }
+
+    public void setInterstitialsCountPerSession(int interstitialsCountPerSession) {
+        this.interstitialsCountPerSession = interstitialsCountPerSession;
+    }
+
+    public void setInterstitialsDelay(int interstitialsDelay) {
+        this.interstitialsDelay = interstitialsDelay;
     }
 
     public void setInterstitialsLastShowDate(double interstitialsLastShowDate) {
