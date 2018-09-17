@@ -72,12 +72,14 @@ open class InAppProduct {
         }
     }
 
-    fun getNewDeveloperPayloadBase64(deviceData: DeviceData): String {
+    fun getNewDeveloperPayloadBase64(deviceData: DeviceData) = try {
         val gson = GsonBuilder().create()
         val obj = gson.toJson(deviceData)
         val result = String(Base64.encode(obj.toByteArray(), Base64.DEFAULT))
         Logger.notify("new DeveloperPayload $obj")
         Logger.notify("new DeveloperPayload $result")
-        return result.replace("\\n", "").replace("\n", "")
+        result.replace("\\n", "").replace("\n", "")
+    } catch (ex: Exception) {
+        ""
     }
 }

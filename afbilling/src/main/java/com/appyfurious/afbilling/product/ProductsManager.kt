@@ -46,39 +46,44 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
         var continuationToken: String? = null
         val gson = GsonBuilder().create()
         val myProducts = ArrayList<MyProduct>()
-
-        do {
-            val result = service?.getPurchases(3, packageName, type, continuationToken)
-            if (result?.getInt("RESPONSE_CODE", -1) != 0) {
-                //throw Exception("Invalid response code")
-                body(myProducts)
-                Logger.exception("readMyPurchases Invalid response code")
-                return
-            }
-            val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
-            val serverProducts = responseList.map {
-                Logger.notify("readMyPurchases $it")
-                gson.fromJson(it, MyProduct::class.java)
-            }
-            myProducts.addAll(serverProducts)
-            continuationToken = result.getString("INAPP_CONTINUATION_TOKEN")
-        } while (continuationToken != null)
-
-        body(myProducts)
-        Logger.notify("finish readMyPurchases")
+        try {
+            do {
+                val result = service?.getPurchases(3, packageName, type, continuationToken)
+                if (result?.getInt("RESPONSE_CODE", -1) != 0) {
+                    throw Exception("Invalid response code")
+                }
+                val responseList = result.getStringArrayList("INAPP_PURCHASE_DATA_LIST")
+                val serverProducts = responseList.map {
+                    Logger.notify("readMyPurchases $it")
+                    gson.fromJson(it, MyProduct::class.java)
+                }
+                myProducts.addAll(serverProducts)
+                continuationToken = result.getString("INAPP_CONTINUATION_TOKEN")
+            } while (continuationToken != null)
+        } catch (ex: Exception) {
+            Logger.exception("readMyPurchases Invalid response code")
+            Logger.exception(ex)
+        } finally {
+            body(myProducts)
+            Logger.notify("finish readMyPurchases")
+        }
     }
 
     fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct> {
         val skuList = ArrayList(productIds)
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
-
-        val skuDetails = service?.getSkuDetails(3, packageName, type, query)
-        val responseList = skuDetails?.getStringArrayList("DETAILS_LIST") ?: listOf<String>()
-        val gson = GsonBuilder().create()
-        return responseList.map {
-            Logger.notify("getInAppPurchases $it")
-            gson.fromJson(it, InAppProduct::class.java)
+        return try {
+            val skuDetails = service?.getSkuDetails(3, packageName, type, query)
+            val responseList = skuDetails?.getStringArrayList("DETAILS_LIST") ?: listOf<String>()
+            val gson = GsonBuilder().create()
+            responseList.map {
+                Logger.notify("getInAppPurchases $it")
+                gson.fromJson(it, InAppProduct::class.java)
+            }
+        } catch (ex: Exception) {
+            Logger.exception(ex)
+            listOf()
         }
     }
 
@@ -87,12 +92,17 @@ class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Un
         getDeviceData(activity) { deviceData ->
             val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
             Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
-            val buyIntentBundle = billingService.inAppBillingService?.getBuyIntent(3,
-                    activity.packageName, product.getSku(), product.type, developerPayload)
-            val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
-            activity.startIntentSenderForResult(pendingIntent?.intentSender, StoreManager.Keys.REQUEST_CODE_BUY,
-                    Intent(), 0, 0, 0)
-            billingService.getStatus(body)
+            try {
+                val buyIntentBundle = billingService.inAppBillingService?.getBuyIntent(3,
+                        activity.packageName, product.getSku(), product.type, developerPayload)
+                val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
+                activity.startIntentSenderForResult(pendingIntent?.intentSender, StoreManager.Keys.REQUEST_CODE_BUY,
+                        Intent(), 0, 0, 0)
+                billingService.getStatus(body)
+            } catch (ex: Exception) {
+                Logger.exception(ex)
+                billingService.getStatus { BillingService.BillingResponseType.NOT_CONNECTED }
+            }
         }
     }
 }
