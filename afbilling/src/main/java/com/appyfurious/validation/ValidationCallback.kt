@@ -1,9 +1,6 @@
 package com.appyfurious.validation
 
 import android.content.Context
-import com.appyfurious.afbilling.InAppProduct
-import com.appyfurious.analytics.ActivityLifecycle
-import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
 import okhttp3.ResponseBody
 import org.json.JSONException
@@ -13,10 +10,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 
-class ValidationCallback(private val product: InAppProduct,
-                         private val secretKey: String,
+class ValidationCallback(private val secretKey: String,
                          private val validationListener: ValidationListener? = null,
-                         private val validationRestoreListener: ValidationRestoreListener? = null)
+                         private val restoreListener: RestoreListener? = null)
     : Callback<ResponseBody> {
 
     private var encryptor: CryptoAES128? = null
@@ -53,6 +49,9 @@ class ValidationCallback(private val product: InAppProduct,
                 Logger.notify("Exception validationSuccess")
                 validationSuccess()
             }
+        } else if (response.code() in 400..499) {
+            Logger.notify("if (response.code() in 400..499) onValidationFailure")
+            validationFailure()
         } else {
             Logger.notify("response.isSuccessful == false onValidationFailure")
             //val decryptString = encryptor?.decrypt(body)
@@ -79,27 +78,22 @@ class ValidationCallback(private val product: InAppProduct,
 
     private fun validationSuccess() {
         validationListener?.onValidationSuccess()
-        if (validationRestoreListener != null) {
-            validationRestoreListener.validationRestoreSuccess()
-        } else {
-            Events.logPurchaseEvents(validationListener?.validationContext(), product)
-        }
+        restoreListener?.validationRestoreSuccess()
     }
 
     private fun validationFailure(errorMessage: String = "Validation Error") {
         validationListener?.onValidationFailure(errorMessage)
-        validationRestoreListener?.validationRestoreFailure(errorMessage)
+        restoreListener?.validationRestoreFailure(errorMessage)
     }
 
     interface ValidationListener {
-        fun validationContext(): Context?
         fun onValidationSuccess()
         fun onValidationFailure(errorMessage: String)
         fun onValidationShowProgress()
         fun onValidationHideProgress()
     }
 
-    interface ValidationRestoreListener {
+    interface RestoreListener {
         fun validationRestoreSuccess()
         fun validationRestoreFailure(errorMessage: String)
     }

@@ -13,6 +13,13 @@ class Logger {
         const val TAG_SH = "AFPreferences"
         private var isDebug = false
         private var isPrintExceptionObject = false
+object Logger {
+    const val NOTIFY = "notify"
+    const val EXCEPTION = "exception"
+    const val TAG = "validation"
+    const val TAG_AD = "AdManager"
+    private var isDebug = false
+    private var isPrintExceptionObject = false
 
         fun init(isDebug: Boolean, isPrintExceptionObject: Boolean) {
             this.isDebug = isDebug

@@ -5,12 +5,23 @@ import android.content.pm.PackageManager
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
+import com.crashlytics.android.Crashlytics
 import com.facebook.appevents.AppEventsLogger
+import io.fabric.sdk.android.Fabric
 
 object Analytics {
 
     private const val FABRIC_API_KEY_NAME = "io.fabric.ApiKey"
     private const val FACEBOOK_SDK_APP_ID = "com.facebook.sdk.ApplicationId"
+
+    var isInitAppsflyer = false
+        private set
+
+    var isInitFacebook = false
+        private set
+
+    var isInitFabric = false
+        private set
 
     fun init(application: Application, appsflyerDevKey: String?) {
         Logger.notify("start Analytics init")
@@ -18,18 +29,26 @@ object Analytics {
                 PackageManager.GET_META_DATA).metaData
         val fabricApiKeyValue = metaData.getString(FABRIC_API_KEY_NAME)
         val facebookSdkAppId = metaData.getString(FACEBOOK_SDK_APP_ID)
+
         Logger.notify("fabricApiKeyValue: $fabricApiKeyValue")
-        if (fabricApiKeyValue != null && fabricApiKeyValue != "") {
+        isInitFabric = fabricApiKeyValue != null && fabricApiKeyValue != ""
+        if (isInitFabric) {
+            Fabric.with(application, Crashlytics())
         }
+
         Logger.notify("facebookSdkAppId: $facebookSdkAppId")
-        if (facebookSdkAppId != null && facebookSdkAppId != "") {
+        isInitFacebook = facebookSdkAppId != null && facebookSdkAppId != ""
+        if (isInitFacebook) {
             AppEventsLogger.activateApp(application)
         }
+
         Logger.notify("appsflyerDevKey: $appsflyerDevKey")
-        if (appsflyerDevKey != null && appsflyerDevKey != "") {
+        isInitAppsflyer = appsflyerDevKey != null && appsflyerDevKey != ""
+        if (isInitAppsflyer) {
             AppsFlyerLib.getInstance().init(appsflyerDevKey, listener, application)
             AppsFlyerLib.getInstance().startTracking(application)
         }
+
         Logger.notify("finish Analytics init")
     }
 

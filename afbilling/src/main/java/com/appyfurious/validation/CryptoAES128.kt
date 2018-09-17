@@ -1,5 +1,6 @@
 package com.appyfurious.validation
 
+import android.annotation.SuppressLint
 import android.util.Base64
 import com.appyfurious.log.Logger
 
@@ -40,21 +41,23 @@ class CryptoAES128(secretKey: String) {
         val c = Cipher.getInstance("AES")
         c.init(Cipher.ENCRYPT_MODE, mSecretKeySpec)
         val encodedBytes = c.doFinal(requestBody.toByteArray())
-        Logger.notify("encodedBytes $encodedBytes")
+        Logger.notify("encodedBytes ${String(encodedBytes)}")
         val original = Base64.encode(encodedBytes, Base64.DEFAULT)
-        Logger.notify("original $original")
+        Logger.notify("original  ${String(original)}")
         String(original)
     } catch (e: Exception) {
         ""
     }
 
+    @SuppressLint("GetInstance")
     fun decrypt(responseBody: String?) = try {
         Logger.notify("responseBody $responseBody")
         val c = Cipher.getInstance("AES/ECB/NoPadding")
         c.init(Cipher.DECRYPT_MODE, mSecretKeySpec)
-        val bytes = Base64.decode(responseBody?.toByteArray(charset("UTF-8")), Base64.DEFAULT)
-        Logger.notify("bytes: $bytes")
+        val bytes = Base64.decode(responseBody?.toByteArray(), Base64.DEFAULT)
+        Logger.notify("decrypt bytes: ${String(bytes)}")
         val b = c.doFinal(bytes)
+        Logger.notify("decrypt value: ${String(b)}")
         String(b)
     } catch (e: Exception) {
         null
