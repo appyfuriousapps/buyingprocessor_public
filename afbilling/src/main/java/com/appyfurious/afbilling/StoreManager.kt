@@ -121,13 +121,13 @@ object StoreManager {
             val product = myProducts.firstOrNull { it.isActive() }
             val isSubs = product?.isActive() == true
             if (isSubs && product != null) {
-                validation(application, listener, product) {
-                    isSubsData.value = isSubs
-                    body?.invoke(product, it)
+                validation(application, listener, product) { validationIsSubs ->
+                    isSubsData.value = validationIsSubs
+                    body?.invoke(product, validationIsSubs)
                 }
             } else {
                 isSubsData.value = isSubs
-                body?.invoke(product, false)
+                body?.invoke(product, isSubs)
             }
         }
     }
