@@ -100,7 +100,6 @@ object StoreManager {
             }
             if (billingService.isConnected) {
                 isSubs(null) { product, isSubs ->
-                    isSubsData.value = isSubs
                     Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
                 }
             } else {
@@ -121,11 +120,13 @@ object StoreManager {
             val product = myProducts.firstOrNull { it.isActive() }
             val isSubs = product?.isActive() == true
             if (isSubs && product != null) {
+                Logger.notify("preValidation isSubs: $isSubs, ${product.productId}")
                 validation(application, listener, product) { validationIsSubs ->
-                    isSubsData.value = validationIsSubs
+                    Logger.notify("postValidation isSubs: $validationIsSubs")
                     body?.invoke(product, validationIsSubs)
                 }
             } else {
+                Logger.notify("product == null isSubs: $isSubs")
                 isSubsData.value = isSubs
                 body?.invoke(product, isSubs)
             }
@@ -142,11 +143,13 @@ object StoreManager {
     private fun restore(body: (Boolean) -> Unit) = object : ValidationCallback.RestoreListener {
         override fun validationRestoreSuccess() {
             Logger.notify("validationRestoreSuccess")
+            isSubsData.value = true
             body(true)
         }
 
         override fun validationRestoreFailure(errorMessage: String) {
             Logger.notify("validationRestoreFailure")
+            isSubsData.value = false
             body(false)
         }
     }
