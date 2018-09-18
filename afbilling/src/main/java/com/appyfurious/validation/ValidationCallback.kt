@@ -17,7 +17,11 @@ class ValidationCallback(private val secretKey: String,
     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
         val body = response.body()?.string()
         when {
-            response.isSuccessful -> {
+            response.code() in 500..599 -> {
+                Logger.notify("response.code() in 500..599 validationSuccess")
+                validationSuccess()
+            }
+            else -> {
                 encryptor = CryptoAES128(secretKey)
                 try {
                     val decryptString = encryptor?.decrypt(body)
@@ -36,17 +40,10 @@ class ValidationCallback(private val secretKey: String,
                         validationFailure()
                     }
                 } catch (e: Exception) {
-                    Logger.notify("Exception onValidationFailure")
+                    Logger.exception("Exception onValidationFailure")
+                    Logger.exception(e)
                     validationFailure("Exception onValidationFailure")
                 }
-            }
-            response.code() in 400..499 -> {
-                Logger.notify("if (response.code() in 400..499) onValidationFailure")
-                validationFailure()
-            }
-            else -> {
-                Logger.notify("((response.code() in 500..599)) validationSuccess")
-                validationSuccess()
             }
         }
         validationListener?.onValidationHideProgress()
@@ -55,8 +52,8 @@ class ValidationCallback(private val secretKey: String,
     }
 
     override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-        Logger.notify("onFailure validationSuccess")
-        validationSuccess()
+        Logger.notify("onFailure validationFailure")
+        validationFailure("onFailure validationFailure")
         validationListener?.onValidationHideProgress()
     }
 
