@@ -21,7 +21,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logger.Companion.init(BuildConfig.DEBUG, true);
+        Logger.INSTANCE.init(BuildConfig.DEBUG, true);
 
         AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults);
 

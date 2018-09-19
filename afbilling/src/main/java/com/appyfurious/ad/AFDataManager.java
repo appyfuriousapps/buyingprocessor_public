@@ -6,7 +6,6 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.db.AFAdsManagerConfiguration;
@@ -69,8 +68,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                          @Override
                          public void onComplete(@NonNull Task<Void> task) {
                              if (task.isSuccessful()) {
-                                 Toast.makeText(mApplicationContext, "Fetch Succeeded",
-                                         Toast.LENGTH_SHORT).show();
+                                 Logger.INSTANCE.logDataManager("Fetch Succeeded");
 
                                  // After config data is successfully fetched, it must be activated before newly fetched
                                  // values are returned.
@@ -86,15 +84,13 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                          parser.getInterstitialsCountPerSession(), parser.getInterstitialDelay(),
                                          parser.getActions());
 
-                                // AFRealmDatabase.getInstance().initialize(mApplicationContext);
                                  AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
                                  AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
                                  AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
                                  AFRatingManager.getInstance().initialize();
 
                              } else {
-                                 Toast.makeText(mApplicationContext, "Fetch Failed",
-                                         Toast.LENGTH_SHORT).show();
+                                 Logger.INSTANCE.logDataManager("Fetch Failed");
                              }
                          }
                      });
@@ -102,18 +98,18 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
     @Override
     public void onChange(@NonNull AFAdsManagerConfiguration configuration) {
-        Logger.Companion.logDbChange("AFRealm Configuration Changed. New config: " + configuration.toString());
+        Logger.INSTANCE.logDbChange("AFRealm Configuration Changed. New config: " + configuration.toString());
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onMoveToForeground() {
-        Logger.Companion.logMoveToForeground("App is going to foreground..");
+        Logger.INSTANCE.logMoveToForeground("App is going to foreground..");
         AFSharedPreferencesManager.getInstance().incrementSessionCount();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void onMoveToBackground() {
-        Logger.Companion.logMoveToBackground("App is going to background..");
+        Logger.INSTANCE.logMoveToBackground("App is going to background..");
         AFRealmDatabase.getInstance().resetInterstitialPerSession();
         AFRealmDatabase.getInstance().resetActionCountOnRatingConfigs();
     }

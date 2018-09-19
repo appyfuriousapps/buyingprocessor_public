@@ -5,9 +5,9 @@ import android.content.pm.PackageManager
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.log.Logger
-import com.crashlytics.android.Crashlytics
+//import com.crashlytics.android.Crashlytics
 import com.facebook.appevents.AppEventsLogger
-import io.fabric.sdk.android.Fabric
+//import io.fabric.sdk.android.Fabric
 
 object Analytics {
 
@@ -33,7 +33,7 @@ object Analytics {
         Logger.notify("fabricApiKeyValue: $fabricApiKeyValue")
         isInitFabric = fabricApiKeyValue != null && fabricApiKeyValue != ""
         if (isInitFabric) {
-            Fabric.with(application, Crashlytics())
+       //     Fabric.with(application, Crashlytics())
         }
 
         Logger.notify("facebookSdkAppId: $facebookSdkAppId")

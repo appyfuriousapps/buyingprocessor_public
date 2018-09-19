@@ -49,6 +49,9 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
     private AFAdsManagerConfiguration mAFAdsManagerConfiguration;
 
+    private boolean isBannerAdVisible;
+    private AppCompatActivity bannerActivity;
+
 
     public static synchronized AFAdManager getInstance() {
         if (mInstance == null) {
@@ -98,6 +101,9 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     @Override
     public void onAdLoadSuccess() {
         isAdSuccessfullyDownloaded = true;
+        if (!isBannerAdVisible) {
+            initBannerContainer(bannerActivity);
+        }
     }
 
     @Override
@@ -106,18 +112,24 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void initBannerContainer(AppCompatActivity activity) {
+        this.bannerActivity = activity;
         mAdContainer = activity.findViewById(R.id.ad_container);
         if (mAdContainer != null) {
             if (!isPremium) {
                 if (isAdSuccessfullyDownloaded) {
                     mAdContainer.setVisibility(View.VISIBLE);
                     loadAd(mAdContainer);
+                    isBannerAdVisible = true;
                 } else {
                     mAdContainer.setVisibility(View.GONE);
+                    isBannerAdVisible = false;
                 }
             } else {
                 mAdContainer.setVisibility(View.GONE);
+                isBannerAdVisible = false;
             }
+        } else {
+            isBannerAdVisible = false;
         }
     }
 
@@ -159,10 +171,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         long unixTime = (System.currentTimeMillis() - (long) mAFAdsManagerConfiguration
                 .getInterstitialsLastShowDate()) / 1000;
         if (unixTime > mAFAdsManagerConfiguration.getInterstitialsDelay()) {
-
-            int s = mAFAdsManagerConfiguration.getInterstitialsCountPerSession();
-            int s1 = mAFAdsManagerConfiguration.getCurrentInterstitialCountPerSession();
-
             if (mAFAdsManagerConfiguration.getInterstitialsCountPerSession() >
                     mAFAdsManagerConfiguration.getCurrentInterstitialCountPerSession()) {
 
@@ -185,10 +193,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     }
                 }
             } else {
-                Logger.Companion.logAd("Interstitial aborted by interstitial count per session");
+                Logger.INSTANCE.logAd("Interstitial aborted by interstitial count per session");
             }
         } else {
-            Logger.Companion.logAd("Interstitial aborted by interstitials delay");
+            Logger.INSTANCE.logAd("Interstitial aborted by interstitial delay");
         }
     }
 
@@ -211,7 +219,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     @Override
     public void onChange(@NonNull AFAdsManagerConfiguration configuration) {
         this.mAFAdsManagerConfiguration = configuration;
-        Logger.Companion.logDbChange("Ads Config Changed: " + configuration.toString());
+        Logger.INSTANCE.logDbChange("Ads Config Changed: " + configuration.toString());
     }
 
 }

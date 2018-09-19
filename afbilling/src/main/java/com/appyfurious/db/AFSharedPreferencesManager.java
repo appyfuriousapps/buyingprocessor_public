@@ -38,7 +38,7 @@ public class AFSharedPreferencesManager {
         int sessionCount = mSharedPreferences.getInt(AF_PREFERENCES_SESSION_COUNT_KEY, 0);
         mSharedPreferences.edit().putInt(AF_PREFERENCES_SESSION_COUNT_KEY, sessionCount + 1)
                           .apply();
-        Logger.Companion.logSharedPreferences("Session count = " + getSessionCount());
+        Logger.INSTANCE.logSharedPreferences("Session count = " + getSessionCount());
     }
 
     public int getSessionCount() {
