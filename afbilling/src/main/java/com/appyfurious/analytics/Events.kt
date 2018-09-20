@@ -5,8 +5,8 @@ import android.os.Bundle
 import com.appsflyer.AppsFlyerLib
 import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.log.Logger
-//import com.crashlytics.android.answers.Answers
-//import com.crashlytics.android.answers.CustomEvent
+import com.crashlytics.android.answers.Answers
+import com.crashlytics.android.answers.CustomEvent
 import com.facebook.appevents.AppEventsConstants
 import com.facebook.appevents.AppEventsLogger
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -105,16 +105,16 @@ object Events {
         firebase(context) {
             it.logEvent(eventName, bundle)
         }
-//        if (Analytics.isInitFabric) {
-//            val event = CustomEvent(eventName)
-//                    .putCustomAttribute(SEGMENT_ID, segment)
-//                    .putCustomAttribute(SCREEN_ID, screenName)
-//                    .putCustomAttribute(SOURCE, callScreenName)
-//            if (productId != null) {
-//                event.putCustomAttribute(PRODUCT_ID, productId)
-//            }
-//            Answers.getInstance().logCustom(event)
-//        }
+        if (Analytics.isInitFabric) {
+            val event = CustomEvent(eventName)
+                    .putCustomAttribute(SEGMENT_ID, segment)
+                    .putCustomAttribute(SCREEN_ID, screenName)
+                    .putCustomAttribute(SOURCE, callScreenName)
+            if (productId != null) {
+                event.putCustomAttribute(PRODUCT_ID, productId)
+            }
+            Answers.getInstance().logCustom(event)
+        }
     }
 
     fun logEventUniversal(context: Context?, eventName: String, vararg params: Param) {
@@ -128,10 +128,10 @@ object Events {
                 params.map { putString(it.key, it.value) }
             })
         }
-//        if (Analytics.isInitFabric) {
-//            val event = CustomEvent(eventName)
-//            params.map { event.putCustomAttribute(it.key, it.value) }
-//            Answers.getInstance().logCustom(event)
-//        }
+        if (Analytics.isInitFabric) {
+            val event = CustomEvent(eventName)
+            params.map { event.putCustomAttribute(it.key, it.value) }
+            Answers.getInstance().logCustom(event)
+        }
     }
 }
