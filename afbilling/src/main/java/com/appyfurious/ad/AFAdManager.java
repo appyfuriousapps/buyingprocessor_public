@@ -20,8 +20,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
-import com.mopub.common.MoPub;
-import com.mopub.common.SdkConfiguration;
+//import com.mopub.common.MoPub;
+//import com.mopub.common.SdkConfiguration;
 import com.vungle.mediation.VungleAdapter;
 import com.vungle.mediation.VungleExtrasBuilder;
 import com.vungle.mediation.VungleInterstitialAdapter;
@@ -224,10 +224,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     private void initMediation(String[] vungleExtras) {
-        SdkConfiguration sdkConfiguration =
-                new SdkConfiguration.Builder("MOPUB_AD_UNIT_ID").build(); // TODO add the key
-
-        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+//        SdkConfiguration sdkConfiguration =
+//                new SdkConfiguration.Builder("MOPUB_AD_UNIT_ID").build(); // TODO add the key
+//
+//        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
 
         Bundle bundleVungle = new VungleExtrasBuilder(vungleExtras).build();
 
