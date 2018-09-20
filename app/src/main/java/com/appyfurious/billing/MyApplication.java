@@ -34,7 +34,7 @@ public class MyApplication extends Application {
         configuration.setInterstitialsCountPerSession(1);
         configuration.setInterstitialsLastShowDate(0);
 
-        AFAdManager.getInstance().initialize(this, configuration);
+        AFAdManager.getInstance().initialize(this, configuration, null);
 
         AFDataManager.getInstance().updateConfiguration(BuildConfig.DEBUG);
     }

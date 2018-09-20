@@ -1,6 +1,7 @@
 package com.appyfurious.ad;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,6 +20,11 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
+import com.mopub.common.MoPub;
+import com.mopub.common.SdkConfiguration;
+import com.vungle.mediation.VungleAdapter;
+import com.vungle.mediation.VungleExtrasBuilder;
+import com.vungle.mediation.VungleInterstitialAdapter;
 
 import io.realm.RealmChangeListener;
 
@@ -30,6 +36,7 @@ import io.realm.RealmChangeListener;
  * <p>
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
+
 public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<AFAdsManagerConfiguration> {
 
 
@@ -52,6 +59,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private boolean isBannerAdVisible;
     private AppCompatActivity bannerActivity;
 
+    private AdRequest adRequest;
+
 
     public static synchronized AFAdManager getInstance() {
         if (mInstance == null) {
@@ -61,7 +70,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         return mInstance;
     }
 
-    public void initialize(Context applicationContext, AFAdsManagerConfiguration configuration) {
+    public void initialize(Context applicationContext, AFAdsManagerConfiguration configuration, String[] vungleExtras) {
         this.applicationContext = applicationContext;
 
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
@@ -72,10 +81,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
         MobileAds.initialize(applicationContext, mAFAdsManagerConfiguration.getApplicationId());
 
-        //        SdkConfiguration sdkConfiguration =
-        //                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
-        //
-        //        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+        initMediation(vungleExtras);
 
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
@@ -88,11 +94,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         AFRealmDatabase.getInstance().saveAd(configuration, null);
 
         MobileAds.initialize(applicationContext, mAFAdsManagerConfiguration.getApplicationId());
-
-        //        SdkConfiguration sdkConfiguration =
-        //                new SdkConfiguration.Builder("YOUR_MOPUB_AD_UNIT_ID").build(); // TODO add the key
-        //
-        //        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
 
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
@@ -148,7 +149,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mAdView.setAdSize(AdSize.SMART_BANNER);
         mAdView.setAdUnitId(bannerId);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        //AdRequest adRequest = new AdRequest.Builder().build();
 
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AppyAdListener(this));
@@ -161,7 +162,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     public void loadInterstitialAd(Context applicationContext, String interstitialId) {
         mInterstitialAd = new InterstitialAd(applicationContext);
         mInterstitialAd.setAdUnitId(interstitialId);
-        AdRequest adRequest = new AdRequest.Builder().build();
+        // AdRequest adRequest = new AdRequest.Builder().build();
 
         mInterstitialAd.loadAd(adRequest);
     }
@@ -205,7 +206,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
         mRewardedVideoAd.setRewardedVideoAdListener(new AppyRewardedAdListener(callback, button));
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
-                new AdRequest.Builder().build());
+                adRequest);
     }
 
     public void requestRewardedVideoAd() {
@@ -220,6 +221,20 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     public void onChange(@NonNull AFAdsManagerConfiguration configuration) {
         this.mAFAdsManagerConfiguration = configuration;
         Logger.INSTANCE.logDbChange("Ads Config Changed: " + configuration.toString());
+    }
+
+    private void initMediation(String[] vungleExtras) {
+        SdkConfiguration sdkConfiguration =
+                new SdkConfiguration.Builder("MOPUB_AD_UNIT_ID").build(); // TODO add the key
+
+        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+
+        Bundle bundleVungle = new VungleExtrasBuilder(vungleExtras).build();
+
+        adRequest = new AdRequest.Builder()
+                .addNetworkExtrasBundle(VungleAdapter.class, bundleVungle)
+                .addNetworkExtrasBundle(VungleInterstitialAdapter.class, bundleVungle)
+                .build();
     }
 
 }
