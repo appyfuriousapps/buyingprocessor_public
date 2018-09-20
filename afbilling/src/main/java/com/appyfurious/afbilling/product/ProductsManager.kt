@@ -15,32 +15,21 @@ import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
 
-class ProductsManager(context: Context, completedDeviceData: ((DeviceData) -> Unit)? = null) {
+class ProductsManager(context: Context) {
 
     private val packageName = context.packageName
 
     private val deviceData = DeviceData(AppsFlyerLib.getInstance().getAppsFlyerUID(context)!!, "")
 
-    init {
-        completedDeviceData?.let {
-            getDeviceData(context, it)
-        }
-    }
-
     fun getDeviceData(context: Context, body: (DeviceData) -> Unit) {
-        if (deviceData.idfa == "") {
-            Adverting(context) { idfa, isLimitAdTrackingEnabled ->
-                if (!isLimitAdTrackingEnabled!!) {
-                    deviceData.idfa = idfa
-                } else {
-                    deviceData.idfa = null
-                }
-                body(deviceData)
-                Logger.notify("ProductManager getDeviceData new $deviceData")
+        Adverting(context) { idfa, isLimitAdTrackingEnabled ->
+            if (isLimitAdTrackingEnabled == false) {
+                deviceData.idfa = idfa
+            } else {
+                deviceData.idfa = null
             }
-        } else {
             body(deviceData)
-            Logger.notify("ProductManager getDeviceData actual $deviceData")
+            Logger.notify("ProductManager getDeviceData new $deviceData")
         }
     }
 
