@@ -27,11 +27,12 @@ public class AFRealmDatabase {
 
 
     public void initialize(Context applicationContext) {
-        Realm.init(applicationContext);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("AFManager.realm")
-                                                                    .build();
-        Realm.setDefaultConfiguration(config);
-        realm = Realm.getDefaultInstance();
+      //  Realm.init(applicationContext);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .name("AFManager.realm")
+                .modules(new LibraryModule())
+                .build();
+        realm = Realm.getInstance(config);
     }
 
     public static AFRealmDatabase getInstance() {
