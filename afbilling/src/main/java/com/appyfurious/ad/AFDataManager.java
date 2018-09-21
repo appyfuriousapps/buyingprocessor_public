@@ -52,7 +52,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         mRemoteConfig = FirebaseRemoteConfig.getInstance();
         mRemoteConfig.setDefaults(remoteConfigDefaultFileLocation);
 
-        AFRealmDatabase.getInstance().initialize(mApplicationContext);
+        AFRealmDatabase.getInstance().initialize();
         AFSharedPreferencesManager.getInstance().initialize(mApplicationContext);
 
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
