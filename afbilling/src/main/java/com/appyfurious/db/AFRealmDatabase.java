@@ -21,18 +21,26 @@ import io.realm.RealmResults;
 
 public class AFRealmDatabase {
 
-
     private static AFRealmDatabase mInstance;
     private Realm realm;
 
 
-    public void initialize(Context applicationContext) {
-      //  Realm.init(applicationContext);
+    public void initialize() {
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .name("AFManager.realm")
                 .modules(new LibraryModule())
                 .build();
+
         realm = Realm.getInstance(config);
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(@NonNull Realm realm) {
+                realm.createObject(AFAdsManagerConfiguration.class);
+                realm.createObject(AFRatingConfiguration.class);
+                realm.createObject(Action.class);
+            }
+        });
     }
 
     public static AFRealmDatabase getInstance() {
