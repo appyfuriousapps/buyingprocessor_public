@@ -11,6 +11,6 @@ import io.realm.annotations.RealmModule;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-@RealmModule(library = true, classes = {Action.class, AFAdsManagerConfiguration.class, AFRatingConfiguration.class})
+@RealmModule(library = true, allClasses = true)
 public class LibraryModule {
 }
