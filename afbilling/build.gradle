@@ -104,6 +104,7 @@ dependencies {
      *  Smaato
      */
 
-   // implementation project(':SOMAAndroid')
+    implementation(name: 'SOMAAndroid-8.1.0-release', ext: 'aar')
+    // implementation project(':SOMAAndroid')
 
 }
