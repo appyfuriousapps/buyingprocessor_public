@@ -26,8 +26,7 @@ public class AFRealmDatabase {
 
     public void initialize() {
         RealmConfiguration config = new RealmConfiguration.Builder()
-                .name("AFManager.realm")
-                .modules(new LibraryModule())
+                .name("AFManager.realm").modules(new LibraryModule())
                 .build();
 
         Realm.deleteRealm(config);
