@@ -5,7 +5,10 @@ import android.app.Application;
 import com.appyfurious.ad.AFAdManager;
 import com.appyfurious.ad.AFDataManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
+import com.appyfurious.db.LibraryModule;
 import com.appyfurious.log.Logger;
+
+import io.realm.RealmConfiguration;
 
 /**
  * MyApplication.java
@@ -23,7 +26,12 @@ public class MyApplication extends Application {
         super.onCreate();
         Logger.INSTANCE.init(BuildConfig.DEBUG, true);
 
-        AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .name("AFManager.realm")
+                .modules(new LibraryModule())
+                .build();
+
+        AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults, config);
 
         AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration();
         configuration.setApplicationId("ca-app-pub-5995390255785257~5457813889");
