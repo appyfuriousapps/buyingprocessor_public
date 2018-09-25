@@ -20,7 +20,6 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import io.realm.RealmChangeListener;
-import io.realm.RealmConfiguration;
 
 /**
  * AFDataManager.java
@@ -48,13 +47,12 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         return mInstance;
     }
 
-    public void initialize(Context applicationContext, int remoteConfigDefaultFileLocation,
-                           RealmConfiguration configuration) {
+    public void initialize(Context applicationContext, int remoteConfigDefaultFileLocation) {
         this.mApplicationContext = applicationContext;
         mRemoteConfig = FirebaseRemoteConfig.getInstance();
         mRemoteConfig.setDefaults(remoteConfigDefaultFileLocation);
 
-        AFRealmDatabase.getInstance().initialize(configuration);
+        AFRealmDatabase.getInstance().initialize();
         AFSharedPreferencesManager.getInstance().initialize(mApplicationContext);
 
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
