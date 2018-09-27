@@ -182,6 +182,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             llp.gravity = Gravity.BOTTOM;
         } else if (lp instanceof FrameLayout.LayoutParams) {
             FrameLayout.LayoutParams flp = ((FrameLayout.LayoutParams) lp);
+            flp.width = FrameLayout.LayoutParams.MATCH_PARENT;
+            flp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             flp.gravity = Gravity.BOTTOM;
         } else if (lp instanceof RelativeLayout.LayoutParams) {
             RelativeLayout.LayoutParams rlp = ((RelativeLayout.LayoutParams) lp);
