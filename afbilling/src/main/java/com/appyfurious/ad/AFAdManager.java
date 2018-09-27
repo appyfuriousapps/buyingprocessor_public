@@ -133,8 +133,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     if (v != null) {
                         if (v instanceof ViewGroup) {
                             mAdContainer = (ViewGroup) v;
+                            break;
                         }
-                        break;
                     }
                 }
 
@@ -162,7 +162,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     isBannerAdVisible = false;
                 }
             } else {
-                Logger.INSTANCE.logAd("Ad is not visible. Activity is not instance of BannerAdActivity");
+                Logger.INSTANCE
+                        .logAd("Ad is not visible. Activity is not instance of BannerAdActivity");
             }
 
         }
@@ -178,23 +179,31 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         adContainer.addView(mAdView);
 
         ViewGroup.LayoutParams lp = mAdView.getLayoutParams();
+
+        lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
         if (lp instanceof LinearLayout.LayoutParams) {
             LinearLayout.LayoutParams llp = ((LinearLayout.LayoutParams) lp);
             llp.gravity = Gravity.BOTTOM;
         } else if (lp instanceof FrameLayout.LayoutParams) {
             FrameLayout.LayoutParams flp = ((FrameLayout.LayoutParams) lp);
-            flp.width = FrameLayout.LayoutParams.MATCH_PARENT;
-            flp.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             flp.gravity = Gravity.BOTTOM;
+
+            for (int i = 0; i < adContainer.getChildCount(); i++) {
+                View v = adContainer.getChildAt(i);
+                if (v != null) {
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
+                    if (params.gravity == Gravity.BOTTOM) {
+                        params.bottomMargin = mAdView.getHeight();
+                    }
+                }
+            }
         } else if (lp instanceof RelativeLayout.LayoutParams) {
             RelativeLayout.LayoutParams rlp = ((RelativeLayout.LayoutParams) lp);
-            rlp.width = RelativeLayout.LayoutParams.MATCH_PARENT;
-            rlp.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
             rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         } else if (lp instanceof GridLayout.LayoutParams) {
             GridLayout.LayoutParams glp = ((GridLayout.LayoutParams) lp);
-            glp.width = GridLayout.LayoutParams.MATCH_PARENT;
-            glp.height = GridLayout.LayoutParams.WRAP_CONTENT;
             glp.setGravity(Gravity.BOTTOM);
         } else if (lp instanceof ConstraintLayout.LayoutParams) {
             ConstraintSet constraintSet = new ConstraintSet();
