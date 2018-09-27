@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ContentFrameLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,7 +123,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         this.bannerActivity = activity;
         if (activity != null) {
             if (activity instanceof BannerAdActivity) {
-                mAdContainer = activity.findViewById(android.R.id.content);
+                mAdContainer = (ViewGroup) ((ViewGroup) mAdContainer
+                        .findViewById(android.R.id.content)).getChildAt(0);
                 if (mAdContainer != null) {
                     Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
                     //     boolean isSubs = bool == null ? false : bool;
@@ -183,6 +185,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             constraintSet.connect(mAdView.getId(), ConstraintSet.RIGHT, adContainer.getId(),
                     ConstraintSet.RIGHT, 0);
             constraintSet.applyTo((ConstraintLayout) adContainer);
+        } else if (lp instanceof ContentFrameLayout.LayoutParams) {
+
         }
 
         mAdView.setLayoutParams(lp);
