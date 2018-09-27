@@ -201,8 +201,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
         }
 
-        mAdView.setLayoutParams(lp);
-        adContainer.addView(mAdView);
+        //mAdView.setLayoutParams(lp);
+        adContainer.addView(mAdView, lp);
     }
 
     public void initBanner(Context applicationContext, String bannerId) {
