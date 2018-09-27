@@ -196,6 +196,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
                     if (params.gravity == Gravity.BOTTOM) {
                         params.bottomMargin = mAdView.getHeight();
+                        v.setLayoutParams(params);
+                    } else if (params.height == FrameLayout.LayoutParams.MATCH_PARENT) {
+                        params.bottomMargin = mAdView.getHeight();
+                        v.setLayoutParams(params);
                     }
                 }
             }
