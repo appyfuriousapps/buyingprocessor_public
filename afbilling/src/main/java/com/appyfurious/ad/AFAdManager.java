@@ -174,7 +174,9 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             tempVg.removeView(mAdView);
         }
 
-        ViewGroup.LayoutParams lp = adContainer.getLayoutParams();
+        adContainer.addView(mAdView);
+
+        ViewGroup.LayoutParams lp = mAdView.getLayoutParams();
         if (lp instanceof LinearLayout.LayoutParams) {
             LinearLayout.LayoutParams llp = ((LinearLayout.LayoutParams) lp);
             llp.gravity = Gravity.BOTTOM;
@@ -201,8 +203,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
         }
 
-        //mAdView.setLayoutParams(lp);
-        adContainer.addView(mAdView, lp);
+        mAdView.setLayoutParams(lp);
+
     }
 
     public void initBanner(Context applicationContext, String bannerId) {
