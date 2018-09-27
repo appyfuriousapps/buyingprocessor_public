@@ -3,13 +3,18 @@ package com.appyfurious.ad;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-import com.appyfurious.afbilling.R;
 import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
@@ -21,13 +26,14 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
-//import com.mopub.common.MoPub;
-//import com.mopub.common.SdkConfiguration;
 import com.vungle.mediation.VungleAdapter;
 import com.vungle.mediation.VungleExtrasBuilder;
 import com.vungle.mediation.VungleInterstitialAdapter;
 
 import io.realm.RealmChangeListener;
+
+//import com.mopub.common.MoPub;
+//import com.mopub.common.SdkConfiguration;
 
 /**
  * AFAdManager.java
@@ -114,25 +120,30 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
     public void initBannerContainer(AppCompatActivity activity) {
         this.bannerActivity = activity;
-        mAdContainer = activity.findViewById(R.id.ad_container);
-        if (mAdContainer != null) {
-           Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
-           boolean isSubs = bool == null ? false : bool;
-            if (!isSubs) {
-                if (isAdSuccessfullyDownloaded) {
-                    mAdContainer.setVisibility(View.VISIBLE);
-                    loadAd(mAdContainer);
-                    isBannerAdVisible = true;
+        if (activity != null) {
+            mAdContainer = activity.findViewById(android.R.id.content);
+            if (mAdContainer != null) {
+                Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
+                boolean isSubs = bool == null ? false : bool;
+                if (!isSubs) {
+                    if (isAdSuccessfullyDownloaded) {
+                        //       mAdContainer.setVisibility(View.VISIBLE);
+                        loadAd(mAdContainer);
+                        mAdView.setVisibility(View.VISIBLE);
+                        isBannerAdVisible = true;
+                    } else {
+                        //       mAdContainer.setVisibility(View.GONE);
+                        mAdView.setVisibility(View.GONE);
+                        isBannerAdVisible = false;
+                    }
                 } else {
-                    mAdContainer.setVisibility(View.GONE);
+                    //   mAdContainer.setVisibility(View.GONE);
+                    mAdView.setVisibility(View.GONE);
                     isBannerAdVisible = false;
                 }
             } else {
-                mAdContainer.setVisibility(View.GONE);
                 isBannerAdVisible = false;
             }
-        } else {
-            isBannerAdVisible = false;
         }
     }
 
@@ -143,6 +154,32 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             tempVg.removeView(mAdView);
         }
 
+        ViewGroup.LayoutParams lp = adContainer.getLayoutParams();
+        if (lp instanceof LinearLayout.LayoutParams) {
+            LinearLayout.LayoutParams llp = ((LinearLayout.LayoutParams) lp);
+            llp.gravity = Gravity.BOTTOM;
+        } else if (lp instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams flp = ((FrameLayout.LayoutParams) lp);
+            flp.gravity = Gravity.BOTTOM;
+        } else if (lp instanceof RelativeLayout.LayoutParams) {
+            RelativeLayout.LayoutParams rlp = ((RelativeLayout.LayoutParams) lp);
+            rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        } else if (lp instanceof GridLayout.LayoutParams) {
+            GridLayout.LayoutParams glp = ((GridLayout.LayoutParams) lp);
+            glp.setGravity(Gravity.BOTTOM);
+        } else if (lp instanceof ConstraintLayout.LayoutParams) {
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone((ConstraintLayout) adContainer);
+            constraintSet.connect(mAdView.getId(), ConstraintSet.BOTTOM, adContainer.getId(),
+                    ConstraintSet.BOTTOM, 0);
+            constraintSet.connect(mAdView.getId(), ConstraintSet.LEFT, adContainer.getId(),
+                    ConstraintSet.LEFT, 0);
+            constraintSet.connect(mAdView.getId(), ConstraintSet.RIGHT, adContainer.getId(),
+                    ConstraintSet.RIGHT, 0);
+            constraintSet.applyTo((ConstraintLayout) adContainer);
+        }
+
+        mAdView.setLayoutParams(lp);
         adContainer.addView(mAdView);
     }
 
@@ -225,10 +262,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     private void initMediation(String[] vungleExtras) {
-//        SdkConfiguration sdkConfiguration =
-//                new SdkConfiguration.Builder("MOPUB_AD_UNIT_ID").build(); // TODO add the key
-//
-//        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
+        //        SdkConfiguration sdkConfiguration =
+        //                new SdkConfiguration.Builder("MOPUB_AD_UNIT_ID").build(); // TODO add the key
+        //
+        //        MoPub.initializeSdk(applicationContext, sdkConfiguration, null);
 
         Bundle bundleVungle = new VungleExtrasBuilder(vungleExtras).build();
 
