@@ -124,7 +124,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             mAdContainer = activity.findViewById(android.R.id.content);
             if (mAdContainer != null) {
                 Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
-                boolean isSubs = bool == null ? false : bool;
+           //     boolean isSubs = bool == null ? false : bool;
+                boolean isSubs = false;
                 if (!isSubs) {
                     if (isAdSuccessfullyDownloaded) {
                         //       mAdContainer.setVisibility(View.VISIBLE);
