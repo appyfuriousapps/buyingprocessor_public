@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ContentFrameLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -206,8 +206,11 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             constraintSet.connect(mAdView.getId(), ConstraintSet.RIGHT, adContainer.getId(),
                     ConstraintSet.RIGHT, 0);
             constraintSet.applyTo((ConstraintLayout) adContainer);
-        } else if (lp instanceof ContentFrameLayout.LayoutParams) {
-
+        } else if (lp instanceof CoordinatorLayout.LayoutParams) {
+            CoordinatorLayout.LayoutParams clp = ((CoordinatorLayout.LayoutParams) lp);
+            clp.width = CoordinatorLayout.LayoutParams.MATCH_PARENT;
+            clp.height = CoordinatorLayout.LayoutParams.WRAP_CONTENT;
+            clp.gravity = Gravity.BOTTOM;
         }
 
         mAdView.setLayoutParams(lp);
