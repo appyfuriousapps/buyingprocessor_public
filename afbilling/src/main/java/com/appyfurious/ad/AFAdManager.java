@@ -51,6 +51,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
     private Context applicationContext;
 
+    private ViewGroup mRootView;
     private ViewGroup mAdContainer;
     private AdView mAdView;
 
@@ -124,8 +125,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         if (activity != null) {
             if (activity instanceof BannerAdActivity) {
 
-                for (int i = 0; i < mAdContainer.getChildCount(); i++) {
-                    View v = mAdContainer.getChildAt(i);
+                mRootView = activity.findViewById(android.R.id.content);
+
+                for (int i = 0; i < mRootView.getChildCount(); i++) {
+                    View v = mRootView.getChildAt(i);
                     if (v != null) {
                         if (v instanceof ViewGroup) {
                             mAdContainer = (ViewGroup) v;
@@ -133,7 +136,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                         break;
                     }
                 }
-
 
                 if (mAdContainer != null) {
                     Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
