@@ -121,30 +121,35 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     public void initBannerContainer(AppCompatActivity activity) {
         this.bannerActivity = activity;
         if (activity != null) {
-            mAdContainer = activity.findViewById(android.R.id.content);
-            if (mAdContainer != null) {
-                Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
-           //     boolean isSubs = bool == null ? false : bool;
-                boolean isSubs = false;
-                if (!isSubs) {
-                    if (isAdSuccessfullyDownloaded) {
-                        //       mAdContainer.setVisibility(View.VISIBLE);
-                        loadAd(mAdContainer);
-                        mAdView.setVisibility(View.VISIBLE);
-                        isBannerAdVisible = true;
+            if (activity instanceof BannerAdActivity) {
+                mAdContainer = activity.findViewById(android.R.id.content);
+                if (mAdContainer != null) {
+                    Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
+                    //     boolean isSubs = bool == null ? false : bool;
+                    boolean isSubs = false;
+                    if (!isSubs) {
+                        if (isAdSuccessfullyDownloaded) {
+                            //       mAdContainer.setVisibility(View.VISIBLE);
+                            loadAd(mAdContainer);
+                            mAdView.setVisibility(View.VISIBLE);
+                            isBannerAdVisible = true;
+                        } else {
+                            //       mAdContainer.setVisibility(View.GONE);
+                            mAdView.setVisibility(View.GONE);
+                            isBannerAdVisible = false;
+                        }
                     } else {
-                        //       mAdContainer.setVisibility(View.GONE);
+                        //   mAdContainer.setVisibility(View.GONE);
                         mAdView.setVisibility(View.GONE);
                         isBannerAdVisible = false;
                     }
                 } else {
-                    //   mAdContainer.setVisibility(View.GONE);
-                    mAdView.setVisibility(View.GONE);
                     isBannerAdVisible = false;
                 }
             } else {
-                isBannerAdVisible = false;
+                Logger.INSTANCE.logAd("Ad is not visible. Activity is not instance of BannerAdActivity");
             }
+
         }
     }
 
