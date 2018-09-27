@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.appyfurious.afbilling.R;
+import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.Action;
@@ -39,7 +40,6 @@ import io.realm.RealmChangeListener;
 
 public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<AFAdsManagerConfiguration> {
 
-
     private static AFAdManager mInstance;
 
     private Context applicationContext;
@@ -48,7 +48,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private AdView mAdView;
 
     private boolean isAdSuccessfullyDownloaded;
-    private boolean isPremium;
 
     private InterstitialAd mInterstitialAd;
 
@@ -70,7 +69,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         return mInstance;
     }
 
-    public void initialize(Context applicationContext, AFAdsManagerConfiguration configuration, String[] vungleExtras) {
+    public void initialize(Context applicationContext, AFAdsManagerConfiguration configuration,
+                           String[] vungleExtras) {
         this.applicationContext = applicationContext;
 
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
@@ -116,7 +116,9 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         this.bannerActivity = activity;
         mAdContainer = activity.findViewById(R.id.ad_container);
         if (mAdContainer != null) {
-            if (!isPremium) {
+           Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
+           boolean isSubs = bool == null ? false : bool;
+            if (!isSubs) {
                 if (isAdSuccessfullyDownloaded) {
                     mAdContainer.setVisibility(View.VISIBLE);
                     loadAd(mAdContainer);
@@ -149,8 +151,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mAdView.setAdSize(AdSize.SMART_BANNER);
         mAdView.setAdUnitId(bannerId);
 
-        //AdRequest adRequest = new AdRequest.Builder().build();
-
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AppyAdListener(this));
     }
@@ -168,6 +168,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void requestInterstitial(String action) {
+
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
         long unixTime = (System.currentTimeMillis() - (long) mAFAdsManagerConfiguration
                 .getInterstitialsLastShowDate()) / 1000;
