@@ -50,7 +50,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
     private Context applicationContext;
 
-    private LinearLayout mAdContainer;
+    private ViewGroup mAdContainer;
     private AdView mAdView;
 
     private boolean isAdSuccessfullyDownloaded;
