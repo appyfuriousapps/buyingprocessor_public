@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
@@ -233,9 +234,12 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
     public void initBanner(Context applicationContext, String bannerId) {
         mAdView = new AdView(applicationContext);
-        mAdView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            initBannerContainer(bannerActivity);
-            mAdView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        mAdView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                initBannerContainer(bannerActivity);
+                mAdView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             mAdView.setId(View.generateViewId());
