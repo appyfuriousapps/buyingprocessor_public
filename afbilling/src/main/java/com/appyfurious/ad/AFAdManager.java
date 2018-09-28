@@ -174,10 +174,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void loadAd(ViewGroup rootView, ViewGroup adContainer) {
-        if (mAdView.getHeight() == 0) {
-            return;
-        }
-
         if (mAdView.getParent() != null) {
             ViewGroup tempVg = (ViewGroup) mAdView.getParent();
             tempVg.removeView(mAdView);
