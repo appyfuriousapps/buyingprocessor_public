@@ -69,6 +69,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private AppCompatActivity bannerActivity;
 
     private AdRequest adRequest;
+    private ViewGroup mRootViewMarginToNull;
 
 
     public static synchronized AFAdManager getInstance() {
@@ -152,11 +153,13 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                             //       mAdContainer.setVisibility(View.GONE);
                             mAdView.setVisibility(View.GONE);
                             isBannerAdVisible = false;
+                            setRootViewMarginToNull(mAdContainer);
                         }
                     } else {
                         //   mAdContainer.setVisibility(View.GONE);
                         mAdView.setVisibility(View.GONE);
                         isBannerAdVisible = false;
+                        setRootViewMarginToNull(mAdContainer);
                     }
                 } else {
                     isBannerAdVisible = false;
@@ -369,4 +372,20 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 .build();
     }
 
+    private void setRootViewMarginToNull(ViewGroup adContainer) {
+        if (mAdView.getParent() != null) {
+            ViewGroup tempVg = (ViewGroup) mAdView.getParent();
+            tempVg.removeView(mAdView);
+        }
+
+        if (adContainer.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) adContainer.getLayoutParams();
+
+            if (flp.bottomMargin != 0) {
+                flp.bottomMargin = 0;
+            }
+
+            adContainer.setLayoutParams(flp);
+        }
+    }
 }
