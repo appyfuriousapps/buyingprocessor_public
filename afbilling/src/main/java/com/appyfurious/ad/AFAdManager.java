@@ -17,6 +17,7 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.appyfurious.afbilling.R;
 import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
@@ -176,6 +177,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             tempVg.removeView(mAdView);
         }
 
+        if (adContainer.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams flp = (FrameLayout.LayoutParams) adContainer.getLayoutParams();
+
+            flp.bottomMargin = mAdView.getHeight();
+
+            adContainer.setLayoutParams(flp);
+        }
+
         adContainer.addView(mAdView);
 
         ViewGroup.LayoutParams lp = mAdView.getLayoutParams();
@@ -186,29 +195,68 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         if (lp instanceof LinearLayout.LayoutParams) {
             LinearLayout.LayoutParams llp = ((LinearLayout.LayoutParams) lp);
             llp.gravity = Gravity.BOTTOM;
+
+//            for (int i = 0; i < adContainer.getChildCount(); i++) {
+//                View v = adContainer.getChildAt(i);
+//                if (v != null) {
+//                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) v.getLayoutParams();
+//                    if (params.gravity == Gravity.BOTTOM && !(v instanceof AdView)) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    } else if (params.height == LinearLayout.LayoutParams.MATCH_PARENT) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    }
+//                }
+//            }
+
         } else if (lp instanceof FrameLayout.LayoutParams) {
             FrameLayout.LayoutParams flp = ((FrameLayout.LayoutParams) lp);
             flp.gravity = Gravity.BOTTOM;
 
-            for (int i = 0; i < adContainer.getChildCount(); i++) {
-                View v = adContainer.getChildAt(i);
-                if (v != null) {
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
-                    if (params.gravity == Gravity.BOTTOM && !(v instanceof AdView)) {
-                        params.bottomMargin = mAdView.getHeight();
-                        v.setLayoutParams(params);
-                    } else if (params.height == FrameLayout.LayoutParams.MATCH_PARENT) {
-                        params.bottomMargin = mAdView.getHeight();
-                        v.setLayoutParams(params);
-                    }
-                }
-            }
+//            for (int i = 0; i < adContainer.getChildCount(); i++) {
+//                View v = adContainer.getChildAt(i);
+//                if (v != null) {
+//                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) v.getLayoutParams();
+//                    if (params.gravity == Gravity.BOTTOM && !(v instanceof AdView)) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    } else if (params.height == FrameLayout.LayoutParams.MATCH_PARENT) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    }
+//                }
+//            }
         } else if (lp instanceof RelativeLayout.LayoutParams) {
             RelativeLayout.LayoutParams rlp = ((RelativeLayout.LayoutParams) lp);
             rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+//            for (int i = 0; i < adContainer.getChildCount(); i++) {
+//                View v = adContainer.getChildAt(i);
+//                if (v != null) {
+//                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) v.getLayoutParams();
+//                    if (params.getRules() [RelativeLayout.ALIGN_PARENT_BOTTOM] == v.getId()) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    }
+//                }
+//            }
+
         } else if (lp instanceof GridLayout.LayoutParams) {
             GridLayout.LayoutParams glp = ((GridLayout.LayoutParams) lp);
             glp.setGravity(Gravity.BOTTOM);
+
+//            for (int i = 0; i < adContainer.getChildCount(); i++) {
+//                View v = adContainer.getChildAt(i);
+//                if (v != null) {
+//                    GridLayout.LayoutParams params = (GridLayout.LayoutParams) v.getLayoutParams();
+//                    if (params.height == GridLayout.LayoutParams.MATCH_PARENT) {
+//                        params.bottomMargin = mAdView.getHeight();
+//                        v.setLayoutParams(params);
+//                    }
+//                }
+//            }
+
         } else if (lp instanceof ConstraintLayout.LayoutParams) {
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone((ConstraintLayout) adContainer);
@@ -221,13 +269,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             constraintSet.applyTo((ConstraintLayout) adContainer);
         } else if (lp instanceof CoordinatorLayout.LayoutParams) {
             CoordinatorLayout.LayoutParams clp = ((CoordinatorLayout.LayoutParams) lp);
-            clp.width = CoordinatorLayout.LayoutParams.MATCH_PARENT;
-            clp.height = CoordinatorLayout.LayoutParams.WRAP_CONTENT;
             clp.gravity = Gravity.BOTTOM;
         }
 
         mAdView.setLayoutParams(lp);
-
     }
 
     public void initBanner(Context applicationContext, String bannerId) {
