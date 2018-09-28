@@ -146,7 +146,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     if (!isSubs) {
                         if (isAdSuccessfullyDownloaded) {
                             //       mAdContainer.setVisibility(View.VISIBLE);
-                            loadAd(mAdContainer);
+                            loadAd(mRootView, mAdContainer);
                             mAdView.setVisibility(View.VISIBLE);
                             isBannerAdVisible = true;
                         } else {
@@ -170,7 +170,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         }
     }
 
-    public void loadAd(ViewGroup adContainer) {
+    public void loadAd(ViewGroup rootView, ViewGroup adContainer) {
 
         if (mAdView.getParent() != null) {
             ViewGroup tempVg = (ViewGroup) mAdView.getParent();
@@ -185,7 +185,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             adContainer.setLayoutParams(flp);
         }
 
-        adContainer.addView(mAdView);
+        rootView.addView(mAdView);
 
         ViewGroup.LayoutParams lp = mAdView.getLayoutParams();
 
