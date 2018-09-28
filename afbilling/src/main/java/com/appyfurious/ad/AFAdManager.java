@@ -174,7 +174,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void loadAd(ViewGroup rootView, ViewGroup adContainer) {
-        if (mAdView.getHeight == 0) {
+        if (mAdView.getHeight() == 0) {
             return;
         }
 
