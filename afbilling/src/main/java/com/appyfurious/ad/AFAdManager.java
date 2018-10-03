@@ -72,6 +72,8 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private AdRequest adRequest;
     private ViewGroup mRootViewMarginToNull;
 
+    private boolean isPremium;
+
 
     public static synchronized AFAdManager getInstance() {
         if (mInstance == null) {
@@ -97,6 +99,11 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
 
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
+
+        StoreManager.INSTANCE.isSubsData().observe(this, isSubs -> {
+            isPremium = isSubs == null ? false : isSubs;
+        });
+
     }
 
     public void updateConfiguration(Context applicationContext, AFAdsManagerConfiguration configuration) {
@@ -142,9 +149,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 }
 
                 if (mAdContainer != null) {
-                    Boolean bool = StoreManager.INSTANCE.isSubsData().getValue();
-                    boolean isSubs = bool == null ? false : bool;
-                    if (!isSubs) {
+                    if (!isPremium) {
                         if (isAdSuccessfullyDownloaded) {
                             //       mAdContainer.setVisibility(View.VISIBLE);
                             loadAd(mRootView, mAdContainer);
