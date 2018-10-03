@@ -1,5 +1,6 @@
 package com.appyfurious.ad;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.appyfurious.afbilling.R;
 import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
@@ -100,8 +100,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
 
-        StoreManager.INSTANCE.isSubsData().observe(this, isSubs -> {
-            isPremium = isSubs == null ? false : isSubs;
+        StoreManager.INSTANCE.isSubsData().observeForever(isSubs -> {
+            boolean tempBool = isSubs == null ? false : isSubs;
+            if (isPremium != tempBool) {
+                isPremium = tempBool;
+                if (bannerActivity != null && mAdView != null) {
+                    initBannerContainer(bannerActivity);
+                }
+            }
         });
 
     }

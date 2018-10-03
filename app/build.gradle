@@ -1,11 +1,17 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'https://maven.google.com' }
+    mavenCentral()
+}
 
 android {
     compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.appyfurious.billing"
         minSdkVersion 16
@@ -20,6 +26,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -50,5 +61,5 @@ dependencies {
     }
     implementation 'com.android.support:support-v4:27.1.1'
 }
-
 apply plugin: 'com.google.gms.google-services'
+
