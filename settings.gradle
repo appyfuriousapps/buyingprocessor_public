@@ -1,1 +1,1 @@
-include ':app', ':afbilling', ':SOMAAndroid'
+include ':app', ':afbilling'
