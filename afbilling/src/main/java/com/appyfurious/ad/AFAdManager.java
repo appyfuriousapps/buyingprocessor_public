@@ -24,6 +24,7 @@ import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.Action;
 import com.appyfurious.log.Logger;
+import com.appyfurious.utils.AFNetworkManager;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -166,6 +167,9 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                             mAdView.setVisibility(View.GONE);
                             isBannerAdVisible = false;
                             setRootViewMarginToNull(mAdContainer);
+                            if (AFNetworkManager.isOnline(applicationContext)) {
+                                updateConfiguration(applicationContext, mAFAdsManagerConfiguration);
+                            }
                         }
                     } else {
                         //   mAdContainer.setVisibility(View.GONE);
