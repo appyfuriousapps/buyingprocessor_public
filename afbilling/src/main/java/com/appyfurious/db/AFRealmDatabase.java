@@ -187,9 +187,9 @@ public class AFRealmDatabase {
     }
 
     public void saveProductIds(RealmList<AFProductIdConfiguration> productIdConfigurations, RealmChangeListener<RealmResults<AFProductIdConfiguration>> listener) {
+        RealmResults<AFProductIdConfiguration> results = realm.where(AFProductIdConfiguration.class).findAll();
+        results.addChangeListener(listener);
         realm.executeTransaction(realm -> {
-            RealmResults<AFProductIdConfiguration> results = realm.where(AFProductIdConfiguration.class).findAll();
-            results.addChangeListener(listener);
             for (AFProductIdConfiguration configuration : productIdConfigurations) {
                 realm.copyToRealmOrUpdate(configuration);
             }
