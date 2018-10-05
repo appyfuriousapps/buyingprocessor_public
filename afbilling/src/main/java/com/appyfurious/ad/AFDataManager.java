@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.ad.parser.ProductIdsConfigParser;
-import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.AFSharedPreferencesManager;
@@ -17,7 +16,6 @@ import com.appyfurious.log.Logger;
 import com.appyfurious.rating.AFRatingManager;
 import com.appyfurious.rating.RatingConfigParser;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -97,6 +95,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                              Logger.INSTANCE.logDataManager("Fetch Failed");
                          }
                      });
+    }
+
+    public String getProductIdForAction(String action) {
+        return AFRealmDatabase.getInstance().getProductIdForAction(action);
     }
 
     @Override
