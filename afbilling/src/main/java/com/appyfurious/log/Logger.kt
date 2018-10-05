@@ -11,6 +11,7 @@ object Logger {
     const val TAG_LC = "AFLifecycle"
     const val TAG_SH = "AFPreferences"
     const val TAG_DM = "AFDataManager"
+    const val TAG_PC = "AFProducts"
     private var isDebug = false
     private var isPrintExceptionObject = false
 
@@ -82,6 +83,12 @@ object Logger {
     fun logDataManager(message: String) {
         if (isDebug) {
             Log.d(TAG_DM, message)
+        }
+    }
+
+    fun logRatingIdConfigChanged(message: String) {
+        if (isDebug) {
+            Log.d(TAG_PC, message)
         }
     }
 }

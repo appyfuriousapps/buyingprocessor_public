@@ -7,17 +7,21 @@ import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.ad.parser.ProductIdsConfigParser;
+import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.AFSharedPreferencesManager;
 import com.appyfurious.log.Logger;
 import com.appyfurious.rating.AFRatingManager;
 import com.appyfurious.rating.RatingConfigParser;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.RealmChangeListener;
 
@@ -64,7 +68,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         mRemoteConfig.setConfigSettings(settings);
 
         mRemoteConfig.fetch(720)
-                     .addOnCompleteListener((OnCompleteListener<Void>) task -> {
+                     .addOnCompleteListener(task -> {
                          if (task.isSuccessful()) {
                              Logger.INSTANCE.logDataManager("Fetch Succeeded");
 
@@ -86,7 +90,15 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
                              AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
                              AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
-                             AFRealmDatabase.getInstance().saveProductIds(productIdsParser.getProductIdConfigurations());
+                             AFRealmDatabase.getInstance().saveProductIds(productIdsParser.getProductIdConfigurations(), afProductIdConfigurations -> {
+                                 Logger.INSTANCE.logRatingIdConfigChanged("Product Id Config changed. New config: " + afProductIdConfigurations.toString());
+                                 List<String> productIds = new ArrayList<>();
+                                 for (AFProductIdConfiguration conf : afProductIdConfigurations) {
+                                     productIds.add(conf.getValue());
+                                 }
+
+                                 StoreManager.INSTANCE.updateProducts(productIds);
+                             });
                              AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
 
                              AFRatingManager.getInstance().initialize();
