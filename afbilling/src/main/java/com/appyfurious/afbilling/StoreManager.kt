@@ -5,6 +5,7 @@ import android.app.Application
 import android.arch.lifecycle.*
 import android.content.Context
 import android.content.Intent
+import com.android.vending.billing.IInAppBillingService
 import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.afbilling.product.MyProduct
 import com.appyfurious.afbilling.product.ProductsManager
@@ -28,25 +29,34 @@ object StoreManager {
     private lateinit var application: Application
     private lateinit var productManager: ProductsManager
     private lateinit var billingService: BillingService
-    private var isLazyInit = false
 
     private lateinit var inAppProductsId: List<String>
     lateinit var myProducts: List<MyProduct>
         private set
-    lateinit var inAppProducts: List<InAppProduct>
+    var inAppProducts = listOf<InAppProduct>()
         private set
 
     val isSubsData = MutableLiveData<Boolean>()
 
     fun getInAppProduct(productId: String) = inAppProducts.firstOrNull { it.productId == productId }
 
-    fun init(application: Application, inAppProductsId: List<String>, baseUrl: String, apiKey: String, secretKey: String) {
+    fun init(application: Application, baseUrl: String, apiKey: String, secretKey: String) {
         this.application = application
-        this.inAppProductsId = inAppProductsId
+        billingService = BillingService(application)
         ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
         ValidKeys.init(baseUrl, apiKey, secretKey)
         productManager = ProductsManager(application)
         Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
+    }
+
+    fun updateProducts(inAppProductsId: List<String>) {
+        if (billingService.isConnected) {
+            inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, inAppProductsId)
+        } else {
+            billingService.addConnectedListener {
+                inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, inAppProductsId)
+            }
+        }
     }
 
     fun showPurchaseProduct(activity: Activity, product: InAppProduct, body: ((BillingService.BillingResponseType) -> Unit)?) {
@@ -76,13 +86,13 @@ object StoreManager {
         Logger.notify("finish onActivityResult validate")
     }
 
-    fun isSubs(owner: LifecycleOwner, body: (Boolean) -> Unit) {
+    fun isSubs(body: (Boolean) -> Unit) {
         if (billingService.isConnected) {
             isSubs(null) { _, isSubs -> body(isSubs) }
         } else {
-            billingService.isConnectedInit.observe(owner, Observer {
+            billingService.addConnectedListener {
                 isSubs(null) { _, isSubs -> body(isSubs) }
-            })
+            }
         }
     }
 
@@ -90,20 +100,17 @@ object StoreManager {
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
-            billingService = BillingService(application) { service ->
-                inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
-                Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
-                if (isLazyInit) {
-                    isLazyInit = false
-                    isSubs(null, null)
-                }
-            }
+            billingService = BillingService(application)
             if (billingService.isConnected) {
                 isSubs(null) { product, isSubs ->
                     Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
                 }
             } else {
-                isLazyInit = true
+                billingService.addConnectedListener { service ->
+                    inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
+                    Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
+                    isSubs(null, null)
+                }
             }
         }
 
