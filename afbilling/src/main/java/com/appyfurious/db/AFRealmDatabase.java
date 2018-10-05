@@ -186,8 +186,10 @@ public class AFRealmDatabase {
         return afRatingConfiguration[0];
     }
 
-    public void saveProductIds(RealmList<AFProductIdConfiguration> productIdConfigurations, RealmChangeListener<RealmResults<AFProductIdConfiguration>> realmChangeListener) {
+    public void saveProductIds(RealmList<AFProductIdConfiguration> productIdConfigurations, RealmChangeListener<RealmResults<AFProductIdConfiguration>> listener) {
         realm.executeTransaction(realm -> {
+            RealmResults<AFProductIdConfiguration> results = realm.where(AFProductIdConfiguration.class).findAll();
+            results.addChangeListener(listener);
             for (AFProductIdConfiguration configuration : productIdConfigurations) {
                 realm.copyToRealmOrUpdate(configuration);
             }
