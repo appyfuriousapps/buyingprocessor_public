@@ -31,7 +31,7 @@ public class MyApplication extends Application {
                 .modules(new LibraryModule())
                 .build();
 
-        AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults);
+        AFDataManager.getInstance().initialize(this, R.xml.remote_config_defaults, BuildConfig.DEBUG);
 
         AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration();
         configuration.setApplicationId("ca-app-pub-5995390255785257~5457813889");
@@ -43,8 +43,6 @@ public class MyApplication extends Application {
         configuration.setInterstitialsLastShowDate(0);
 
         AFAdManager.getInstance().initialize(this, configuration, null);
-
-        AFDataManager.getInstance().updateConfiguration(BuildConfig.DEBUG);
     }
 
 }

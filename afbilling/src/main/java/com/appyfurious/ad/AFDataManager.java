@@ -42,6 +42,8 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
     private Context mApplicationContext;
     private FirebaseRemoteConfig mRemoteConfig;
 
+    private boolean isDebug;
+
 
     public static synchronized AFDataManager getInstance() {
         if (mInstance == null) {
@@ -51,8 +53,9 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         return mInstance;
     }
 
-    public void initialize(Context applicationContext, int remoteConfigDefaultFileLocation) {
+    public void initialize(Context applicationContext, int remoteConfigDefaultFileLocation, boolean isDebug) {
         this.mApplicationContext = applicationContext;
+        this.isDebug = isDebug;
         mRemoteConfig = FirebaseRemoteConfig.getInstance();
         mRemoteConfig.setDefaults(remoteConfigDefaultFileLocation);
 
@@ -62,7 +65,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
     }
 
-    public void updateConfiguration(final boolean isDebug) {
+    public void updateConfiguration() {
         FirebaseRemoteConfigSettings settings =
                 new FirebaseRemoteConfigSettings.Builder().setDeveloperModeEnabled(false).build();
         mRemoteConfig.setConfigSettings(settings);
@@ -122,6 +125,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
     public void onMoveToForeground() {
         Logger.INSTANCE.logMoveToForeground("App is going to foreground..");
         AFSharedPreferencesManager.getInstance().incrementSessionCount();
+        updateConfiguration();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
