@@ -30,8 +30,8 @@ object StoreManager {
     private lateinit var productManager: ProductsManager
     private lateinit var billingService: BillingService
 
-    private lateinit var inAppProductsId: List<String>
-    lateinit var myProducts: List<MyProduct>
+    private var inAppProductsId = listOf<String>()
+    var myProducts = listOf<MyProduct>()
         private set
     var inAppProducts = listOf<InAppProduct>()
         private set
@@ -50,11 +50,12 @@ object StoreManager {
     }
 
     fun updateProducts(inAppProductsId: List<String>) {
+        this.inAppProductsId = inAppProductsId
         if (billingService.isConnected) {
-            inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, inAppProductsId)
+            inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
         } else {
             billingService.addConnectedListener {
-                inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, inAppProductsId)
+                inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
             }
         }
     }

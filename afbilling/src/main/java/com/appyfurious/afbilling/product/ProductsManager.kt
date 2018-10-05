@@ -63,6 +63,9 @@ class ProductsManager(context: Context) {
     }
 
     fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct> {
+        if (productIds.isEmpty()) {
+            return listOf()
+        }
         val skuList = ArrayList(productIds)
         val query = Bundle()
         query.putStringArrayList("ITEM_ID_LIST", skuList)
