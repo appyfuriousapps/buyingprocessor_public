@@ -42,6 +42,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -59,7 +60,7 @@ dependencies {
         // Exclude the "plain java" json module to fix build warnings.
         exclude group: 'org.json', module: 'json'
     }
-    implementation 'com.android.support:support-v4:27.1.1'
+
 }
 apply plugin: 'com.google.gms.google-services'
 

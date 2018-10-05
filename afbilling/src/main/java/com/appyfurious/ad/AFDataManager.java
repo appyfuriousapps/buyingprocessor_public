@@ -8,6 +8,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.appyfurious.ad.parser.AdConfigParser;
+import com.appyfurious.ad.parser.ProductIdsConfigParser;
+import com.appyfurious.afbilling.StoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.AFSharedPreferencesManager;
@@ -64,34 +66,35 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         mRemoteConfig.setConfigSettings(settings);
 
         mRemoteConfig.fetch(720)
-                     .addOnCompleteListener(new OnCompleteListener<Void>() {
-                         @Override
-                         public void onComplete(@NonNull Task<Void> task) {
-                             if (task.isSuccessful()) {
-                                 Logger.INSTANCE.logDataManager("Fetch Succeeded");
+                     .addOnCompleteListener((OnCompleteListener<Void>) task -> {
+                         if (task.isSuccessful()) {
+                             Logger.INSTANCE.logDataManager("Fetch Succeeded");
 
-                                 // After config data is successfully fetched, it must be activated before newly fetched
-                                 // values are returned.
-                                 mRemoteConfig.activateFetched();
+                             // After config data is successfully fetched, it must be activated before newly fetched
+                             // values are returned.
+                             mRemoteConfig.activateFetched();
 
-                                 AdConfigParser parser = new AdConfigParser(mRemoteConfig // TODO check null
-                                         .getString("ads_config"), isDebug);
+                             AdConfigParser parser = new AdConfigParser(mRemoteConfig // TODO check null
+                                     .getString("ads_config"), isDebug);
 
-                                 RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
+                             RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
 
-                                 AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration(parser.getApplicationId(),
-                                         parser.getBannerId(), parser.getInterstitialId(), parser.getRewardedVideoId(),
-                                         parser.getInterstitialsCountPerSession(), parser.getInterstitialDelay(),
-                                         parser.getActions());
+                             ProductIdsConfigParser productIdsParser = new ProductIdsConfigParser(mRemoteConfig.getString("product_ids_config"));
 
-                                 AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
-                                 AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
-                                 AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
-                                 AFRatingManager.getInstance().initialize();
+                             AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration(parser.getApplicationId(),
+                                     parser.getBannerId(), parser.getInterstitialId(), parser.getRewardedVideoId(),
+                                     parser.getInterstitialsCountPerSession(), parser.getInterstitialDelay(),
+                                     parser.getActions());
 
-                             } else {
-                                 Logger.INSTANCE.logDataManager("Fetch Failed");
-                             }
+                             AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
+                             AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
+                             AFRealmDatabase.getInstance().saveProductIds(productIdsParser.getProductIdConfigurations());
+                             AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
+
+                             AFRatingManager.getInstance().initialize();
+
+                         } else {
+                             Logger.INSTANCE.logDataManager("Fetch Failed");
                          }
                      });
     }

@@ -2,6 +2,8 @@ package com.appyfurious.db;
 
 import android.support.annotation.NonNull;
 
+import com.appyfurious.AFProductIdConfiguration;
+
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
@@ -182,6 +184,14 @@ public class AFRealmDatabase {
         });
 
         return afRatingConfiguration[0];
+    }
+
+    public void saveProductIds(RealmList<AFProductIdConfiguration> productIdConfigurations) {
+        realm.executeTransaction(realm -> {
+            for (AFProductIdConfiguration configuration : productIdConfigurations) {
+                realm.copyToRealmOrUpdate(configuration);
+            }
+        });
     }
 
 }
