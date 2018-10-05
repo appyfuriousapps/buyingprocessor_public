@@ -194,4 +194,15 @@ public class AFRealmDatabase {
         });
     }
 
+    public String getProductIdForAction(String action) {
+        AFProductIdConfiguration configuration =
+                realm.where(AFProductIdConfiguration.class).equalTo("key", action).findFirst();
+
+        if (configuration != null) {
+            return configuration.getValue();
+        }
+
+        return null;
+    }
+
 }
