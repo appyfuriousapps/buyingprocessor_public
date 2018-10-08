@@ -6,6 +6,7 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
@@ -84,7 +85,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
                              RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
 
-                             if (mRemoteConfig.getString("product_ids_config") == null) {
+                             if (TextUtils.isEmpty(mRemoteConfig.getString("product_ids_config"))) {
                                  if (AFRealmDatabase.getInstance().isProductIdConfigurationEmpty()) {
                                      throw new IllegalStateException("Product ID Configuration must not be null");
                                  }
