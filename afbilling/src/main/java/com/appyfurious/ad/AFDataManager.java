@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 
 /**
  * AFDataManager.java
@@ -85,18 +86,13 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
                              RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
 
-                             if (TextUtils.isEmpty(mRemoteConfig.getString("product_ids_config"))) {
-                                 if (AFRealmDatabase.getInstance()
-                                                    .isProductIdConfigurationEmpty()) {
-                                     throw new IllegalStateException("Product ID Configuration must not be null");
-                                 }
-                             } else {
+                             if (!TextUtils.isEmpty(mRemoteConfig.getString("product_ids_config"))) {
                                  ProductIdsConfigParser productIdsParser = new ProductIdsConfigParser(mRemoteConfig
                                          .getString("product_ids_config"));
                                  AFRealmDatabase.getInstance().saveProductIds(productIdsParser
                                          .getProductIdConfigurations(), afProductIdConfigurations -> {
                                      Logger.INSTANCE.logRatingIdConfigChanged("Product Id Config changed. New config: " + afProductIdConfigurations
-                                                     .toString());
+                                             .toString());
                                      List<String> productIds = new ArrayList<>();
                                      for (AFProductIdConfiguration conf : afProductIdConfigurations) {
                                          if (!productIds.contains(conf.getValue())) {
@@ -133,6 +129,20 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
     public String getProductIdForAction(String action) {
         return AFRealmDatabase.getInstance().getProductIdForAction(action);
+    }
+
+    public void setDefaultProductIdsConfiguration(RealmList<AFProductIdConfiguration> defConfigs) {
+        AFRealmDatabase.getInstance().saveProductIds(defConfigs, afProductIdConfigurations -> {
+            Logger.INSTANCE.logRatingIdConfigChanged("Product Id Default Config: " + defConfigs.toString());
+            List<String> productIds = new ArrayList<>();
+            for (AFProductIdConfiguration conf : afProductIdConfigurations) {
+                if (!productIds.contains(conf.getValue())) {
+                    productIds.add(conf.getValue());
+                }
+            }
+
+            StoreManager.INSTANCE.updateProducts(productIds);
+        });
     }
 
     @Override
