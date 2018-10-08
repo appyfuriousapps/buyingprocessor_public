@@ -64,6 +64,7 @@ class ProductsManager(context: Context) {
 
     fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct> {
         if (productIds.isEmpty()) {
+            Logger.notify("productIds.isEmpty()")
             return listOf()
         }
         val skuList = ArrayList(productIds)
@@ -79,6 +80,7 @@ class ProductsManager(context: Context) {
             }
         } catch (ex: Exception) {
             Logger.exception(ex)
+            Logger.exception("error read purchase products")
             listOf()
         }
     }

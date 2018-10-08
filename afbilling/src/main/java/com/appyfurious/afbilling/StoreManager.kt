@@ -52,9 +52,12 @@ object StoreManager {
     fun updateProducts(inAppProductsId: List<String>) {
         this.inAppProductsId = inAppProductsId
         if (billingService.isConnected) {
+            Logger.notify("billingService.isConnected == true")
             inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
         } else {
+            Logger.notify("billingService.isConnected == false")
             billingService.addConnectedListener {
+                Logger.notify("billingService.isConnected == false, addConnectedListener")
                 inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
             }
         }

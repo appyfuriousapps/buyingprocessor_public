@@ -102,16 +102,16 @@ dependencies {
     // implementation project(':SOMAAndroid')
 }
 
-/*
-group 'com.appyfurious'
-version '1.0.0'
 
-apply plugin: 'maven'
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: uri('/Users/home/Documents/development/repository'))
-        }
-    }
-}*/
+//group 'com.appyfurious'
+//version '1.0.0'
+//
+//apply plugin: 'maven'
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri('/Users/olegappyfurious/repository'))
+//        }
+//    }
+//}

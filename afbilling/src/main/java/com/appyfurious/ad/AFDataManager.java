@@ -81,37 +81,48 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                              mRemoteConfig.activateFetched();
 
                              AdConfigParser parser = new AdConfigParser(mRemoteConfig // TODO check null
-                                     .getString("ads_config"), isDebug);
+                                                                                      .getString("ads_config"), isDebug);
 
-                             RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
+                             RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig
+                                     .getString("rating_config")); // TODO check null
 
                              if (TextUtils.isEmpty(mRemoteConfig.getString("product_ids_config"))) {
-                                 if (AFRealmDatabase.getInstance().isProductIdConfigurationEmpty()) {
+                                 if (AFRealmDatabase.getInstance()
+                                                    .isProductIdConfigurationEmpty()) {
                                      throw new IllegalStateException("Product ID Configuration must not be null");
                                  }
                              } else {
-                                 ProductIdsConfigParser productIdsParser = new ProductIdsConfigParser(mRemoteConfig.getString("product_ids_config"));
-                                 AFRealmDatabase.getInstance().saveProductIds(productIdsParser.getProductIdConfigurations(), afProductIdConfigurations -> {
-                                     Logger.INSTANCE.logRatingIdConfigChanged("Product Id Config changed. New config: " + afProductIdConfigurations.toString());
+                                 ProductIdsConfigParser productIdsParser = new ProductIdsConfigParser(mRemoteConfig
+                                         .getString("product_ids_config"));
+                                 AFRealmDatabase.getInstance().saveProductIds(productIdsParser
+                                         .getProductIdConfigurations(), afProductIdConfigurations -> {
+                                     Logger.INSTANCE.logRatingIdConfigChanged("Product Id Config changed. New config: " + afProductIdConfigurations
+                                                     .toString());
                                      List<String> productIds = new ArrayList<>();
                                      for (AFProductIdConfiguration conf : afProductIdConfigurations) {
-                                         productIds.add(conf.getValue());
+                                         if (!productIds.contains(conf.getValue())) {
+                                             productIds.add(conf.getValue());
+                                         }
                                      }
 
                                      StoreManager.INSTANCE.updateProducts(productIds);
                                  });
                              }
 
-
-
-                             AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration(parser.getApplicationId(),
-                                     parser.getBannerId(), parser.getInterstitialId(), parser.getRewardedVideoId(),
-                                     parser.getInterstitialsCountPerSession(), parser.getInterstitialDelay(),
+                             AFAdsManagerConfiguration configuration = new AFAdsManagerConfiguration(parser
+                                     .getApplicationId(),
+                                     parser.getBannerId(), parser.getInterstitialId(), parser
+                                     .getRewardedVideoId(),
+                                     parser.getInterstitialsCountPerSession(), parser
+                                     .getInterstitialDelay(),
                                      parser.getActions());
 
-                             AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
-                             AFRealmDatabase.getInstance().saveRating(ratingParser.getRatingConfigurations());
-                             AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
+                             AFRealmDatabase.getInstance()
+                                            .saveAd(configuration, AFDataManager.this);
+                             AFRealmDatabase.getInstance()
+                                            .saveRating(ratingParser.getRatingConfigurations());
+                             AFAdManager.getInstance()
+                                        .updateConfiguration(mApplicationContext, configuration);
 
                              AFRatingManager.getInstance().initialize();
 
@@ -127,7 +138,8 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
     @Override
     public void onChange(@NonNull AFAdsManagerConfiguration configuration) {
-        Logger.INSTANCE.logDbChange("AFRealm Configuration Changed. New config: " + configuration.toString());
+        Logger.INSTANCE.logDbChange("AFRealm Configuration Changed. New config: " + configuration
+                .toString());
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
