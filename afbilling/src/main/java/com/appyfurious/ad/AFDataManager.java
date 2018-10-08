@@ -6,6 +6,7 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
