@@ -207,4 +207,11 @@ public class AFRealmDatabase {
         return null;
     }
 
+    public boolean isProductIdConfigurationEmpty() {
+        RealmResults<AFProductIdConfiguration> configuration =
+                realm.where(AFProductIdConfiguration.class).findAll();
+
+        return configuration.isEmpty();
+    }
+
 }
