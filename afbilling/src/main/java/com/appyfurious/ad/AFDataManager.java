@@ -6,7 +6,6 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
@@ -81,10 +80,9 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                              mRemoteConfig.activateFetched();
 
                              AdConfigParser parser = new AdConfigParser(mRemoteConfig // TODO check null
-                                                                                      .getString("ads_config"), isDebug);
+                                     .getString("ads_config"), isDebug);
 
-                             RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig
-                                     .getString("rating_config")); // TODO check null
+                             RatingConfigParser ratingParser = new RatingConfigParser(mRemoteConfig.getString("rating_config")); // TODO check null
 
                              if (TextUtils.isEmpty(mRemoteConfig.getString("product_ids_config"))) {
                                  if (AFRealmDatabase.getInstance()
@@ -138,14 +136,14 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
     @Override
     public void onChange(@NonNull AFAdsManagerConfiguration configuration) {
-        Logger.INSTANCE.logDbChange("AFRealm Configuration Changed. New config: " + configuration
-                .toString());
+        Logger.INSTANCE.logDbChange("AFRealm Configuration Changed. New config: " + configuration.toString());
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void onMoveToForeground() {
         Logger.INSTANCE.logMoveToForeground("App is going to foreground..");
         AFSharedPreferencesManager.getInstance().incrementSessionCount();
+        updateConfiguration();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
