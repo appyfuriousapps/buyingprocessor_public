@@ -6,12 +6,13 @@ object Logger {
     const val NOTIFY = "notify"
     const val EXCEPTION = "exception"
     const val TAG = "validation"
-    const val TAG_AD = "AdManager"
+    const val TAG_AD = "AFAdManager"
     const val TAG_DB = "AFRealm"
     const val TAG_LC = "AFLifecycle"
     const val TAG_SH = "AFPreferences"
     const val TAG_DM = "AFDataManager"
     const val TAG_PC = "AFProducts"
+    const val TAG_AS = "AFAppSee"
     private var isDebug = false
     private var isPrintExceptionObject = false
 
@@ -89,6 +90,12 @@ object Logger {
     fun logRatingIdConfigChanged(message: String) {
         if (isDebug) {
             Log.d(TAG_PC, message)
+        }
+    }
+
+    fun logAppSee(message: String) {
+        if (isDebug) {
+            Log.d(TAG_AS, message)
         }
     }
 }

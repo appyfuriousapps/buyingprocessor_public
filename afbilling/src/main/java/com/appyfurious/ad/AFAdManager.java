@@ -342,6 +342,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         adRequest = new AdRequest.Builder()
                 .addNetworkExtrasBundle(VungleAdapter.class, bundleVungle)
                 .addNetworkExtrasBundle(VungleInterstitialAdapter.class, bundleVungle)
+                .addTestDevice("5C9C9DBD05D907E8397E575B2D3C8516")
                 .build();
     }
 

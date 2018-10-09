@@ -1,8 +1,6 @@
 package com.appyfurious.ad;
 
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.ads.reward.RewardItem;
@@ -18,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
+
 public class AppyRewardedAdListener implements RewardedVideoAdListener {
 
     private RewardedCallback mRewardedCallback;
@@ -60,5 +59,8 @@ public class AppyRewardedAdListener implements RewardedVideoAdListener {
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int i) {}
+
+    @Override
+    public void onRewardedVideoCompleted() {}
 
 }

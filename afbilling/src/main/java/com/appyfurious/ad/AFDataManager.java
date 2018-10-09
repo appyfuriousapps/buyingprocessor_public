@@ -8,6 +8,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.appsee.Appsee;
 import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.ad.parser.ProductIdsConfigParser;
@@ -120,6 +121,23 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                         .updateConfiguration(mApplicationContext, configuration);
 
                              AFRatingManager.getInstance().initialize();
+
+
+                             if (!TextUtils.isEmpty(mRemoteConfig.getString("is_AppSee_enabled"))) {
+                                 try {
+                                     int isAppSeeEnabled = Integer.parseInt(mRemoteConfig.getString("is_AppSee_enabled"));
+                                     if (isAppSeeEnabled == 1) {
+                                         Appsee.start();
+                                         Logger.INSTANCE.logAppSee("Initializing AppSee for this app...");
+                                     } else if (isAppSeeEnabled == 0) {
+                                         Logger.INSTANCE.logAppSee("AppSee disabled by Remote Config.");
+                                     } else {
+                                         Logger.INSTANCE.logAppSee("Unable to resolve AppSee config. Unknown value: " + isAppSeeEnabled);
+                                     }
+                                 } catch (Exception e) {
+                                     Logger.INSTANCE.logAppSee("Unable to resolve AppSee config. Caused by: " + e.getMessage());
+                                 }
+                             }
 
                          } else {
                              Logger.INSTANCE.logDataManager("Fetch Failed");
