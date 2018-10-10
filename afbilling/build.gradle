@@ -114,7 +114,8 @@ apply plugin: 'maven'
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: uri('/Users/olegappyfurious/repository'))
+            //repository(url: uri('/Users/olegappyfurious/repository'))
+            repository(url: uri('/Users/home/Documents/development/repository'))
         }
     }
 }

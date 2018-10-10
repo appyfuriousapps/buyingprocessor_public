@@ -11,6 +11,7 @@ import com.appyfurious.afbilling.StoreManager
 import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.log.Logger
+import com.appyfurious.utils.AFNetworkManager
 import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
@@ -85,9 +86,17 @@ class ProductsManager(context: Context) {
         }
     }
 
-    fun showPurchaseProduct(activity: Activity, billingService: BillingService, product: InAppProduct,
+    fun showPurchaseProduct(activity: Activity, billingService: BillingService, product: InAppProduct?,
                             body: ((BillingService.BillingResponseType) -> Unit)?) {
         getDeviceData(activity) { deviceData ->
+            if (!AFNetworkManager.isOnline(activity)) {
+                body?.invoke(BillingService.BillingResponseType.NOT_INTERNET)
+                return@getDeviceData
+            }
+            if (product == null) {
+                body?.invoke(BillingService.BillingResponseType.NOT_PRODUCT)
+                return@getDeviceData
+            }
             val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
             Logger.notify("showFormPurchaseProduct developerPayload $developerPayload")
             try {
@@ -99,7 +108,7 @@ class ProductsManager(context: Context) {
                 billingService.getStatus(body)
             } catch (ex: Exception) {
                 Logger.exception(ex)
-                billingService.getStatus { BillingService.BillingResponseType.NOT_CONNECTED }
+                body?.invoke(BillingService.BillingResponseType.NOT_AUTH)
             }
         }
     }

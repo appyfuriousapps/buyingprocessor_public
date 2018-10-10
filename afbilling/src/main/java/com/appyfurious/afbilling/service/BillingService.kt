@@ -58,11 +58,11 @@ class BillingService(context: Context) : ServiceConnection {
         if (isConnected) {
             body?.invoke(BillingResponseType.SUCCESS)
         } else {
-            body?.invoke(BillingResponseType.NOT_CONNECTED)
+            body?.invoke(BillingResponseType.NOT_AUTH)
         }
     }
 
     enum class BillingResponseType {
-        SUCCESS, NOT_CONNECTED
+        SUCCESS, NOT_AUTH, NOT_INTERNET, NOT_PRODUCT
     }
 }

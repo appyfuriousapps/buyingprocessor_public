@@ -13,6 +13,7 @@ import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
+import com.appyfurious.utils.AFNetworkManager
 import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
 
@@ -63,7 +64,7 @@ object StoreManager {
         }
     }
 
-    fun showPurchaseProduct(activity: Activity, product: InAppProduct, body: ((BillingService.BillingResponseType) -> Unit)?) {
+    fun showPurchaseProduct(activity: Activity, product: InAppProduct?, body: ((BillingService.BillingResponseType) -> Unit)?) {
         productManager.showPurchaseProduct(activity, billingService, product, body)
     }
 
