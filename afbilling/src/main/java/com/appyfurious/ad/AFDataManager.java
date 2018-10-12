@@ -122,7 +122,6 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
                              AFRatingManager.getInstance().initialize();
 
-
                              if (!TextUtils.isEmpty(mRemoteConfig.getString("is_AppSee_enabled"))) {
                                  try {
                                      int isAppSeeEnabled = Integer.parseInt(mRemoteConfig.getString("is_AppSee_enabled"));
@@ -145,6 +144,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                      });
     }
 
+    public Context getApplicationContext() {
+        return mApplicationContext;
+    }
+
     public String getProductIdForAction(String action) {
         return AFRealmDatabase.getInstance().getProductIdForAction(action);
     }
@@ -161,6 +164,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
             StoreManager.INSTANCE.updateProducts(productIds);
         });
+    }
+
+    public int getSessionCount() {
+        return AFSharedPreferencesManager.getInstance().getSessionCount();
     }
 
     @Override

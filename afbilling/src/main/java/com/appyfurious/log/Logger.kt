@@ -13,6 +13,7 @@ object Logger {
     const val TAG_DM = "AFDataManager"
     const val TAG_PC = "AFProducts"
     const val TAG_AS = "AFAppSee"
+    const val TAG_RM = "AFRatingManager"
     private var isDebug = false
     private var isPrintExceptionObject = false
 
@@ -96,6 +97,12 @@ object Logger {
     fun logAppSee(message: String) {
         if (isDebug) {
             Log.d(TAG_AS, message)
+        }
+    }
+
+    fun logRating(message: String) {
+        if (isDebug) {
+            Log.d(TAG_RM, message)
         }
     }
 }
