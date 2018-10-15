@@ -126,18 +126,16 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                  try {
                                      int isAppSeeEnabled = Integer.parseInt(mRemoteConfig.getString("is_AppSee_enabled"));
                                      if (isAppSeeEnabled == 1) {
-                                         Appsee.start();
-                                         Logger.INSTANCE.logAppSee("Initializing AppSee for this app...");
+                                         AFSharedPreferencesManager.getInstance().putAppseeEnabled(true);
                                      } else if (isAppSeeEnabled == 0) {
-                                         Logger.INSTANCE.logAppSee("AppSee disabled by Remote Config.");
+                                         AFSharedPreferencesManager.getInstance().putAppseeEnabled(false);
                                      } else {
-                                         Logger.INSTANCE.logAppSee("Unable to resolve AppSee config. Unknown value: " + isAppSeeEnabled);
+                                         Logger.INSTANCE.logAppSee("Unable to resolve Appsee config. Unknown value: " + isAppSeeEnabled);
                                      }
                                  } catch (Exception e) {
-                                     Logger.INSTANCE.logAppSee("Unable to resolve AppSee config. Caused by: " + e.getMessage());
+                                     Logger.INSTANCE.logAppSee("Unable to resolve Appsee config. Caused by: " + e.getMessage());
                                  }
                              }
-
                          } else {
                              Logger.INSTANCE.logDataManager("Fetch Failed");
                          }
@@ -168,6 +166,16 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
 
     public int getSessionCount() {
         return AFSharedPreferencesManager.getInstance().getSessionCount();
+    }
+
+    public void entryPoint() {
+        boolean isAFAppseeEnabled = AFSharedPreferencesManager.getInstance().isAFAppseeEnabled();
+        if (isAFAppseeEnabled) {
+            Appsee.start();
+            Logger.INSTANCE.logAppSee("Initializing Appsee for this app...");
+        } else {
+            Logger.INSTANCE.logAppSee("AppSee disabled by Remote Config.");
+        }
     }
 
     @Override

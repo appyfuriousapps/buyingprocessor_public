@@ -17,6 +17,7 @@ import com.appyfurious.log.Logger;
 public class AFSharedPreferencesManager {
 
     private static final String AF_PREFERENCES_SESSION_COUNT_KEY = "af_session_count";
+    private static final String AF_PREFERENCES_APPSEE_ENABLED = "af_appsee_enabled";
 
     private static AFSharedPreferencesManager mSharedPreferencesManager;
     private SharedPreferences mSharedPreferences;
@@ -43,6 +44,15 @@ public class AFSharedPreferencesManager {
 
     public int getSessionCount() {
         return mSharedPreferences.getInt(AF_PREFERENCES_SESSION_COUNT_KEY, 0);
+    }
+
+    public void putAppseeEnabled(boolean isEnabled) {
+        mSharedPreferences.edit().putBoolean(AF_PREFERENCES_APPSEE_ENABLED, isEnabled).apply();
+        Logger.INSTANCE.logSharedPreferences("AFAppsee enabled: " + isEnabled);
+    }
+
+    public boolean isAFAppseeEnabled() {
+        return mSharedPreferences.getBoolean(AF_PREFERENCES_APPSEE_ENABLED, true);
     }
 
 }
