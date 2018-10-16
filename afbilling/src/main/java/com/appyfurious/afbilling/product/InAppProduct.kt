@@ -27,7 +27,7 @@ open class InAppProduct {
 
     @SerializedName("price_amount_micros")
     @Expose
-    var priceAmountMicros: Int? = null
+    var priceAmountMicros: Long? = null
 
     @SerializedName("price_currency_code")
     @Expose

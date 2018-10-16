@@ -30,6 +30,7 @@ public class AFRealmDatabase {
         RealmConfiguration libraryConfig = new RealmConfiguration.Builder()
                 .name("AFManager.realm")
                 .modules(new LibraryModule())
+                .deleteRealmIfMigrationNeeded()
                 .build();
 
         realm = Realm.getInstance(libraryConfig);
