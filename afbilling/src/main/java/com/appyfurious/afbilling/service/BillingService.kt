@@ -13,10 +13,11 @@ class BillingService(context: Context) : ServiceConnection {
     var inAppBillingService: IInAppBillingService? = null
         private set
     var isConnected = false
+        private set
 
     private val listenersConnected = arrayListOf<(IInAppBillingService?) -> Unit>()
 
-    fun addConnectedListener(listener: (IInAppBillingService?) -> Unit) {
+    private fun addConnectedListener(listener: (IInAppBillingService?) -> Unit) {
         listenersConnected.add(listener)
     }
 
@@ -25,15 +26,29 @@ class BillingService(context: Context) : ServiceConnection {
         inAppBillingService = IInAppBillingService.Stub.asInterface(service)
         listenersConnected.map { it(inAppBillingService) }
         listenersConnected.removeAll(listenersConnected)
+        Logger.notify("onServiceConnected!")
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
         isConnected = false
         inAppBillingService = null
+        Logger.notify("onServiceDisconnected!")
     }
 
     init {
         bind(context)
+    }
+
+    fun connected(body: (IInAppBillingService?) -> Unit) {
+        if (isConnected) {
+            Logger.notify("BillingService connected isConnected success")
+            body(inAppBillingService)
+        } else {
+            addConnectedListener { service ->
+                Logger.notify("BillingService connected addConnectedListener success")
+                body(inAppBillingService)
+            }
+        }
     }
 
     fun bind(context: Context) {
@@ -49,9 +64,7 @@ class BillingService(context: Context) : ServiceConnection {
 
     fun unbind(context: Context) {
         Logger.notify("onPause disconnected")
-        if (isConnected)
-            context.unbindService(this)
-        isConnected = false
+        context.unbindService(this)
     }
 
     fun getStatus(body: ((BillingResponseType) -> Unit)? = null) {

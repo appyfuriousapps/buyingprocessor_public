@@ -5,7 +5,6 @@ import android.app.Application
 import android.arch.lifecycle.*
 import android.content.Context
 import android.content.Intent
-import com.android.vending.billing.IInAppBillingService
 import com.appyfurious.afbilling.product.InAppProduct
 import com.appyfurious.afbilling.product.MyProduct
 import com.appyfurious.afbilling.product.ProductsManager
@@ -13,9 +12,11 @@ import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
-import com.appyfurious.utils.AFNetworkManager
+import com.appyfurious.network.manager.AFNetworkManager
 import com.appyfurious.validation.ValidKeys
 import com.appyfurious.validation.ValidationCallback
+import com.appyfurious.network.manager.NetworkChangeReceiver
+
 
 object StoreManager {
 
@@ -31,36 +32,41 @@ object StoreManager {
     private lateinit var productManager: ProductsManager
     private lateinit var billingService: BillingService
 
-    private var inAppProductsId = listOf<String>()
-    var myProducts = listOf<MyProduct>()
-        private set
-    var inAppProducts = listOf<InAppProduct>()
-        private set
-
+    private var isInit = false
     val isSubsData = MutableLiveData<Boolean>()
+
+    private var myProducts = listOf<MyProduct>()
+    private var inAppProducts = listOf<InAppProduct>()
+    private var inAppProductsId = listOf<String>()
+        set(value) {
+            field = LinkedHashSet<String>(value).toList()
+        }
 
     fun getInAppProduct(productId: String) = inAppProducts.firstOrNull { it.productId == productId }
 
     fun init(application: Application, baseUrl: String, apiKey: String, secretKey: String) {
-        this.application = application
-        billingService = BillingService(application)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
-        ValidKeys.init(baseUrl, apiKey, secretKey)
-        productManager = ProductsManager(application)
-        Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
+        if (!isInit) {
+            this.application = application
+            AFNetworkManager.init(application)
+            billingService = BillingService(application)
+            ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
+            ValidKeys.init(baseUrl, apiKey, secretKey)
+            productManager = ProductsManager(application)
+            Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
+        }
     }
 
-    fun updateProducts(inAppProductsId: List<String>) {
-        this.inAppProductsId = inAppProductsId
-        if (billingService.isConnected) {
-            Logger.notify("billingService.isConnected == true")
-            inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
-        } else {
-            Logger.notify("billingService.isConnected == false")
-            billingService.addConnectedListener {
-                Logger.notify("billingService.isConnected == false, addConnectedListener")
-                inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, InAppProduct.SUBS, this.inAppProductsId)
-            }
+    fun updateProducts(newInAppProductsId: List<String>) {
+        Logger.notify("updateProducts")
+        inAppProductsId = newInAppProductsId
+    }
+
+    private fun loadingProducts(newInAppProductsId: List<String>, completed: ((List<InAppProduct>) -> Unit)?) {
+        this.inAppProductsId = newInAppProductsId
+        Logger.notify("loadingProducts")
+        billingService.connected {
+            inAppProducts = productManager.getInAppPurchases(billingService.inAppBillingService, this.inAppProductsId)
+            completed?.invoke(inAppProducts)
         }
     }
 
@@ -92,13 +98,15 @@ object StoreManager {
     }
 
     fun isSubs(body: (Boolean) -> Unit) {
-        if (billingService.isConnected) {
-            isSubs(null) { _, isSubs -> body(isSubs) }
-        } else {
-            billingService.addConnectedListener {
-                isSubs(null) { _, isSubs -> body(isSubs) }
-            }
+        isSubs(null) { _, isSubs -> body(isSubs) }
+    }
+
+    private val networkListener = { context: Context, isOnline: Boolean ->
+        if (isOnline) {
+            loadingProducts(inAppProductsId, null)
         }
+        Logger.notify("networkListener $isOnline")
+        Unit
     }
 
     private val listener = object : LifecycleObserver {
@@ -106,41 +114,38 @@ object StoreManager {
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
             billingService = BillingService(application)
-            if (billingService.isConnected) {
-                isSubs(null) { product, isSubs ->
-                    Logger.notify("onMoveToForeground  isSubs: $isSubs, isActive: ${product?.isActive()}, ${product?.productId}")
-                }
-            } else {
-                billingService.addConnectedListener { service ->
-                    inAppProducts = productManager.getInAppPurchases(service, InAppProduct.SUBS, inAppProductsId)
-                    Logger.notify("success service connection, productsId: ${inAppProductsId.joinToString(", ")}")
-                    isSubs(null, null)
-                }
-            }
+            AFNetworkManager.addListener(networkListener)
+            isSubs(null, null)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun onMoveToBackground() {
             Logger.notify("onMoveToBackground")
+            AFNetworkManager.removeListener(networkListener)
             billingService.unbind(application)
         }
     }
 
     private fun isSubs(listener: ValidationCallback.ValidationListener?, body: ((MyProduct?, Boolean) -> Unit)?) {
-        productManager.readMyPurchases(billingService.inAppBillingService, InAppProduct.SUBS) { products ->
-            myProducts = products
-            val product = myProducts.firstOrNull { it.isActive() }
-            val isSubs = product?.isActive() == true
-            if (isSubs && product != null) {
-                Logger.notify("preValidation isSubs: $isSubs, ${product.productId}")
-                validation(application, listener, product) { validationIsSubs ->
-                    Logger.notify("postValidation isSubs: $validationIsSubs")
-                    body?.invoke(product, validationIsSubs)
+        Logger.notify("IsSubs start")
+        billingService.connected { _ ->
+            Logger.notify("IsSubs billingService connected")
+            productManager.readMyPurchases(billingService.inAppBillingService, InAppProduct.SUBS) { products ->
+                Logger.notify("IsSubs readMyPurchases")
+                myProducts = products
+                val product = myProducts.firstOrNull { it.isActive() }
+                val isSubs = product?.isActive() == true
+                if (isSubs && product != null) {
+                    Logger.notify("preValidation isSubs: $isSubs, ${product.productId}")
+                    validation(application, listener, product) { validationIsSubs ->
+                        Logger.notify("postValidation isSubs: $validationIsSubs")
+                        body?.invoke(product, validationIsSubs)
+                    }
+                } else {
+                    Logger.notify("product == null isSubs: $isSubs")
+                    isSubsData.value = isSubs
+                    body?.invoke(product, isSubs)
                 }
-            } else {
-                Logger.notify("product == null isSubs: $isSubs")
-                isSubsData.value = isSubs
-                body?.invoke(product, isSubs)
             }
         }
     }

@@ -11,7 +11,7 @@ import com.appyfurious.afbilling.StoreManager
 import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.log.Logger
-import com.appyfurious.utils.AFNetworkManager
+import com.appyfurious.network.manager.AFNetworkManager
 import com.appyfurious.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
@@ -63,7 +63,7 @@ class ProductsManager(context: Context) {
         }
     }
 
-    fun getInAppPurchases(service: IInAppBillingService?, type: String, productIds: List<String>): List<InAppProduct> {
+    fun getInAppPurchases(service: IInAppBillingService?, productIds: List<String>, type: String = InAppProduct.SUBS): List<InAppProduct> {
         if (productIds.isEmpty()) {
             Logger.notify("productIds.isEmpty()")
             return listOf()
@@ -91,10 +91,12 @@ class ProductsManager(context: Context) {
         getDeviceData(activity) { deviceData ->
             if (!AFNetworkManager.isOnline(activity)) {
                 body?.invoke(BillingService.BillingResponseType.NOT_INTERNET)
+                Logger.notify("return ${BillingService.BillingResponseType.NOT_INTERNET.name}")
                 return@getDeviceData
             }
             if (product == null) {
                 body?.invoke(BillingService.BillingResponseType.NOT_PRODUCT)
+                Logger.notify("return ${BillingService.BillingResponseType.NOT_PRODUCT.name}")
                 return@getDeviceData
             }
             val developerPayload = product.getNewDeveloperPayloadBase64(deviceData)
@@ -108,6 +110,7 @@ class ProductsManager(context: Context) {
                 billingService.getStatus(body)
             } catch (ex: Exception) {
                 Logger.exception(ex)
+                Logger.notify("exception ${BillingService.BillingResponseType.NOT_AUTH.name}")
                 body?.invoke(BillingService.BillingResponseType.NOT_AUTH)
             }
         }
