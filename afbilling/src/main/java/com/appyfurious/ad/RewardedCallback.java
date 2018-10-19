@@ -9,14 +9,20 @@ package com.appyfurious.ad;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public interface RewardedCallback<T> {
+public interface RewardedCallback {
 
     void onRewardedVideoAdLoaded();
 
     void onRewardUser();
 
-    void onRewardedVideoAdClosed();
+    /**
+     *
+     *  This method fires in 2 cases:
+     *  1) When the user closed the rewarded video ad.
+     *  2) When the user go to the ad and then, go back to the app.
+     *
+     */
 
-    void onUserBackToAppAfterAd();
+    void onRewardedVideoAdClosed();
 
 }

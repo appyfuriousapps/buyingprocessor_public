@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">afbilling</string>
+
+    <string name="rewarded_video_error">Error while downloading Rewarded Video</string>
 </resources>

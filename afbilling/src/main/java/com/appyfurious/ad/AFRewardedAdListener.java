@@ -1,8 +1,15 @@
 package com.appyfurious.ad;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.appyfurious.afbilling.R;
+import com.appyfurious.log.Logger;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 
@@ -19,24 +26,35 @@ import org.jetbrains.annotations.NotNull;
 
 public class AFRewardedAdListener implements RewardedVideoAdListener {
 
+    private Context mContext;
     private RewardedCallback mRewardedCallback;
-    private Button mButton;
+    private String mErrorMessage;
     private boolean isUserLeftAppForAd;
 
-    public AFRewardedAdListener(@NotNull RewardedCallback callback, @Nullable Button button) {
+    public AFRewardedAdListener(@NonNull Context context, @NotNull RewardedCallback callback) {
+        mContext = context;
         mRewardedCallback = callback;
-        mButton = button;
-        if (mButton != null) {
-            mButton.setEnabled(false);
-        }
+    }
+
+    public AFRewardedAdListener(Context context, @NonNull RewardedCallback callback, @Nullable String errorMessage) {
+        mContext = context;
+        mRewardedCallback = callback;
+        mErrorMessage = errorMessage;
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
-        if (mButton != null) {
-            mButton.setEnabled(true);
-        }
-        mRewardedCallback.onRewardedVideoAdLoaded();
+        hideRewardedLoadingProgress();
+        AFAdManager.getInstance().requestRewardedVideoAd();
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int i) {
+        hideRewardedLoadingProgress();
+        Logger.INSTANCE.logAd("Rewarded loading failed. Error code: " + i);
+        Toast.makeText(mContext, mErrorMessage == null ?
+                mContext.getString(R.string.rewarded_video_error) : mErrorMessage, Toast.LENGTH_SHORT)
+             .show();
     }
 
     @Override
@@ -51,6 +69,16 @@ public class AFRewardedAdListener implements RewardedVideoAdListener {
     }
 
     @Override
+    public void onRewarded(RewardItem rewardItem) {
+        mRewardedCallback.onRewardUser();
+    }
+
+    @Override
+    public void onRewardedVideoCompleted() {
+
+    }
+
+    @Override
     public void onRewardedVideoAdClosed() {
         if (!isUserLeftAppForAd) {
             mRewardedCallback.onRewardedVideoAdClosed();
@@ -58,23 +86,19 @@ public class AFRewardedAdListener implements RewardedVideoAdListener {
         }
     }
 
-    @Override
-    public void onRewarded(RewardItem rewardItem) {
-        mRewardedCallback.onRewardUser();
-    }
-
-    @Override
-    public void onRewardedVideoAdFailedToLoad(int i) {}
-
-    @Override
-    public void onRewardedVideoCompleted() {
-
-    }
-
     public void onAppMovedToForegroundAfterAd() {
         if (isUserLeftAppForAd) {
-            mRewardedCallback.onUserBackToAppAfterAd();
+            mRewardedCallback.onRewardedVideoAdClosed();
+            isUserLeftAppForAd = false;
         }
+    }
+
+    public void showRewardedLoadingProgress() {
+        Toast.makeText(mContext, "Show progress...", Toast.LENGTH_SHORT).show();
+    }
+
+    public void hideRewardedLoadingProgress() {
+        Toast.makeText(mContext, "Hide progress...", Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -1,6 +1,9 @@
 package com.appyfurious.ad;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +38,8 @@ import com.vungle.mediation.VungleAdapter;
 import com.vungle.mediation.VungleExtrasBuilder;
 import com.vungle.mediation.VungleInterstitialAdapter;
 
+import org.jetbrains.annotations.NotNull;
+
 import io.realm.RealmChangeListener;
 
 //import com.mopub.common.MoPub;
@@ -49,11 +54,13 @@ import io.realm.RealmChangeListener;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<AFAdsManagerConfiguration> {
+public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<AFAdsManagerConfiguration>,
+        LifecycleObserver {
 
     private static AFAdManager mInstance;
 
     private Context applicationContext;
+    private Context mRewardedVideoContext;
 
     private ViewGroup mRootView;
     private ViewGroup mAdContainer;
@@ -111,7 +118,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 }
             }
         });
-
     }
 
     public void updateConfiguration(Context applicationContext, AFAdsManagerConfiguration configuration) {
@@ -311,13 +317,19 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         }
     }
 
-    public void loadRewardedVideoAd(AppCompatActivity context, RewardedCallback callback, Button button) {
+    public void loadRewardedVideoAd(@NotNull AppCompatActivity context, RewardedCallback callback, String errorMessage) {
+        mRewardedVideoContext = context;
         mRewardedVideoAd = MobileAds
                 .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
-        mRewardedListener = new AFRewardedAdListener(callback, button);
+        mRewardedListener = new AFRewardedAdListener(context, callback, errorMessage);
         mRewardedVideoAd.setRewardedVideoAdListener(mRewardedListener);
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
                 new AdRequest.Builder().build());
+
+        mRewardedListener.showRewardedLoadingProgress();
+
+        Lifecycle lc = context.getLifecycle();
+        lc.addObserver(this);
     }
 
     public void remoteRewardedListener() {
@@ -375,4 +387,26 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             mRewardedListener.onAppMovedToForegroundAfterAd();
         }
     }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    void onCreate() {
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.resume(mRewardedVideoContext);
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    void onPause() {
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.pause(mRewardedVideoContext);
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    void onDestroy() {
+        if (mRewardedVideoAd != null) {
+            mRewardedVideoAd.destroy(mRewardedVideoContext);
+        }
+    }
+
 }
