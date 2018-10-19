@@ -9,7 +9,7 @@ import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * AppyRewardedAdListener.java
+ * AFRewardedAdListener.java
  * buyingprocessor_public
  * <p>
  * Created by o.davidovich on 20.08.2018.
@@ -17,12 +17,13 @@ import org.jetbrains.annotations.NotNull;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public class AppyRewardedAdListener implements RewardedVideoAdListener {
+public class AFRewardedAdListener implements RewardedVideoAdListener {
 
     private RewardedCallback mRewardedCallback;
     private Button mButton;
+    private boolean isUserLeftAppForAd;
 
-    public AppyRewardedAdListener(@NotNull RewardedCallback callback, @Nullable Button button) {
+    public AFRewardedAdListener(@NotNull RewardedCallback callback, @Nullable Button button) {
         mRewardedCallback = callback;
         mButton = button;
         if (mButton != null) {
@@ -45,8 +46,16 @@ public class AppyRewardedAdListener implements RewardedVideoAdListener {
     public void onRewardedVideoStarted() {}
 
     @Override
+    public void onRewardedVideoAdLeftApplication() {
+        isUserLeftAppForAd = true;
+    }
+
+    @Override
     public void onRewardedVideoAdClosed() {
-        mRewardedCallback.onRewardedVideoAdClosed();
+        if (!isUserLeftAppForAd) {
+            mRewardedCallback.onRewardedVideoAdClosed();
+            isUserLeftAppForAd = false;
+        }
     }
 
     @Override
@@ -55,12 +64,17 @@ public class AppyRewardedAdListener implements RewardedVideoAdListener {
     }
 
     @Override
-    public void onRewardedVideoAdLeftApplication() {}
-
-    @Override
     public void onRewardedVideoAdFailedToLoad(int i) {}
 
     @Override
-    public void onRewardedVideoCompleted() {}
+    public void onRewardedVideoCompleted() {
+
+    }
+
+    public void onAppMovedToForegroundAfterAd() {
+        if (isUserLeftAppForAd) {
+            mRewardedCallback.onUserBackToAppAfterAd();
+        }
+    }
 
 }

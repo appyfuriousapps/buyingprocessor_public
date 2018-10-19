@@ -1,11 +1,5 @@
 package com.appyfurious.ad;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-
-import java.util.Collection;
-import java.util.List;
-
 /**
  * RewardedCallback.java
  * buyingprocessor_public
@@ -14,6 +8,7 @@ import java.util.List;
  * <p>
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
+
 public interface RewardedCallback<T> {
 
     void onRewardedVideoAdLoaded();
@@ -21,5 +16,7 @@ public interface RewardedCallback<T> {
     void onRewardUser();
 
     void onRewardedVideoAdClosed();
+
+    void onUserBackToAppAfterAd();
 
 }

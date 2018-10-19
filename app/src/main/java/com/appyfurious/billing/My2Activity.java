@@ -72,4 +72,9 @@ public class My2Activity extends BaseActivity implements View.OnClickListener, R
     public void onRewardedVideoAdClosed() {
 
     }
+
+    @Override
+    public void onUserBackToAppAfterAd() {
+
+    }
 }

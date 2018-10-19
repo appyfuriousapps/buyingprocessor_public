@@ -1,6 +1,6 @@
 package com.appyfurious.ad;
 
-import android.arch.lifecycle.LifecycleOwner;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,6 +64,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private InterstitialAd mInterstitialAd;
 
     private RewardedVideoAd mRewardedVideoAd;
+    private AFRewardedAdListener mRewardedListener;
 
     private AFAdsManagerConfiguration mAFAdsManagerConfiguration;
 
@@ -246,6 +247,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     public void initBanner(Context applicationContext, String bannerId) {
         mAdView = new AdView(applicationContext);
         mAdView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressLint("NewApi")
             @Override
             public void onGlobalLayout() {
                 initBannerContainer(bannerActivity);
@@ -312,9 +314,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     public void loadRewardedVideoAd(AppCompatActivity context, RewardedCallback callback, Button button) {
         mRewardedVideoAd = MobileAds
                 .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
-        mRewardedVideoAd.setRewardedVideoAdListener(new AppyRewardedAdListener(callback, button));
+        mRewardedListener = new AFRewardedAdListener(callback, button);
+        mRewardedVideoAd.setRewardedVideoAdListener(mRewardedListener);
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
-                adRequest);
+                new AdRequest.Builder().build());
+    }
+
+    public void remoteRewardedListener() {
+        mRewardedListener = null;
     }
 
     public void requestRewardedVideoAd() {
@@ -360,6 +367,12 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
             }
 
             adContainer.setLayoutParams(flp);
+        }
+    }
+
+    public void onMoveToForeground() {
+        if (mRewardedListener != null) {
+            mRewardedListener.onAppMovedToForegroundAfterAd();
         }
     }
 }

@@ -188,6 +188,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
         Logger.INSTANCE.logMoveToForeground("App is going to foreground..");
         AFSharedPreferencesManager.getInstance().incrementSessionCount();
         updateConfiguration();
+        AFAdManager.getInstance().onMoveToForeground();
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
