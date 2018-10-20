@@ -59,7 +59,7 @@ public class AFRealmDatabase {
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
                 currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
-                currentConfig.setActions(remoteConfiguration.getActions());
+                //currentConfig.setActions(remoteConfiguration.getActions()); // TODO error on this line
                 realm.copyToRealmOrUpdate(currentConfig);
             } else {
                 realm.copyToRealmOrUpdate(remoteConfiguration);
