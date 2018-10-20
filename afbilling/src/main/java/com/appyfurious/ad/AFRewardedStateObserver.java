@@ -3,9 +3,6 @@ package com.appyfurious.ad;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.appyfurious.afbilling.R;
@@ -16,7 +13,7 @@ import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * AFRewardedAdListener.java
+ * AFRewardedStateObserver.java
  * buyingprocessor_public
  * <p>
  * Created by o.davidovich on 20.08.2018.
@@ -24,33 +21,43 @@ import org.jetbrains.annotations.NotNull;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public class AFRewardedAdListener implements RewardedVideoAdListener {
+public class AFRewardedStateObserver implements RewardedVideoAdListener {
 
     private Context mContext;
     private RewardedCallback mRewardedCallback;
+    private RewardedLoadingProgressListener mRewardedLoadingListener;
     private String mErrorMessage;
     private boolean isUserLeftAppForAd;
 
-    public AFRewardedAdListener(@NonNull Context context, @NotNull RewardedCallback callback) {
+    public AFRewardedStateObserver(@NonNull Context context, @NotNull RewardedCallback callback) {
         mContext = context;
         mRewardedCallback = callback;
+        mRewardedLoadingListener = new RewardedLoadingProgressDefault(mContext);
     }
 
-    public AFRewardedAdListener(Context context, @NonNull RewardedCallback callback, @Nullable String errorMessage) {
+    public AFRewardedStateObserver(Context context, @NonNull RewardedCallback callback, @Nullable String errorMessage) {
         mContext = context;
         mRewardedCallback = callback;
         mErrorMessage = errorMessage;
+        mRewardedLoadingListener = new RewardedLoadingProgressDefault(mContext);
+    }
+
+    public AFRewardedStateObserver(Context context, @NonNull RewardedCallback callback, @Nullable String errorMessage, @Nullable RewardedLoadingProgressListener progressListener) {
+        mContext = context;
+        mRewardedCallback = callback;
+        mErrorMessage = errorMessage;
+        mRewardedLoadingListener = progressListener;
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
-        hideRewardedLoadingProgress();
+        mRewardedLoadingListener.hideRewardedLoadingProgress();
         AFAdManager.getInstance().requestRewardedVideoAd();
     }
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int i) {
-        hideRewardedLoadingProgress();
+        mRewardedLoadingListener.hideRewardedLoadingProgress();
         Logger.INSTANCE.logAd("Rewarded loading failed. Error code: " + i);
         Toast.makeText(mContext, mErrorMessage == null ?
                 mContext.getString(R.string.rewarded_video_error) : mErrorMessage, Toast.LENGTH_SHORT)
@@ -93,12 +100,8 @@ public class AFRewardedAdListener implements RewardedVideoAdListener {
         }
     }
 
-    public void showRewardedLoadingProgress() {
-        Toast.makeText(mContext, "Show progress...", Toast.LENGTH_SHORT).show();
-    }
-
-    public void hideRewardedLoadingProgress() {
-        Toast.makeText(mContext, "Hide progress...", Toast.LENGTH_SHORT).show();
+    public void startLoading() {
+       mRewardedLoadingListener.showRewardedLoadingProgress();
     }
 
 }

@@ -16,7 +16,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -71,7 +70,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     private InterstitialAd mInterstitialAd;
 
     private RewardedVideoAd mRewardedVideoAd;
-    private AFRewardedAdListener mRewardedListener;
+    private AFRewardedStateObserver mRewardedObserver;
 
     private AFAdsManagerConfiguration mAFAdsManagerConfiguration;
 
@@ -188,8 +187,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     isBannerAdVisible = false;
                 }
             } else {
-                Logger.INSTANCE
-                        .logAd("Ad is not visible. Activity is not instance of BannerAdActivity");
+                Logger.INSTANCE.logAd("Ad is not visible. Activity is not instance of BannerAdActivity");
             }
 
         }
@@ -321,19 +319,19 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mRewardedVideoContext = context;
         mRewardedVideoAd = MobileAds
                 .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
-        mRewardedListener = new AFRewardedAdListener(context, callback, errorMessage);
-        mRewardedVideoAd.setRewardedVideoAdListener(mRewardedListener);
+        mRewardedObserver = new AFRewardedStateObserver(context, callback, errorMessage);
+        mRewardedVideoAd.setRewardedVideoAdListener(mRewardedObserver);
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
                 new AdRequest.Builder().build());
 
-        mRewardedListener.showRewardedLoadingProgress();
+        mRewardedObserver.startLoading();
 
         Lifecycle lc = context.getLifecycle();
         lc.addObserver(this);
     }
 
     public void remoteRewardedListener() {
-        mRewardedListener = null;
+        mRewardedObserver = null;
     }
 
     public void requestRewardedVideoAd() {
@@ -383,13 +381,13 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
     }
 
     public void onMoveToForeground() {
-        if (mRewardedListener != null) {
-            mRewardedListener.onAppMovedToForegroundAfterAd();
+        if (mRewardedObserver != null) {
+            mRewardedObserver.onAppMovedToForegroundAfterAd();
         }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    void onCreate() {
+    void onResume() {
         if (mRewardedVideoAd != null) {
             mRewardedVideoAd.resume(mRewardedVideoContext);
         }

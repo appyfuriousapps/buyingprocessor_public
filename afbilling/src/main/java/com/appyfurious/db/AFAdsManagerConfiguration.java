@@ -129,6 +129,10 @@ public class AFAdsManagerConfiguration extends RealmObject {
         this.interstitialsLastShowDate = interstitialsLastShowDate;
     }
 
+    public void setActions(RealmList<Action> actions) {
+        this.actions = actions;
+    }
+
     public void incrementCurrentInterstitialCountPerSession() {
         currentInterstitialCountPerSession += 1;
     }

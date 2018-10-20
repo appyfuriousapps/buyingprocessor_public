@@ -46,12 +46,23 @@ public class AFRealmDatabase {
 
     private AFRealmDatabase() { }
 
-    public void saveAd(final AFAdsManagerConfiguration configuration,
+    public void saveAd(final AFAdsManagerConfiguration remoteConfiguration,
                        RealmChangeListener<AFAdsManagerConfiguration> listener) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(@NonNull Realm realm) {
-                realm.copyToRealmOrUpdate(configuration);
+        realm.executeTransaction(realm -> {
+            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
+                                                           .findFirst();
+
+            if (currentConfig != null) {
+                currentConfig.setApplicationId(remoteConfiguration.getApplicationId());
+                currentConfig.setBannerId(remoteConfiguration.getBannerId());
+                currentConfig.setInterstitialId(remoteConfiguration.getInterstitialId());
+                currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
+                currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
+                currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
+                currentConfig.setActions(remoteConfiguration.getActions());
+                realm.copyToRealmOrUpdate(currentConfig);
+            } else {
+                realm.copyToRealmOrUpdate(remoteConfiguration);
             }
         });
 

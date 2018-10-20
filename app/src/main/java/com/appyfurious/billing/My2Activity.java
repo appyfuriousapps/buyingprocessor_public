@@ -34,7 +34,7 @@ public class My2Activity extends BaseActivity implements View.OnClickListener, R
         mButton = findViewById(R.id.button3);
         mTextView = findViewById(R.id.textView);
         mButton.setOnClickListener(this);
-        AFAdManager.getInstance().loadRewardedVideoAd(this, this, mButton);
+        AFAdManager.getInstance().loadRewardedVideoAd(this, this, "");
 
         AFRatingConfiguration conf = AFRatingManager.getInstance().requestRating("Enter in Activity 2");
         if (conf != null) {
@@ -70,11 +70,6 @@ public class My2Activity extends BaseActivity implements View.OnClickListener, R
 
     @Override
     public void onRewardedVideoAdClosed() {
-
-    }
-
-    @Override
-    public void onUserBackToAppAfterAd() {
 
     }
 }

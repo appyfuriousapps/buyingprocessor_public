@@ -113,12 +113,10 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                      .getInterstitialDelay(),
                                      parser.getActions());
 
-                             AFRealmDatabase.getInstance()
-                                            .saveAd(configuration, AFDataManager.this);
+                             AFRealmDatabase.getInstance().saveAd(configuration, AFDataManager.this);
                              AFRealmDatabase.getInstance()
                                             .saveRating(ratingParser.getRatingConfigurations());
-                             AFAdManager.getInstance()
-                                        .updateConfiguration(mApplicationContext, configuration);
+                             AFAdManager.getInstance().updateConfiguration(mApplicationContext, configuration);
 
                              AFRatingManager.getInstance().initialize();
 
