@@ -2,6 +2,6 @@
 <resources>
 
     <color name="rewarded_progress_color">#ffffff</color>
-    <color name="rewarded_progress_bg">#33000000</color>
+    <color name="rewarded_progress_bg_color">#33000000</color>
 
 </resources>
