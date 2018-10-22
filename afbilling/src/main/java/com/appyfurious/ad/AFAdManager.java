@@ -161,6 +161,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 }
 
                 if (mAdContainer != null) {
+                    Boolean isPremium = StoreManager.INSTANCE.isSubsData().getValue();
                     if (isPremium != null && !isPremium) {
                         if (isAdSuccessfullyDownloaded) {
                             //       mAdContainer.setVisibility(View.VISIBLE);
