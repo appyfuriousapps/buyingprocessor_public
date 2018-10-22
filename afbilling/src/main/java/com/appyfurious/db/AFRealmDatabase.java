@@ -64,8 +64,8 @@ public class AFRealmDatabase {
                                                            .findFirst();
 
             if (currentConfig != null) {
-                RealmList<Action> remoteActions = remoteConfiguration.getActions();
-                realm.insertOrUpdate(remoteActions);
+//                RealmList<Action> remoteActions = remoteConfiguration.getActions();
+//                realm.insertOrUpdate(remoteActions);
 
                 currentConfig.setApplicationId(remoteConfiguration.getApplicationId());
                 currentConfig.setBannerId(remoteConfiguration.getBannerId());
@@ -73,7 +73,7 @@ public class AFRealmDatabase {
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
                 currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
-                currentConfig.setActions(remoteActions);
+              //  currentConfig.setActions(remoteActions);
                 realm.copyToRealmOrUpdate(currentConfig);
             } else {
                 realm.copyToRealmOrUpdate(remoteConfiguration);
