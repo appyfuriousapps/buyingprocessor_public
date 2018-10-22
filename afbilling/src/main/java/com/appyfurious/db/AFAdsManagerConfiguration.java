@@ -2,6 +2,7 @@ package com.appyfurious.db;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -12,6 +13,7 @@ import io.realm.annotations.PrimaryKey;
  * <p>
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
+
 public class AFAdsManagerConfiguration extends RealmObject {
 
     @PrimaryKey
@@ -131,6 +133,17 @@ public class AFAdsManagerConfiguration extends RealmObject {
 
     public void setActions(RealmList<Action> actions) {
         this.actions = actions;
+    }
+
+    public void setActions(RealmResults<Action> actions) {
+        if (actions != null && !actions.isEmpty()) {
+
+            if (this.actions == null) {
+                this.actions = new RealmList<>();
+            }
+
+            this.actions.addAll(actions);
+        }
     }
 
     public void incrementCurrentInterstitialCountPerSession() {
