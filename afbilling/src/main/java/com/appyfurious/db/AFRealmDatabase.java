@@ -55,7 +55,7 @@ public class AFRealmDatabase {
             RealmList<Action> remoteActions = remoteConfiguration.getActions();
 
             if (remoteActions != null) {
-                realm.copyToRealmOrUpdate(remoteActions);
+                realm.insertOrUpdate(remoteActions);
             } else {
                 realm.where(Action.class).findAll().deleteAllFromRealm();
             }
