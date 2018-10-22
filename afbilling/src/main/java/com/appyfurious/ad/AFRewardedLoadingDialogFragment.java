@@ -33,7 +33,8 @@ public class AFRewardedLoadingDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Widget_DeviceDefault_Light_ProgressBar);
+        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Widget_ProgressBar);
+        setCancelable(false);
     }
 
     @Override
