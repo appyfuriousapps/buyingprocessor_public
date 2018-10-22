@@ -51,32 +51,33 @@ public class AFRealmDatabase {
     public void saveAd(final AFAdsManagerConfiguration remoteConfiguration,
                        RealmChangeListener<AFAdsManagerConfiguration> listener) {
         realm.executeTransaction(realm -> {
-            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
-                                                           .findFirst();
-            if (currentConfig != null) {
-                RealmList<Action> remoteActions = remoteConfiguration.getActions();
-                realm.copyToRealmOrUpdate(remoteActions);
+
+            RealmList<Action> remoteActions = remoteConfiguration.getActions();
+
+            if (remoteActions != null) {
+                realm.insertOrUpdate(remoteActions);
+            } else {
+                realm.where(Action.class).findAll().deleteAllFromRealm();
             }
         });
 
         realm.executeTransaction(realm -> {
-            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
-                                                           .findFirst();
+            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class).findFirst();
 
             if (currentConfig != null) {
-//                RealmList<Action> remoteActions = remoteConfiguration.getActions();
-//                realm.insertOrUpdate(remoteActions);
+                RealmResults<Action> actions = realm.where(Action.class).findAll();
 
                 currentConfig.setApplicationId(remoteConfiguration.getApplicationId());
                 currentConfig.setBannerId(remoteConfiguration.getBannerId());
                 currentConfig.setInterstitialId(remoteConfiguration.getInterstitialId());
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
-                currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
+                currentConfig.setInterstitialsCountPerSession(remoteConfiguration
+                        .getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
-              //  currentConfig.setActions(remoteActions);
-                realm.copyToRealmOrUpdate(currentConfig);
+                currentConfig.setActions(actions);
+                realm.insertOrUpdate(currentConfig);
             } else {
-                realm.copyToRealmOrUpdate(remoteConfiguration);
+                realm.insertOrUpdate(remoteConfiguration);
             }
         });
 
@@ -213,7 +214,8 @@ public class AFRealmDatabase {
     }
 
     public void saveProductIds(RealmList<AFProductIdConfiguration> productIdConfigurations, RealmChangeListener<RealmResults<AFProductIdConfiguration>> listener) {
-        RealmResults<AFProductIdConfiguration> results = realm.where(AFProductIdConfiguration.class).findAll();
+        RealmResults<AFProductIdConfiguration> results = realm.where(AFProductIdConfiguration.class)
+                                                              .findAll();
         results.addChangeListener(listener);
         realm.executeTransaction(realm -> {
             for (AFProductIdConfiguration configuration : productIdConfigurations) {
