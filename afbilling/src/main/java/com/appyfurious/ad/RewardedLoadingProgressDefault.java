@@ -37,7 +37,7 @@ public class RewardedLoadingProgressDefault implements RewardedLoadingProgressLi
             AppCompatActivity rewardedActivity = (AppCompatActivity) mContext;
             mRootView = rewardedActivity.findViewById(android.R.id.content);
 
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mRootView.getLayoutParams();
+            ViewGroup.LayoutParams params = mRootView.getLayoutParams();
             params.width = FrameLayout.LayoutParams.MATCH_PARENT;
             params.height = FrameLayout.LayoutParams.WRAP_CONTENT;
             mProgressBar.setLayoutParams(params);
