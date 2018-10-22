@@ -75,9 +75,9 @@ public class AFRealmDatabase {
                         .getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
                 currentConfig.setActions(actions);
-                realm.copyToRealmOrUpdate(currentConfig);
+                realm.insertOrUpdate(currentConfig);
             } else {
-                realm.copyToRealmOrUpdate(remoteConfiguration);
+                realm.insertOrUpdate(remoteConfiguration);
             }
         });
 

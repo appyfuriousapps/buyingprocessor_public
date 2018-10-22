@@ -137,11 +137,7 @@ public class AFAdsManagerConfiguration extends RealmObject {
 
     public void setActions(RealmResults<Action> actions) {
         if (actions != null && !actions.isEmpty()) {
-
-            if (this.actions == null) {
-                this.actions = new RealmList<>();
-            }
-
+            this.actions = new RealmList<>();
             this.actions.addAll(actions);
         }
     }
