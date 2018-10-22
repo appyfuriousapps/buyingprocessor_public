@@ -26,14 +26,12 @@ import com.appyfurious.afbilling.R;
 public class AFRewardedLoadingDialogFragment extends DialogFragment {
 
     public static final String TAG = "AFRewardedLoadingDialogFragment";
-
-    //private View mRootView;
     private ProgressBar mProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Widget_ProgressBar);
+        //setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Widget_ProgressBar);
         setCancelable(false);
     }
 
