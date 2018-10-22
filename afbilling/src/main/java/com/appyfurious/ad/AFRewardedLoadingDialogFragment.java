@@ -27,7 +27,7 @@ public class AFRewardedLoadingDialogFragment extends DialogFragment {
 
     public static final String TAG = "AFRewardedLoadingDialogFragment";
 
-    private RelativeLayout.LayoutParams mLayoutParams;
+    //private View mRootView;
     private ProgressBar mProgressBar;
 
     @Override
@@ -39,12 +39,13 @@ public class AFRewardedLoadingDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.layout_rewarded_loading, container, false);
+        View rootView = inflater.inflate(R.layout.layout_rewarded_loading, container, false);
+        mProgressBar = rootView.findViewById(R.id.af_rewarded_loading_pb);
 
-        mLayoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-
-        mProgressBar = view.findViewById(R.id.af_rewarded_loading_pb);
-        return view;
+        RelativeLayout.LayoutParams mLayoutParams = (RelativeLayout.LayoutParams) rootView.getLayoutParams();
+        mLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mProgressBar.setLayoutParams(mLayoutParams);
+        return rootView;
     }
 
 
@@ -56,9 +57,6 @@ public class AFRewardedLoadingDialogFragment extends DialogFragment {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
             dialog.getWindow().setLayout(width, height);
-
-            mLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-            mProgressBar.setLayoutParams(mLayoutParams);
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.rewarded_progress_bg);
         }
     }
