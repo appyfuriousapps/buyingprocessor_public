@@ -53,13 +53,16 @@ public class AFRealmDatabase {
                                                            .findFirst();
 
             if (currentConfig != null) {
+                RealmList<Action> remoteActions = remoteConfiguration.getActions();
+                realm.copyToRealmOrUpdate(remoteActions);
+
                 currentConfig.setApplicationId(remoteConfiguration.getApplicationId());
                 currentConfig.setBannerId(remoteConfiguration.getBannerId());
                 currentConfig.setInterstitialId(remoteConfiguration.getInterstitialId());
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
                 currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
-                //currentConfig.setActions(remoteConfiguration.getActions()); // TODO error on this line
+                currentConfig.setActions(remoteActions);
                 realm.copyToRealmOrUpdate(currentConfig);
             } else {
                 realm.copyToRealmOrUpdate(remoteConfiguration);
