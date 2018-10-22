@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 import com.appyfurious.AFProductIdConfiguration;
 
+import java.util.List;
+
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
@@ -54,7 +56,7 @@ public class AFRealmDatabase {
 
             if (currentConfig != null) {
                 RealmList<Action> remoteActions = remoteConfiguration.getActions();
-                realm.copyToRealmOrUpdate(remoteActions);
+                RealmList<Action> managedRemoteActions = (RealmList<Action>) realm.copyToRealmOrUpdate(remoteActions);
 
                 currentConfig.setApplicationId(remoteConfiguration.getApplicationId());
                 currentConfig.setBannerId(remoteConfiguration.getBannerId());
@@ -62,7 +64,7 @@ public class AFRealmDatabase {
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
                 currentConfig.setInterstitialsCountPerSession(remoteConfiguration.getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
-                currentConfig.setActions(remoteActions);
+                currentConfig.setActions(managedRemoteActions);
                 realm.copyToRealmOrUpdate(currentConfig);
             } else {
                 realm.copyToRealmOrUpdate(remoteConfiguration);
