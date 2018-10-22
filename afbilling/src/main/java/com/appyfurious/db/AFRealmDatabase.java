@@ -53,6 +53,15 @@ public class AFRealmDatabase {
         realm.executeTransaction(realm -> {
             AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
                                                            .findFirst();
+            if (currentConfig != null) {
+                RealmList<Action> remoteActions = remoteConfiguration.getActions();
+                realm.copyToRealmOrUpdate(remoteActions);
+            }
+        });
+
+        realm.executeTransaction(realm -> {
+            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
+                                                           .findFirst();
 
             if (currentConfig != null) {
                 RealmList<Action> remoteActions = remoteConfiguration.getActions();
