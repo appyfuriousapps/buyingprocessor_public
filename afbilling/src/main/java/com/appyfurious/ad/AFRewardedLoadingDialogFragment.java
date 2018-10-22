@@ -8,11 +8,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.appyfurious.afbilling.R;
 
 /**
- * FullScreenDialog.java
+ * AFRewardedLoadingDialogFragment.java
  * buyingprocessor_public
  * <p>
  * Created by o.davidovich on 22.10.2018.
@@ -20,9 +23,12 @@ import com.appyfurious.afbilling.R;
  * Copyright © 2018 Appyfurious. All rights reserved.
  */
 
-public class FullScreenDialog extends DialogFragment {
+public class AFRewardedLoadingDialogFragment extends DialogFragment {
 
-    public static String TAG = "FullScreenDialog";
+    public static final String TAG = "AFRewardedLoadingDialogFragment";
+
+    private RelativeLayout.LayoutParams mLayoutParams;
+    private ProgressBar mProgressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,10 @@ public class FullScreenDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.layout_rewarded_loading, container, false);
+
+        mLayoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
+
+        mProgressBar = view.findViewById(R.id.af_rewarded_loading_pb);
         return view;
     }
 
@@ -46,7 +56,9 @@ public class FullScreenDialog extends DialogFragment {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
             dialog.getWindow().setLayout(width, height);
-            dialog.getWindow().setGravity(Gravity.CENTER);
+
+            mLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+            mProgressBar.setLayoutParams(mLayoutParams);
             dialog.getWindow().setBackgroundDrawableResource(R.drawable.rewarded_progress_bg);
         }
     }
