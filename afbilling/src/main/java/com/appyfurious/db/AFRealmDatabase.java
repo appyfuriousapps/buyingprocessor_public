@@ -59,20 +59,10 @@ public class AFRealmDatabase {
             } else {
                 realm.where(Action.class).findAll().deleteAllFromRealm();
             }
-
-            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
-                                                           .findFirst();
-
-            if (currentConfig != null) {
-                currentConfig.getActions().deleteAllFromRealm();
-            }
-
-
         });
 
         realm.executeTransaction(realm -> {
-            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class)
-                                                           .findFirst();
+            AFAdsManagerConfiguration currentConfig = realm.where(AFAdsManagerConfiguration.class).findFirst();
 
             if (currentConfig != null) {
                 RealmResults<Action> actions = realm.where(Action.class).findAll();
