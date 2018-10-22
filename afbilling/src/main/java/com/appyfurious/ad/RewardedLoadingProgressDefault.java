@@ -39,7 +39,7 @@ public class RewardedLoadingProgressDefault implements RewardedLoadingProgressLi
 
             ViewGroup.LayoutParams params = mRootView.getLayoutParams();
             params.width = FrameLayout.LayoutParams.MATCH_PARENT;
-            params.height = FrameLayout.LayoutParams.WRAP_CONTENT;
+            params.height = 5;
             mProgressBar.setLayoutParams(params);
 
             mRootView.addView(mProgressBar);
