@@ -58,6 +58,9 @@ object StoreManager {
 
     fun updateProducts(newInAppProductsId: List<String>) {
         Logger.notify("updateProducts")
+        if (!(inAppProductsId.any { old -> newInAppProductsId.any { new -> old == new } })) {
+            loadingProducts(newInAppProductsId, null)
+        }
         inAppProductsId = newInAppProductsId
     }
 
