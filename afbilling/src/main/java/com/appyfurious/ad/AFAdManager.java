@@ -333,7 +333,11 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mRewardedVideoContext = context;
         mRewardedVideoAd = MobileAds
                 .getRewardedVideoAdInstance(context); // Context must always be the cast of Activity
-        mRewardedObserver = new AFRewardedStateObserver(context, callback, errorMessage);
+
+        mRewardedObserver = new AFRewardedStateObserver(context, callback,
+                mAFAdsManagerConfiguration.getRewardedVideoWaitingTime(),
+                errorMessage);
+
         mRewardedVideoAd.setRewardedVideoAdListener(mRewardedObserver);
         mRewardedVideoAd.loadAd(mAFAdsManagerConfiguration.getRewardedVideoId(),
                 new AdRequest.Builder().build());

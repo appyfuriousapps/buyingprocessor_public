@@ -64,6 +64,7 @@ public class AFRewardedStateObserver implements RewardedVideoAdListener, AFRewar
 
         if (mRewardedWaitingTimer != null) {
             mRewardedWaitingTimer.cancel();
+            Logger.INSTANCE.logAd("AFRewardedTimer aborted.");
         }
 
         AFAdManager.getInstance().requestRewardedVideoAd();
@@ -75,6 +76,7 @@ public class AFRewardedStateObserver implements RewardedVideoAdListener, AFRewar
 
         if (mRewardedWaitingTimer != null) {
             mRewardedWaitingTimer.cancel();
+            Logger.INSTANCE.logAd("AFRewardedTimer aborted.");
         }
 
         Logger.INSTANCE.logAd("Rewarded loading failed. Error code: " + i);
@@ -113,6 +115,7 @@ public class AFRewardedStateObserver implements RewardedVideoAdListener, AFRewar
 
         if (mRewardedWaitingTimer != null) {
             mRewardedWaitingTimer.cancel();
+            Logger.INSTANCE.logAd("AFRewardedTimer aborted.");
         }
     }
 

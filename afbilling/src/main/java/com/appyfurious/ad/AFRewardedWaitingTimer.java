@@ -39,6 +39,7 @@ public class AFRewardedWaitingTimer extends CountDownTimer {
     }
 
 
+
     public interface AFRewardedTimerListener {
 
         void onFinish();
