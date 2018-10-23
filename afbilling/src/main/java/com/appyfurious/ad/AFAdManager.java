@@ -27,6 +27,7 @@ import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.Action;
 import com.appyfurious.log.Logger;
 import com.appyfurious.network.manager.AFNetworkManager;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -276,11 +277,14 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         mInterstitialAd = new InterstitialAd(applicationContext);
         mInterstitialAd.setAdUnitId(interstitialId);
         // AdRequest adRequest = new AdRequest.Builder().build();
-
         mInterstitialAd.loadAd(adRequest);
     }
 
     public void requestInterstitial(String action) {
+        requestInterstitial(action, null);
+    }
+
+    public void requestInterstitial(String action, InterstitialCallback callback) {
 
         mAFAdsManagerConfiguration = AFRealmDatabase.getInstance().getAdsConfiguration();
         long unixTime = (System.currentTimeMillis() - (long) mAFAdsManagerConfiguration
@@ -295,11 +299,24 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     if (isActionEnabled) {
                         if (mInterstitialAd != null) {
                             if (mInterstitialAd.isLoaded()) {
+                                if (callback != null) {
+                                    mInterstitialAd.setAdListener(new AdListener() {
+                                        @Override
+                                        public void onAdClosed() {
+                                            callback.onInterstitialClosed();
+                                        }
+
+                                        @Override
+                                        public void onAdOpened() {
+                                            callback.onInterstitialOpened();
+                                        }
+                                    });
+                                }
                                 mInterstitialAd.show();
                                 AFRealmDatabase.getInstance().setInterstitialsLastShowDate(System
                                         .currentTimeMillis());
                                 AFRealmDatabase.getInstance()
-                                               .incrementCurrentInterstitialCountPerSession();
+                                        .incrementCurrentInterstitialCountPerSession();
                             }
 
                             loadInterstitialAd(applicationContext, mAFAdsManagerConfiguration
