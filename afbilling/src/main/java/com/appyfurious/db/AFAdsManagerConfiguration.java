@@ -22,6 +22,7 @@ public class AFAdsManagerConfiguration extends RealmObject {
     private String bannerId;
     private String interstitialId;
     private String rewardedVideoId;
+    private int rewardedVideoWaitingTime;
     private int interstitialsCountPerSession;
     private int interstitialsDelay;
     private RealmList<Action> actions;
@@ -36,13 +37,15 @@ public class AFAdsManagerConfiguration extends RealmObject {
     }
 
     public AFAdsManagerConfiguration (String applicationId, String bannerId, String interstitialId,
-                                      String rewardedVideoId, int interstitialsCountPerSession,
+                                      String rewardedVideoId, int rewardedVideoWaitingTime,
+                                      int interstitialsCountPerSession,
                                       int interstitialsDelay, RealmList<Action> actions) {
         this.id = 0;
         this.applicationId = applicationId;
         this.bannerId = bannerId;
         this.interstitialId = interstitialId;
         this.rewardedVideoId = rewardedVideoId;
+        this.rewardedVideoWaitingTime = rewardedVideoWaitingTime;
         this.interstitialsCountPerSession = interstitialsCountPerSession;
         this.interstitialsDelay = interstitialsDelay;
         this.actions = actions;
@@ -129,6 +132,14 @@ public class AFAdsManagerConfiguration extends RealmObject {
 
     public void setInterstitialsLastShowDate(double interstitialsLastShowDate) {
         this.interstitialsLastShowDate = interstitialsLastShowDate;
+    }
+
+    public int getRewardedVideoWaitingTime() {
+        return rewardedVideoWaitingTime;
+    }
+
+    public void setRewardedVideoWaitingTime(int rewardedVideoWaitingTime) {
+        this.rewardedVideoWaitingTime = rewardedVideoWaitingTime;
     }
 
     public void setActions(RealmList<Action> actions) {

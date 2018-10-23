@@ -165,12 +165,10 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                     Boolean isPremium = AFStoreManager.INSTANCE.isSubsData().getValue();
                     if (isPremium != null && !isPremium) {
                         if (isAdSuccessfullyDownloaded) {
-                            //       mAdContainer.setVisibility(View.VISIBLE);
                             loadAd(mRootView, mAdContainer);
                             mAdView.setVisibility(View.VISIBLE);
                             isBannerAdVisible = true;
                         } else {
-                            //       mAdContainer.setVisibility(View.GONE);
                             mAdView.setVisibility(View.GONE);
                             isBannerAdVisible = false;
                             setRootViewMarginToNull(mAdContainer);
@@ -179,7 +177,6 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                             }
                         }
                     } else {
-                        //   mAdContainer.setVisibility(View.GONE);
                         mAdView.setVisibility(View.GONE);
                         isBannerAdVisible = false;
                         setRootViewMarginToNull(mAdContainer);

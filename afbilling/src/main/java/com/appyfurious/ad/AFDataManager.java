@@ -109,6 +109,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                      .getApplicationId(),
                                      parser.getBannerId(), parser.getInterstitialId(), parser
                                      .getRewardedVideoId(),
+                                     parser.getRewardedVideoWaitingTime(),
                                      parser.getInterstitialsCountPerSession(), parser
                                      .getInterstitialDelay(),
                                      parser.getActions());

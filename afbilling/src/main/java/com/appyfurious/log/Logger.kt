@@ -58,6 +58,12 @@ object Logger {
         }
     }
 
+    fun logDb(message: String) {
+        if (isDebug) {
+            Log.d(TAG_DB, message)
+        }
+    }
+
     fun logDbChange(message: String) {
         if (isDebug) {
             Log.d(TAG_DB, message)

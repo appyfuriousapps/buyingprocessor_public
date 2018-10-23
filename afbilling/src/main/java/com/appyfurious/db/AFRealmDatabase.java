@@ -3,8 +3,7 @@ package com.appyfurious.db;
 import android.support.annotation.NonNull;
 
 import com.appyfurious.AFProductIdConfiguration;
-
-import java.util.List;
+import com.appyfurious.db.migration.AFRealmMigrations;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -32,7 +31,8 @@ public class AFRealmDatabase {
         RealmConfiguration libraryConfig = new RealmConfiguration.Builder()
                 .name("AFManager.realm")
                 .modules(new LibraryModule())
-                .deleteRealmIfMigrationNeeded()
+                .schemaVersion(2)
+                .migration(new AFRealmMigrations())
                 .build();
 
         realm = Realm.getInstance(libraryConfig);

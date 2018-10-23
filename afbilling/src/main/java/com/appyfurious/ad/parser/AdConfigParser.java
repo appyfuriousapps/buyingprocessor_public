@@ -24,6 +24,7 @@ public class AdConfigParser {
     private static final String BANNER_ID = "banner_id";
     private static final String INTERSTITIAL_ID = "interstitial_id";
     private static final String REWARDED_VIDEO_ID = "rewarded_video_id";
+    private static final String REWARDED_VIDEO_WAITING_TIME = "rewarded_video_waiting_time";
     private static final String INTERSTITIALS_COUNT_PER_SESSION = "interstitials_count_per_session";
     private static final String INTERSTITIALS_DELAY = "interstitials_delay";
 
@@ -33,6 +34,7 @@ public class AdConfigParser {
     private String bannerId;
     private String interstitialId;
     private String rewardedVideoId;
+    private int rewardedVideoWaitingTime;
     private int interstitialsCountPerSession;
     private int interstitialDelay;
     private RealmList<Action> actions;
@@ -95,6 +97,12 @@ public class AdConfigParser {
             }
 
             try {
+                rewardedVideoWaitingTime = (int) source.get(REWARDED_VIDEO_WAITING_TIME);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
                 interstitialsCountPerSession = (int) source
                         .get(INTERSTITIALS_COUNT_PER_SESSION);
             } catch (JSONException e) {
@@ -137,6 +145,10 @@ public class AdConfigParser {
 
     public String getRewardedVideoId() {
         return rewardedVideoId;
+    }
+
+    public int getRewardedVideoWaitingTime() {
+        return rewardedVideoWaitingTime;
     }
 
     public int getInterstitialsCountPerSession() {
