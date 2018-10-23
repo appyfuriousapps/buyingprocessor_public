@@ -132,6 +132,7 @@ public class AFRewardedStateObserver implements RewardedVideoAdListener, AFRewar
 
     @Override
     public void onFinish() {
+        mRewardedLoadingListener.hideRewardedLoadingProgress();
         mRewardedCallback.onRewardUser();
         mRewardedCallback.onRewardedVideoAdClosed();
     }
