@@ -71,6 +71,7 @@ public class AFRealmDatabase {
                 currentConfig.setBannerId(remoteConfiguration.getBannerId());
                 currentConfig.setInterstitialId(remoteConfiguration.getInterstitialId());
                 currentConfig.setRewardedVideoId(remoteConfiguration.getRewardedVideoId());
+                currentConfig.setRewardedVideoWaitingTime(remoteConfiguration.getRewardedVideoWaitingTime());
                 currentConfig.setInterstitialsCountPerSession(remoteConfiguration
                         .getInterstitialsCountPerSession());
                 currentConfig.setInterstitialsDelay(remoteConfiguration.getInterstitialsDelay());
