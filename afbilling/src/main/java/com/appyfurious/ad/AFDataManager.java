@@ -12,7 +12,7 @@ import com.appsee.Appsee;
 import com.appyfurious.AFProductIdConfiguration;
 import com.appyfurious.ad.parser.AdConfigParser;
 import com.appyfurious.ad.parser.ProductIdsConfigParser;
-import com.appyfurious.afbilling.StoreManager;
+import com.appyfurious.afbilling.AFStoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.AFSharedPreferencesManager;
@@ -101,7 +101,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                                          }
                                      }
 
-                                     StoreManager.INSTANCE.updateProducts(productIds);
+                                     AFStoreManager.INSTANCE.updateProducts(productIds);
                                  });
                              }
 
@@ -158,7 +158,7 @@ public class AFDataManager implements RealmChangeListener<AFAdsManagerConfigurat
                 }
             }
 
-            StoreManager.INSTANCE.updateProducts(productIds);
+            AFStoreManager.INSTANCE.updateProducts(productIds);
         });
     }
 

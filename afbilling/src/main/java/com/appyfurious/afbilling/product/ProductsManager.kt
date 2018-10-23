@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.android.vending.billing.IInAppBillingService
 import com.appsflyer.AppsFlyerLib
-import com.appyfurious.afbilling.StoreManager
+import com.appyfurious.afbilling.AFStoreManager
 import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.log.Logger
@@ -105,7 +105,7 @@ class ProductsManager(context: Context) {
                 val buyIntentBundle = billingService.inAppBillingService?.getBuyIntent(3,
                         activity.packageName, product.getSku(), product.type, developerPayload)
                 val pendingIntent = buyIntentBundle?.getParcelable<PendingIntent>("BUY_INTENT")
-                activity.startIntentSenderForResult(pendingIntent?.intentSender, StoreManager.Keys.REQUEST_CODE_BUY,
+                activity.startIntentSenderForResult(pendingIntent?.intentSender, AFStoreManager.Keys.REQUEST_CODE_BUY,
                         Intent(), 0, 0, 0)
                 billingService.getStatus(body)
             } catch (ex: Exception) {

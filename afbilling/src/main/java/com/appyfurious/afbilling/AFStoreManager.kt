@@ -18,7 +18,7 @@ import com.appyfurious.validation.ValidationCallback
 import com.appyfurious.network.manager.NetworkChangeReceiver
 
 
-object StoreManager {
+object AFStoreManager {
 
     object Keys {
         const val REQUEST_CODE_BUY = 1234
@@ -52,7 +52,7 @@ object StoreManager {
             ProcessLifecycleOwner.get().lifecycle.addObserver(listener)
             ValidKeys.init(baseUrl, apiKey, secretKey)
             productManager = ProductsManager(application)
-            Logger.notify("success init StoreManager $baseUrl $apiKey $secretKey")
+            Logger.notify("success init AFStoreManager $baseUrl $apiKey $secretKey")
         }
     }
 

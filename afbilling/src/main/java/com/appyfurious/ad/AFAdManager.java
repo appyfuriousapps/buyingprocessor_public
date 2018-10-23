@@ -21,7 +21,7 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.appyfurious.afbilling.StoreManager;
+import com.appyfurious.afbilling.AFStoreManager;
 import com.appyfurious.db.AFAdsManagerConfiguration;
 import com.appyfurious.db.AFRealmDatabase;
 import com.appyfurious.db.Action;
@@ -108,7 +108,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
         initBanner(applicationContext, mAFAdsManagerConfiguration.getBannerId());
         initInterstitialId(applicationContext, mAFAdsManagerConfiguration.getInterstitialId());
 
-        StoreManager.INSTANCE.isSubsData().observeForever(isSubs -> {
+        AFStoreManager.INSTANCE.isSubsData().observeForever(isSubs -> {
             if (isPremium != isSubs) {
                 isPremium = isSubs;
                 if (bannerActivity != null && mAdView != null) {
@@ -161,7 +161,7 @@ public class AFAdManager implements AdDownloadingCallback, RealmChangeListener<A
                 }
 
                 if (mAdContainer != null) {
-                    Boolean isPremium = StoreManager.INSTANCE.isSubsData().getValue();
+                    Boolean isPremium = AFStoreManager.INSTANCE.isSubsData().getValue();
                     if (isPremium != null && !isPremium) {
                         if (isAdSuccessfullyDownloaded) {
                             //       mAdContainer.setVisibility(View.VISIBLE);
