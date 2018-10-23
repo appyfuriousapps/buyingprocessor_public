@@ -31,7 +31,7 @@ public class AFRealmDatabase {
         RealmConfiguration libraryConfig = new RealmConfiguration.Builder()
                 .name("AFManager.realm")
                 .modules(new LibraryModule())
-                .schemaVersion(2)
+                .schemaVersion(1)
                 .migration(new AFRealmMigrations())
                 .build();
 

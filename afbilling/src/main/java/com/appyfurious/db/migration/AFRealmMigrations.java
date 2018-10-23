@@ -28,7 +28,7 @@ public class AFRealmMigrations implements RealmMigration {
 
         final RealmSchema schema = realm.getSchema();
 
-        if (oldVersion == 1) {
+        if (oldVersion == 0) {
             final RealmObjectSchema afAdConfig = schema.get("AFAdsManagerConfiguration");
             if (afAdConfig != null) {
                 afAdConfig.addField("rewardedVideoWaitingTime", int.class);
