@@ -169,6 +169,7 @@ public class AFAdsManagerConfiguration extends RealmObject {
                 ", bannerId='" + bannerId + '\'' +
                 ", interstitialId='" + interstitialId + '\'' +
                 ", rewardedVideoId='" + rewardedVideoId + '\'' +
+                ", rewardedVideoWaitingTime=" + rewardedVideoWaitingTime +
                 ", interstitialsCountPerSession=" + interstitialsCountPerSession +
                 ", interstitialsDelay=" + interstitialsDelay +
                 ", actions=" + actions +
@@ -176,5 +177,4 @@ public class AFAdsManagerConfiguration extends RealmObject {
                 ", currentInterstitialCountPerSession=" + currentInterstitialCountPerSession +
                 '}';
     }
-
 }
