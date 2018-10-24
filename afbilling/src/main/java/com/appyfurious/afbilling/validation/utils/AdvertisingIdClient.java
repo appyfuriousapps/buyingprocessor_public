@@ -1,4 +1,4 @@
-package com.appyfurious.validation.utils;
+package com.appyfurious.afbilling.validation.utils;
 
 /**
  * AdvertisingIdClient.java

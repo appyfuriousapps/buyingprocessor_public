@@ -12,7 +12,7 @@ import com.appyfurious.afbilling.service.BillingService
 import com.appyfurious.afbilling.utils.Adverting
 import com.appyfurious.log.Logger
 import com.appyfurious.network.manager.AFNetworkManager
-import com.appyfurious.validation.body.DeviceData
+import com.appyfurious.afbilling.validation.body.DeviceData
 import com.google.gson.GsonBuilder
 import java.util.*
 

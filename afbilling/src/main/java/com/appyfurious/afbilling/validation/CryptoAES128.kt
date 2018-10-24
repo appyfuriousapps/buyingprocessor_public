@@ -1,4 +1,4 @@
-package com.appyfurious.validation
+package com.appyfurious.afbilling.validation
 
 import android.annotation.SuppressLint
 import android.util.Base64

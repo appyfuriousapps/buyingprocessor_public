@@ -1,6 +1,6 @@
-package com.appyfurious.validation;
+package com.appyfurious.afbilling.validation;
 
-import com.appyfurious.validation.interceptor.EncryptionInterceptor;
+import com.appyfurious.afbilling.validation.interceptor.EncryptionInterceptor;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

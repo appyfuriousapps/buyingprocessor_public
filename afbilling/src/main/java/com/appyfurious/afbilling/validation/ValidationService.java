@@ -1,6 +1,6 @@
-package com.appyfurious.validation;
+package com.appyfurious.afbilling.validation;
 
-import com.appyfurious.validation.body.ValidationBody;
+import com.appyfurious.afbilling.validation.body.ValidationBody;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

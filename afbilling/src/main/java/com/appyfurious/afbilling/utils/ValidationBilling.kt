@@ -2,11 +2,11 @@ package com.appyfurious.afbilling.utils
 
 import com.appyfurious.afbilling.product.MyProduct
 import com.appyfurious.log.Logger
-import com.appyfurious.validation.ValidKeys
-import com.appyfurious.validation.ValidationCallback
-import com.appyfurious.validation.ValidationClient
-import com.appyfurious.validation.body.DeviceData
-import com.appyfurious.validation.body.ValidationBody
+import com.appyfurious.afbilling.validation.ValidKeys
+import com.appyfurious.afbilling.validation.ValidationCallback
+import com.appyfurious.afbilling.validation.ValidationClient
+import com.appyfurious.afbilling.validation.body.DeviceData
+import com.appyfurious.afbilling.validation.body.ValidationBody
 import java.util.*
 
 class ValidationBilling(private val packageName: String, private val deviceData: DeviceData) {

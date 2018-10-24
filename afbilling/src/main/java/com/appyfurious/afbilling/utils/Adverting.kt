@@ -2,7 +2,7 @@ package com.appyfurious.afbilling.utils
 
 import android.content.Context
 import com.appyfurious.log.Logger
-import com.appyfurious.validation.utils.AdvertisingIdClient
+import com.appyfurious.afbilling.validation.utils.AdvertisingIdClient
 
 class Adverting(context: Context, private val success: (String, Boolean?) -> Unit) : AdvertisingIdClient.Listener {
 

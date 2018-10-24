@@ -1,8 +1,8 @@
-package com.appyfurious.validation.interceptor;
+package com.appyfurious.afbilling.validation.interceptor;
 
 import android.support.annotation.NonNull;
 
-import com.appyfurious.validation.CryptoAES128;
+import com.appyfurious.afbilling.validation.CryptoAES128;
 
 import java.io.IOException;
 

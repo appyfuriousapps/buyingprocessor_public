@@ -1,4 +1,4 @@
-package com.appyfurious.validation
+package com.appyfurious.afbilling.validation
 
 object ValidKeys {
 

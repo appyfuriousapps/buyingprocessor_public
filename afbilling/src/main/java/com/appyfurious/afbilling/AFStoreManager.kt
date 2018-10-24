@@ -13,9 +13,8 @@ import com.appyfurious.afbilling.utils.ValidationBilling
 import com.appyfurious.analytics.Events
 import com.appyfurious.log.Logger
 import com.appyfurious.network.manager.AFNetworkManager
-import com.appyfurious.validation.ValidKeys
-import com.appyfurious.validation.ValidationCallback
-import com.appyfurious.network.manager.NetworkChangeReceiver
+import com.appyfurious.afbilling.validation.ValidKeys
+import com.appyfurious.afbilling.validation.ValidationCallback
 
 
 object AFStoreManager {
@@ -58,10 +57,11 @@ object AFStoreManager {
 
     fun updateProducts(newInAppProductsId: List<String>) {
         Logger.notify("updateProducts")
-        if (!(inAppProductsId.any { old -> newInAppProductsId.any { new -> old == new } })) {
+        val isUpdate = !(inAppProductsId.toTypedArray() contentEquals newInAppProductsId.toTypedArray())
+        if (isUpdate) {
             loadingProducts(newInAppProductsId, null)
+            inAppProductsId = newInAppProductsId
         }
-        inAppProductsId = newInAppProductsId
     }
 
     private fun loadingProducts(newInAppProductsId: List<String>, completed: ((List<InAppProduct>) -> Unit)?) {
@@ -104,27 +104,17 @@ object AFStoreManager {
         isSubs(null) { _, isSubs -> body(isSubs) }
     }
 
-    private val networkListener = { context: Context, isOnline: Boolean ->
-        if (isOnline) {
-            loadingProducts(inAppProductsId, null)
-        }
-        Logger.notify("networkListener $isOnline")
-        Unit
-    }
-
     private val listener = object : LifecycleObserver {
         @OnLifecycleEvent(Lifecycle.Event.ON_START)
         fun onMoveToForeground() {
             Logger.notify("onMoveToForeground")
             billingService = BillingService(application)
-            AFNetworkManager.addListener(networkListener)
             isSubs(null, null)
         }
 
         @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
         fun onMoveToBackground() {
             Logger.notify("onMoveToBackground")
-            AFNetworkManager.removeListener(networkListener)
             billingService.unbind(application)
         }
     }

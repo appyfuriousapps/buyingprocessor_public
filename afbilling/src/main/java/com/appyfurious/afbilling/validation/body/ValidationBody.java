@@ -1,4 +1,4 @@
-package com.appyfurious.validation.body;
+package com.appyfurious.afbilling.validation.body;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,4 +1,4 @@
-package com.appyfurious.validation
+package com.appyfurious.afbilling.validation
 
 import com.appyfurious.log.Logger
 import okhttp3.ResponseBody
